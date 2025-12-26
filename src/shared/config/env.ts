@@ -13,4 +13,5 @@ function requireEnv(key: string): string {
 export const env = {
   port: Number(requireEnv('PORT')),
   nodeEnv: requireEnv('NODE_ENV'),
+  mongoUri: requireEnv('MONGO_URI'),
 };
