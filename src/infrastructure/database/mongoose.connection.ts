@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { env } from '../../shared/config/env';
 import { logger } from '../../shared/utils/logger';
+import './models/user.model';
+
 
 /**
  * Register MongoDB lifecycle events (call once)
