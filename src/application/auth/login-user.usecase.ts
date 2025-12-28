@@ -1,6 +1,7 @@
 import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
 import { JwtService } from "../../infrastructure/security/jwt.services";
 import { PasswordHasher } from "../../infrastructure/security/password-hasher";
+import { AppError } from "../../shared/errors/AppError";
 
 interface LoginUserInput {
     email: string;
@@ -14,7 +15,7 @@ export class LoginUserUseCase {
         const user= await this.userRepo.findByEmail(input.email);
 
         if(!user) {
-            throw new Error ('User account is inactive');
+            throw new AppError ('Invalid email or Password', 401);
         }
 
         const passwordMatch = await PasswordHasher.compare(
@@ -23,7 +24,7 @@ export class LoginUserUseCase {
         );
 
         if(!passwordMatch) {
-            throw new Error ('invalid email or password');
+            throw new AppError ('invalid email or password', 401);
         }
 
         const accessToken = JwtService.sign({
