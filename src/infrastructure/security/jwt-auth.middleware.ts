@@ -17,7 +17,7 @@ export function jwtAuthMiddleware (
 
     if(!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({
-            message: 'Authorization toke missing or invalid',
+            message: 'Authorization token missing or invalid',
         });
     }
 
