@@ -1,4 +1,5 @@
 import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
+import { JwtService } from "../../infrastructure/security/jwt.services";
 import { PasswordHasher } from "../../infrastructure/security/password-hasher";
 
 interface LoginUserInput {
@@ -25,10 +26,18 @@ export class LoginUserUseCase {
             throw new Error ('invalid email or password');
         }
 
-        return {
-            userId: user._id,
-            email:user.email,
+        const accessToken = JwtService.sign({
+            userId:user._id.toString(),
             role: user.role,
+        })
+
+        return {
+            user: {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+            },
+            accessToken,
         };
     }
 }

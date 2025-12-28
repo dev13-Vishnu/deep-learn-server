@@ -31,8 +31,9 @@ export class AuthController{
         const result = await loginUser. execute({email, password});
 
         return res.status(200).json({
-            message:'login successful',
-            user: result,
+            message:'Login successful',
+            user: result.user,
+            accessToken: result.accessToken,
         })
 
     }
