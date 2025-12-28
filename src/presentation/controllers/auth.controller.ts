@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { RegisterUserUseCase } from "../../application/auth/register-user.usecase";
 import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
-import { LoginUserUseCase } from "../../application/auth/login-use.usecase";
+import { LoginUserUseCase } from "../../application/auth/login-user.usecase";
 
 export class AuthController{
     static async register (req: Request, res: Response) {
