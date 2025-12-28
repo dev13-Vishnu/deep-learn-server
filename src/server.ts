@@ -6,6 +6,7 @@ import {
   disconnectDatabase,
 } from './infrastructure/database/mongoose.connection';
 
+
 async function startServer() {
   await connectDatabase();
 
