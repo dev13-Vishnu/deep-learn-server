@@ -2,9 +2,16 @@ import express from 'express';
 import apiRoutes from '../../presentation/routes';
 import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
 import authRoutes from '../../presentation/routes/auth.routes'
+import cors from 'cors';
 
 export function createExpressApp() {
   const app = express();
+
+  app.use(cors({
+    origin: 'http://localhost:5173',
+    Credential:true,
+  }));
+  
 
   app.use(express.json());
 
