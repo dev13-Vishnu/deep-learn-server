@@ -5,11 +5,13 @@ import {
   connectDatabase,
   disconnectDatabase,
 } from './infrastructure/database/mongoose.connection';
+import { initRedis } from './infrastructure/redis/redis.client';
+
 
 
 async function startServer() {
   await connectDatabase();
-
+  await initRedis();
   const app = createExpressApp();
 
   const server = app.listen(env.port, () => {

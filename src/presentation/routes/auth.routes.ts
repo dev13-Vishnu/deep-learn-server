@@ -14,5 +14,7 @@ router.get('/me', jwtAuthMiddleware,(req,res) => {
         user,
     });
 })
+router.post("/request-otp", AuthController.requestOtp)
+router.post("/verify-otp-signup", AuthController.verifyOtpAndRegister);
 
 export default router;
