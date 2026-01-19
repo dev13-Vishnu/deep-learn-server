@@ -1,9 +1,10 @@
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import { env } from '../../shared/config/env';
+import { UserRole } from '../../domain/entities/UserRole';
 
 export interface AuthTokenPayload {
   userId: string;
-  role: 'student' | 'tutor' | 'admin';
+  role:UserRole;
 }
 
 export class JwtService {
@@ -27,7 +28,7 @@ export class JwtService {
 
     return {
       userId: decoded.userId as string,
-      role: decoded.role as 'student' | 'tutor' | 'admin',
+      role: decoded.role as UserRole
     };
   }
 }
