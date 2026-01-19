@@ -1,31 +1,38 @@
+import { User } from "../../domain/entities/User";
+import { UserRole } from "../../domain/entities/UserRole";
+import { Email } from "../../domain/value-objects/Email";
+import { Password } from "../../domain/value-objects/Password";
 import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
 import { PasswordHasher } from "../../infrastructure/security/password-hasher";
+import { AppError } from "../../shared/errors/AppError";
+import { UserRepositoryPort } from "../ports/UserRepositoryPort";
 
 interface RegisterUserInput{
     email: string;
     password: string;
-    role: 'student'|'tutor'|'admin';
 }
 
 export class RegisterUserUseCase{
-    constructor(private readonly userRepo: UserRepository) {}
-    async execute(input: RegisterUserInput) {
-        const existingUser = await this.userRepo.findByEmail(input.email);
+    constructor(private readonly userRepo: UserRepositoryPort) {}
+    async execute(input: RegisterUserInput): Promise<void> {
+        const email = new Email(input.email);
+        const password = new Password(input.password);
+
+        const existingUser = await this.userRepo.findByEmail(email);
         if(existingUser) {
-            throw new Error ('Email already registered');
+            throw new AppError ('User already exists', 409);
         }
 
-        const passwordHash = await PasswordHasher.hash(input.password)
+        const passwordHash = await PasswordHasher.hash(password.getValue());
 
-        await this.userRepo.create({
-            email: input.email,
+        const user = new User(
+            crypto.randomUUID(),
+            email,
+            UserRole.STUDENT,
             passwordHash,
-            role:input.role
-        })
-
-        return {
-            email: input.email,
-            role: input.role,
-        }
+            true,
+            false,
+        );
+        await this.userRepo.create(user);
     }
 }
