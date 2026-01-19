@@ -25,7 +25,6 @@ export class RegisterUserUseCase{
         const passwordHash = await PasswordHasher.hash(password.getValue());
 
         const user = new User(
-            crypto.randomUUID(),
             email,
             UserRole.STUDENT,
             passwordHash,

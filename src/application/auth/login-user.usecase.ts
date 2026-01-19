@@ -32,10 +32,15 @@ export class LoginUserUseCase {
       throw new AppError('Invalid email or password', 401);
     }
 
-    const accessToken = JwtService.sign({
-      userId: user.id,
-      role: user.role,
-    });
+    if (!user.id) {
+  throw new AppError('User identity not initialized', 500);
+}
+
+const accessToken = JwtService.sign({
+  userId: user.id,
+  role: user.role,
+});
+
 
     return {
       user: {

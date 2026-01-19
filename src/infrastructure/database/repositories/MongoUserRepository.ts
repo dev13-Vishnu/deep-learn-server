@@ -4,33 +4,38 @@ import { UserRole } from "../../../domain/entities/UserRole";
 import { Email } from "../../../domain/value-objects/Email";
 import { UserModel } from "../models/user.model";
 
-export class MongoUserRepository implements UserRepositoryPort{
-    async findByEmail(email: Email): Promise<User | null> {
-        const doc = await UserModel.findOne({
-            email: email.getValue(),
-        });
+export class MongoUserRepository implements UserRepositoryPort {
 
-        if(!doc) {
-            return null;
-        }
-        return new User(
-            doc._id.toString(),
-            new Email(doc.email),
-            doc.role as UserRole,
-            doc.passwordHash,
-            doc.isActive,
-            doc.emailVerified,
-        );
-    }
+  async findByEmail(email: Email): Promise<User | null> {
+    const doc = await UserModel.findOne({ email: email.getValue() });
+    if (!doc) return null;
 
-    async create(user: User) : Promise<void> {
-        await UserModel.create({
-            _id: user.id,
-            email: user.email.getValue(),
-            role: user.role,
-            passwordHash: user.passwordHash,
-            isActive: user.isActive,
-            emailVerified: user.emailVerified,
-        });
-    }
+    return new User(
+      new Email(doc.email),
+      doc.role as UserRole,
+      doc.passwordHash,
+      doc.isActive,
+      doc.emailVerified,
+      doc._id.toString(),
+    );
+  }
+
+  async create(user: User): Promise<User> {
+    const doc = await UserModel.create({
+      email: user.email.getValue(),
+      passwordHash: user.passwordHash,
+      role: user.role,
+      isActive: user.isActive,
+      emailVerified: user.emailVerified,
+    });
+
+    return new User(
+      new Email(doc.email),
+      doc.role as UserRole,
+      doc.passwordHash,
+      doc.isActive,
+      doc.emailVerified,
+      doc._id.toString(), // ID assigned here
+    );
+  }
 }
