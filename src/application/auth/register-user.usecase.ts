@@ -2,7 +2,6 @@ import { User } from "../../domain/entities/User";
 import { UserRole } from "../../domain/entities/UserRole";
 import { Email } from "../../domain/value-objects/Email";
 import { Password } from "../../domain/value-objects/Password";
-import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
 import { PasswordHasher } from "../../infrastructure/security/password-hasher";
 import { AppError } from "../../shared/errors/AppError";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
