@@ -1,44 +1,49 @@
-import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
-import { JwtService } from "../../infrastructure/security/jwt.services";
-import { PasswordHasher } from "../../infrastructure/security/password-hasher";
-import { AppError } from "../../shared/errors/AppError";
+import { UserRepositoryPort } from '../ports/UserRepositoryPort';
+import { Email } from '../../domain/value-objects/Email';
+import { Password } from '../../domain/value-objects/Password';
+import { AppError } from '../../shared/errors/AppError';
+import { PasswordHasher } from '../../infrastructure/security/password-hasher';
+import { JwtService } from '../../infrastructure/security/jwt.services';
 
 interface LoginUserInput {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export class LoginUserUseCase {
-    constructor(private readonly userRepo: UserRepository) {}
-    
-    async execute ( input:  LoginUserInput) {
-        const user= await this.userRepo.findByEmail(input.email);
+  constructor(private readonly userRepo: UserRepositoryPort) {}
 
-        if(!user) {
-            throw new AppError ('Invalid email or Password', 401);
-        }
+  async execute(input: LoginUserInput) {
+    const email = new Email(input.email);
+    const password = new Password(input.password);
 
-        const passwordMatch = await PasswordHasher.compare(
-            input.password,
-            user.passwordHash,
-        );
+    const user = await this.userRepo.findByEmail(email);
 
-        if(!passwordMatch) {
-            throw new AppError ('invalid email or password', 401);
-        }
-
-        const accessToken = JwtService.sign({
-            userId:user._id.toString(),
-            role: user.role,
-        })
-
-        return {
-            user: {
-                id: user._id,
-                email: user.email,
-                role: user.role,
-            },
-            accessToken,
-        };
+    if (!user) {
+      throw new AppError('Invalid email or password', 401);
     }
+
+    const passwordMatch = await PasswordHasher.compare(
+      password.getValue(),
+      user.passwordHash,
+    );
+
+    if (!passwordMatch) {
+      throw new AppError('Invalid email or password', 401);
+    }
+
+    const accessToken = JwtService.sign({
+      userId: user.id,
+      role: user.role,
+    });
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email.getValue(),
+        role: user.role,
+      },
+      accessToken,
+    };
+  }
 }
