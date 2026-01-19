@@ -1,6 +1,6 @@
-export type OtpPurpose = 'signup' | 'forgot-password'
+export type OtpPurpose = 'signup' | 'forgot-password';
 
 export interface OtpServicePort {
-    send(email: string, purpose: OtpPurpose): Promise <Date>;
-    verify(email: string, purpose: OtpPurpose, otp: string): Promise<void>;
+  requestOtp(email: string, purpose: OtpPurpose): Promise<void>;
+  verifyOtp(email: string, otp: string, purpose: OtpPurpose): Promise<void>;
 }
