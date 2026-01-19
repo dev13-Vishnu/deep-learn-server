@@ -1,12 +1,13 @@
 import { createClient } from "redis";
 import { logger } from "../../shared/utils/logger";
+import { env } from "../../shared/config/env";
 
 export const redisClient = createClient({
-  username: "default",
-  password: process.env.REDIS_PASSWORD,
+  username: 'default',
+  password: env.redisPassword,
   socket: {
-    host: process.env.REDIS_HOST,
-    port: Number(process.env.REDIS_PORT),
+    host: env.redisHost,
+    port: env.redisPort,
   },
 });
 
@@ -15,7 +16,7 @@ redisClient.on("connect", () => {
 });
 
 redisClient.on("error", (err) => {
-  logger.error("Redis error", err);
+  logger.error("[ERROR]Redis error", err);
 });
 
 export async function initRedis(): Promise<void> {

@@ -11,6 +11,14 @@ function requireEnv(key: string): string {
   return value;
 }
 
+function requireNumberEnv(key: string): number{
+  const value = Number(requireEnv(key));
+  if(Number.isNaN(value)){
+    throw new Error(`Environment variable ${key} must be a number`)
+  }
+  return value;
+}
+
 export const env = {
   // Server
   port: Number(requireEnv('PORT')),
@@ -18,6 +26,11 @@ export const env = {
 
   // Database
   mongoUri: requireEnv('MONGO_URI'),
+
+  // Redis (RESTORED)
+  redisHost: requireEnv('REDIS_HOST'),
+  redisPort: requireNumberEnv('REDIS_PORT'),
+  redisPassword: process.env.REDIS_PASSWORD, // optional
 
   // Auth / Security
   jwtSecret: requireEnv('JWT_SECRET'),
