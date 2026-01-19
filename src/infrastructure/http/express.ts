@@ -9,7 +9,8 @@ export function createExpressApp() {
 
   app.use(cors({
     origin: 'http://localhost:5173',
-    Credential:true,
+    credentials
+    :true,
   }));
   
 

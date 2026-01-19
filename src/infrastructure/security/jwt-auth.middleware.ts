@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtService } from "./jwt.services";
+import { UserRole } from "../../domain/entities/UserRole";
 
 export interface AuthenticatedRequest extends Request {
     user?: {
         userId: string;
-        role: 'student' | 'tutor' | 'admin';
+        role:UserRole;
     };
 }
 

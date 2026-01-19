@@ -14,10 +14,10 @@ const UserSchema = new Schema(
       required: true,
     },
     role: {
-      type: String,
-      enum: ['student', 'tutor', 'admin'],
-      required: true,
-    },
+    type: Number,
+    enum: [0, 1, 2],
+    required: true,
+  },
     isActive: {
       type: Boolean,
       default: true,
