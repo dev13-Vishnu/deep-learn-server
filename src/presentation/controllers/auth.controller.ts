@@ -1,20 +1,14 @@
 import { Request, Response } from "express";
-import { RegisterUserUseCase } from "../../application/auth/register-user.usecase";
-import { UserRepository } from "../../infrastructure/database/repositories/user.repository";
-import { LoginUserUseCase } from "../../application/auth/login-user.usecase";
 import { OTPService } from "../../services/otp.service";
+import { loginUserUseCase, registerUserUseCase } from "../../infrastructure/di/auth.di";
 
 export class AuthController{
     static async register (req: Request, res: Response) {
-        const {email, password, role} = req.body;
+        const {email, password } = req.body;
 
-        const userRepo = new UserRepository();
-        const registerUser = new RegisterUserUseCase(userRepo);
-
-        const result = await registerUser. execute({
+        const result = await registerUserUseCase. execute({
             email,
-            password,
-            role
+            password
         });
 
         return res.status(201).json({
@@ -26,10 +20,7 @@ export class AuthController{
     static async login (req:Request, res: Response) {
         const {email, password} = req.body;
 
-        const userRepo = new UserRepository();
-        const loginUser  = new LoginUserUseCase(userRepo);
-
-        const result = await loginUser. execute({email, password});
+        const result = await loginUserUseCase. execute({email, password});
 
         return res.status(200).json({
             message:'Login successful',
@@ -65,9 +56,9 @@ export class AuthController{
   }
 
   static async verifyOtpAndRegister(req: Request, res: Response) {
-  const { email, otp, password, role } = req.body;
+  const { email, otp, password  } = req.body;
 
-  if (!email || !otp || !password || !role) {
+  if (!email || !otp || !password ) {
     return res.status(400).json({
       message: "Missing required fields",
     });
@@ -79,13 +70,9 @@ export class AuthController{
   await otpService.verifyOtp(email, "signup", otp);
 
   // 2️⃣ Create user
-  const userRepo = new UserRepository();
-  const registerUser = new RegisterUserUseCase(userRepo);
-
-  const user = await registerUser.execute({
+  const user = await registerUserUseCase.execute({
     email,
-    password,
-    role,
+    password
   });
 
   return res.status(201).json({
