@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { OTPService } from "../../services/otp.service";
-import { loginUserUseCase, registerUserUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
-import { Password } from "../../domain/value-objects/Password";
+import { loginUserUseCase, registerUserUseCase, requestSignupOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
 import { JwtService } from "../../infrastructure/security/jwt.services";
 
 export class AuthController{
@@ -22,7 +20,7 @@ export class AuthController{
     static async signup(req:Request, res:Response) {
       const {email, otp, password} = req.body;
 
-      if(!email || !otp || !Password) {
+      if(!email || !otp || !password) {
         return res.status(400).json({
           message: 'Missing required fields',
         });
@@ -72,28 +70,28 @@ export class AuthController{
     }
     
   static async requestOtp(req: Request, res: Response) {
-    const { email, purpose } = req.body;
+  const { email, purpose } = req.body;
 
-    if (!email || !purpose) {
-      return res.status(400).json({
-        message: "Email and purpose are required",
-      });
-    }
-
-    if (!["signup", "forgot-password"].includes(purpose)) {
-      return res.status(400).json({
-        message: "Invalid OTP purpose",
-      });
-    }
-
-    const otpService = new OTPService();
-    const expiresAt = await otpService.sendOtp(email, purpose);
-
-    return res.status(200).json({
-      message: "OTP sent successfully",
-      expiresAt,
+  if (!email || !purpose) {
+    return res.status(400).json({
+      message: "Email and purpose are required",
     });
   }
+
+  if (!["signup", "forgot-password"].includes(purpose)) {
+    return res.status(400).json({
+      message: "Invalid OTP purpose",
+    });
+  }
+
+  const expiresAt = await requestSignupOtpUseCase.execute(email);
+
+  return res.status(200).json({
+    message: "OTP sent successfully",
+    expiresAt,
+  });
+}
+
 
 //   static async verifyOtpAndRegister(req: Request, res: Response) {
 //   const { email, otp, password  } = req.body;
