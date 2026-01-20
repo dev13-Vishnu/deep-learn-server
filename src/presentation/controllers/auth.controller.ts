@@ -1,20 +1,60 @@
 import { Request, Response } from "express";
 import { OTPService } from "../../services/otp.service";
-import { loginUserUseCase, registerUserUseCase } from "../../infrastructure/di/auth.di";
+import { loginUserUseCase, registerUserUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
+import { Password } from "../../domain/value-objects/Password";
+import { JwtService } from "../../infrastructure/security/jwt.services";
 
 export class AuthController{
-    static async register (req: Request, res: Response) {
-        const {email, password } = req.body;
+    // static async register (req: Request, res: Response) {
+    //     const {email, password } = req.body;
 
-        const result = await registerUserUseCase. execute({
-            email,
-            password
+    //     const result = await registerUserUseCase. execute({
+    //         email,
+    //         password
+    //     });
+
+    //     return res.status(201).json({
+    //         message: 'User registered succesfully',
+    //         user: result,
+    //     })
+    // }
+
+    static async signup(req:Request, res:Response) {
+      const {email, otp, password} = req.body;
+
+      if(!email || !otp || !Password) {
+        return res.status(400).json({
+          message: 'Missing required fields',
         });
+      }
+      
+      //1. verify OTP
+      await verifySignupOtpUseCase.execute(email, otp);
 
-        return res.status(201).json({
-            message: 'User registered succesfully',
-            user: result,
-        })
+      //2. Register user
+      const user = await registerUserUseCase.execute({
+        email, 
+        password
+      });
+      if(!user.id) {
+        throw new Error('User identity not initialized');
+      }
+
+      const accessToken = JwtService.sign({
+        userId:user.id,
+        role: user.role,
+      });
+
+      return res.status (201).json({
+        message: 'Signup successful',
+        user:{
+          id: user.id,
+          email: user.email.getValue(),
+          role: user.role,
+        },
+        accessToken,
+      });
+      
     }
     
     static async login (req:Request, res: Response) {
@@ -55,30 +95,30 @@ export class AuthController{
     });
   }
 
-  static async verifyOtpAndRegister(req: Request, res: Response) {
-  const { email, otp, password  } = req.body;
+//   static async verifyOtpAndRegister(req: Request, res: Response) {
+//   const { email, otp, password  } = req.body;
 
-  if (!email || !otp || !password ) {
-    return res.status(400).json({
-      message: "Missing required fields",
-    });
-  }
+//   if (!email || !otp || !password ) {
+//     return res.status(400).json({
+//       message: "Missing required fields",
+//     });
+//   }
 
-  const otpService = new OTPService();
+//   const otpService = new OTPService();
 
-  // 1️⃣ Verify OTP first
-  await otpService.verifyOtp(email, "signup", otp);
+//   // 1️⃣ Verify OTP first
+//   await otpService.verifyOtp(email, "signup", otp);
 
-  // 2️⃣ Create user
-  const user = await registerUserUseCase.execute({
-    email,
-    password
-  });
+//   // 2️⃣ Create user
+//   const user = await registerUserUseCase.execute({
+//     email,
+//     password
+//   });
 
-  return res.status(201).json({
-    message: "Signup successful",
-    user,
-  });
-}
+//   return res.status(201).json({
+//     message: "Signup successful",
+//     user,
+//   });
+// }
 
 }
