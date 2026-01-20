@@ -3,7 +3,7 @@ import { AuthController } from "../controllers/auth.controller";
 import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
 
 const router = Router();
-router.post ('/register', AuthController.register);
+// router.post ('/register', AuthController.register);
 router.post('/login', AuthController.login);
 
 router.get('/me', jwtAuthMiddleware,(req,res) => {
@@ -15,6 +15,6 @@ router.get('/me', jwtAuthMiddleware,(req,res) => {
     });
 })
 router.post("/request-otp", AuthController.requestOtp)
-router.post("/verify-otp-signup", AuthController.verifyOtpAndRegister);
+router.post("/signup", AuthController.signup);
 
 export default router;
