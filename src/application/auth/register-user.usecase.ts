@@ -13,7 +13,7 @@ interface RegisterUserInput{
 
 export class RegisterUserUseCase{
     constructor(private readonly userRepo: UserRepositoryPort) {}
-    async execute(input: RegisterUserInput): Promise<void> {
+    async execute(input: RegisterUserInput): Promise<User> {
         const email = new Email(input.email);
         const password = new Password(input.password);
 
@@ -29,8 +29,8 @@ export class RegisterUserUseCase{
             UserRole.STUDENT,
             passwordHash,
             true,
-            false,
+            true,
         );
-        await this.userRepo.create(user);
+        return this.userRepo.create(user);
     }
 }
