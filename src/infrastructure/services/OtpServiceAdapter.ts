@@ -2,13 +2,13 @@ import { OtpServicePort, OtpPurpose } from '../../application/ports/OtpServicePo
 import { OTPService } from '../../services/otp.service';
 
 export class OtpServiceAdapter implements OtpServicePort {
-  private readonly otpService = new OTPService();
 
-  async requestOtp(email: string, purpose: OtpPurpose): Promise<void> {
-    await this.otpService.sendOtp(email, purpose);
+    constructor(  private readonly otpService :  OTPService) {}
+   requestOtp(email: string, purpose: OtpPurpose): Promise<Date> {
+    return this.otpService.sendOtp(email, purpose);
   }
 
-  async verifyOtp(email: string, otp: string, purpose: OtpPurpose): Promise<void> {
-    await this.otpService.verifyOtp(email, purpose, otp);
+   verifyOtp(email: string, otp: string, purpose: OtpPurpose): Promise<void> {
+    return this.otpService.verifyOtp(email, purpose, otp);
   }
 }
