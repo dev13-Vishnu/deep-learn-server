@@ -16,5 +16,10 @@ router.get('/me', jwtAuthMiddleware,(req,res) => {
 })
 router.post("/request-otp", AuthController.requestOtp)
 router.post("/signup", AuthController.signup);
+router.post(
+  "/forgot-password/request-otp",
+  AuthController.requestPasswordResetOtp
+);
+
 
 export default router;

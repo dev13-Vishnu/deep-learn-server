@@ -5,15 +5,21 @@ import { OTPService } from "../../services/otp.service";
 import { VerifySignupOtpUseCase } from "../../application/auth/verify-signup-otp.usecase";
 import { RequestSignupOtpUseCase } from "../../application/auth/request-signup-otp.usecase";
 import { OtpServiceAdapter } from "../services/OtpServiceAdapter";
+import { RequestPasswordResetOtpUseCase } from "../../application/auth/request-password-reset-otp.usecase";
 
 
-const UserRepository = new MongoUserRepository();
+const userRepository = new MongoUserRepository();
 const rawOtpService = new OTPService();
-const otpService= new OtpServiceAdapter(rawOtpService);
+const otpServiceAdapter= new OtpServiceAdapter(rawOtpService);
 
-export const loginUserUseCase = new LoginUserUseCase(UserRepository);
-export const registerUserUseCase  = new RegisterUserUseCase(UserRepository);
+export const loginUserUseCase = new LoginUserUseCase(userRepository);
+export const registerUserUseCase  = new RegisterUserUseCase(userRepository);
 
-export const verifySignupOtpUseCase = new VerifySignupOtpUseCase(otpService);
+export const verifySignupOtpUseCase = new VerifySignupOtpUseCase(otpServiceAdapter);
 
-export const requestSignupOtpUseCase = new RequestSignupOtpUseCase(otpService);
+export const requestSignupOtpUseCase = new RequestSignupOtpUseCase(otpServiceAdapter);
+
+export const requestPasswordResetOtpUseCase = new RequestPasswordResetOtpUseCase(
+    userRepository,
+    otpServiceAdapter
+)
