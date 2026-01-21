@@ -38,4 +38,17 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc._id.toString(), // ID assigned here
     );
   }
+
+  async update(user: User): Promise<void> {
+  await UserModel.updateOne(
+    { _id: user.id },
+    {
+      $set: {
+        password: user.passwordHash,
+        updatedAt: new Date(),
+      },
+    }
+  );
+}
+
 }

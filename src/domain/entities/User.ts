@@ -5,9 +5,18 @@ export class User {
   constructor(
     public readonly email: Email,
     public readonly role: UserRole,
-    public readonly passwordHash: string,
+    public  passwordHash: string,
     public readonly isActive: boolean = true,
     public readonly emailVerified: boolean = false,
     public readonly id?: string, // assigned by repository
+    
   ) {}
+
+  public changePassword(hashedPassword: string): void {
+    this.passwordHash = hashedPassword;
+  }
+
+  public getPassword(): string {
+    return this.passwordHash;
+  }
 }
