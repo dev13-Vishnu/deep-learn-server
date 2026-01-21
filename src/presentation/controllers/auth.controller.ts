@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
+import { loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, verifyPasswordResetOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
 import { JwtService } from "../../infrastructure/security/jwt.services";
 
 export class AuthController{
@@ -103,6 +103,22 @@ export class AuthController{
     return res.status(200).json({
       message: "If the email exists, an OTP has been sent",
     });
+  }
+
+  static async verifyPasswordResetOtp(req: Request, res: Response) {
+    const  {email, otp} = req.body;
+
+    if(!email || !otp) {
+      return res.status(400).json({
+        message: "Email and OTP are required",
+      });
+    }
+    await verifyPasswordResetOtpUseCase.execute(email, otp);
+
+    return res.status(200).json( {
+      message:"OTP verified succesfully",
+    })
+    
   }
 
 

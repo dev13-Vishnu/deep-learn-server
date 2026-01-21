@@ -6,6 +6,7 @@ import { VerifySignupOtpUseCase } from "../../application/auth/verify-signup-otp
 import { RequestSignupOtpUseCase } from "../../application/auth/request-signup-otp.usecase";
 import { OtpServiceAdapter } from "../services/OtpServiceAdapter";
 import { RequestPasswordResetOtpUseCase } from "../../application/auth/request-password-reset-otp.usecase";
+import { VerifyPasswordResetOtpUseCase } from "../../application/auth/verify-password-reset-otp.usecase";
 
 
 const userRepository = new MongoUserRepository();
@@ -23,3 +24,5 @@ export const requestPasswordResetOtpUseCase = new RequestPasswordResetOtpUseCase
     userRepository,
     otpServiceAdapter
 )
+
+export const verifyPasswordResetOtpUseCase = new VerifyPasswordResetOtpUseCase (otpServiceAdapter);
