@@ -40,15 +40,20 @@ export class MongoUserRepository implements UserRepositoryPort {
   }
 
   async update(user: User): Promise<void> {
-  await UserModel.updateOne(
-    { _id: user.id },
-    {
-      $set: {
-        password: user.passwordHash,
-        updatedAt: new Date(),
-      },
-    }
-  );
+  const result = await UserModel.updateOne(
+  { _id: user.id },
+  {
+    $set: {
+      passwordHash: user.passwordHash,
+      updatedAt: new Date(),
+    },
+  }
+);
+
+if (result.matchedCount === 0) {
+  throw new Error('User not found during password reset');
+}
+
 }
 
 }
