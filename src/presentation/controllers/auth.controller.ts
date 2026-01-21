@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, verifyPasswordResetOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
+import { loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, resetPasswordUseCase, verifyPasswordResetOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
 import { JwtService } from "../../infrastructure/security/jwt.services";
 
 export class AuthController{
@@ -119,6 +119,22 @@ export class AuthController{
       message:"OTP verified succesfully",
     })
     
+  }
+
+  static async resetPassword(req: Request, res: Response) {
+    const {email, password}= req.body;
+
+    if(!email || !password) {
+      return res.status(400).json({
+        message: "Email and new password are required",
+      });
+    }
+
+    await resetPasswordUseCase.execute(email, password);
+
+    return res.status(200).json({
+      message: "Password reset successful",
+    })
   }
 
 

@@ -27,5 +27,10 @@ router.post(
   AuthController.verifyPasswordResetOtp
 );
 
+router.post(
+  "/forgot-password/reset",
+  AuthController.resetPassword
+);
+
 
 export default router;
