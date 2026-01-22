@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getCurrentUserUseCase, loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, resetPasswordUseCase, verifyPasswordResetOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
 import { JwtService } from "../../infrastructure/security/jwt.services";
 import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
+import { RefreshTokenModel } from "../../infrastructure/database/models/RefreshTokenModel";
 
 export class AuthController{
   // static async register (req: Request, res: Response) {
@@ -44,6 +45,25 @@ export class AuthController{
       role: user.role,
     });
 
+      const result = await loginUserUseCase. execute({email, password});
+
+      const refreshToken = JwtService.generateRefreshToken();
+      const refreshTokenHash = JwtService.hashToken(refreshToken);
+
+      await RefreshTokenModel.create({
+        userId: user.id,
+        tokenHash: refreshTokenHash,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      })
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/auth/refresh',
+      });
+
+
     return res.status (201).json({
       message: 'Signup successful',
       user:{
@@ -60,6 +80,22 @@ export class AuthController{
       const {email, password} = req.body;
 
       const result = await loginUserUseCase. execute({email, password});
+
+      const refreshToken = JwtService.generateRefreshToken();
+      const refreshTokenHash = JwtService.hashToken(refreshToken);
+
+      await RefreshTokenModel.create({
+        userId: result.user.id,
+        tokenHash: refreshTokenHash,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      })
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/auth/refresh',
+      });
 
       return res.status(200).json({
           message:'Login successful',
@@ -150,6 +186,81 @@ export class AuthController{
     return res.status(200).json({user});
   }
 
+static async refresh(req: Request, res: Response) {
+  const token = req.cookies?.refreshToken;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Missing refresh token' });
+  }
+
+  const tokenHash = JwtService.hashToken(token);
+
+  const stored = await RefreshTokenModel.findOne({
+    tokenHash,
+    revoked: false,
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!stored) {
+    return res.status(401).json({ message: 'Invalid refresh token' });
+  }
+
+  // rotate
+  stored.revoked = true;
+  await stored.save();
+
+  const newRefreshToken = JwtService.generateRefreshToken();
+  const newHash = JwtService.hashToken(newRefreshToken);
+
+  await RefreshTokenModel.create({
+    userId: stored.userId,
+    tokenHash: newHash,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+  const user = await getCurrentUserUseCase.execute(
+  stored.userId.toString()
+);
+
+if (!user.id) {
+  throw new Error('User ID missing during token refresh');
+}
+
+const accessToken = JwtService.sign({
+  userId: user.id,
+  role: user.role,
+});
+
+
+
+  res.cookie('refreshToken', newRefreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/auth/refresh',
+  });
+
+  return res.status(200).json({ accessToken });
+}
+
+
+static async logout(req: Request, res: Response) {
+  const token = req.cookies?.refreshToken;
+
+  if (token) {
+    const hash = JwtService.hashToken(token);
+    await RefreshTokenModel.updateOne(
+      { tokenHash: hash },
+      { revoked: true }
+    );
+  }
+
+  res.clearCookie('refreshToken', {
+    path: '/auth/refresh',
+  });
+
+  return res.status(200).json({ message: 'Logged out' });
+}
 
 
 //   static async verifyOtpAndRegister(req: Request, res: Response) {

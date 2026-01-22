@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
+import { rootCertificates } from "node:tls";
 
 const router = Router();
 // router.post ('/register', AuthController.register);
@@ -36,6 +37,15 @@ router.get(
   '/me', 
   jwtAuthMiddleware,
   AuthController.me
+)
+router.post(
+  '/refresh',
+  AuthController.refresh
+)
+
+router.post(
+  '/logout',
+  AuthController.logout
 )
 
 

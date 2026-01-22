@@ -3,6 +3,7 @@ import apiRoutes from '../../presentation/routes';
 import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
 import authRoutes from '../../presentation/routes/auth.routes'
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 export function createExpressApp() {
   const app = express();
@@ -15,6 +16,7 @@ export function createExpressApp() {
   
 
   app.use(express.json());
+  app.use(cookieParser());
 
   app.use('/api', apiRoutes);
   app.use('/auth', authRoutes)
