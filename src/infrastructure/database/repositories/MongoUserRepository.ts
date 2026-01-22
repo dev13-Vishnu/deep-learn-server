@@ -56,4 +56,18 @@ if (result.matchedCount === 0) {
 
 }
 
+async findById(id: string): Promise<User | null> {
+    const doc = await UserModel.findById(id);
+    if(!doc) return null;
+
+    return new User (
+      new Email(doc.email),
+      doc.role,
+      doc.passwordHash,
+      doc.isActive,
+      doc.emailVerified,
+      doc._id.toString()
+    );
+}
+
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, resetPasswordUseCase, verifyPasswordResetOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
+import { getCurrentUserUseCase, loginUserUseCase, registerUserUseCase, requestPasswordResetOtpUseCase, requestSignupOtpUseCase, resetPasswordUseCase, verifyPasswordResetOtpUseCase, verifySignupOtpUseCase } from "../../infrastructure/di/auth.di";
 import { JwtService } from "../../infrastructure/security/jwt.services";
+import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
 
 export class AuthController{
   // static async register (req: Request, res: Response) {
@@ -136,6 +137,19 @@ export class AuthController{
       message: "Password reset successful",
     })
   }
+
+  static async me (req: Request, res: Response) {
+    const authReq = req as AuthenticatedRequest;
+
+    if(!authReq.user) {
+      return res.status(401).json({message: "Unauthorized"});
+    }
+    const user = await getCurrentUserUseCase.execute(
+      authReq.user.userId
+    );
+    return res.status(200).json({user});
+  }
+
 
 
 //   static async verifyOtpAndRegister(req: Request, res: Response) {

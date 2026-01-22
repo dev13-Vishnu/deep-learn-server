@@ -8,6 +8,7 @@ import { OtpServiceAdapter } from "../services/OtpServiceAdapter";
 import { RequestPasswordResetOtpUseCase } from "../../application/auth/request-password-reset-otp.usecase";
 import { VerifyPasswordResetOtpUseCase } from "../../application/auth/verify-password-reset-otp.usecase";
 import { ResetPasswordUseCase } from "../../application/auth/reset-password.usecase";
+import { GetCurrentUserUseCase } from "../../application/auth/get-current-user.usecase";
 
 
 const userRepository = new MongoUserRepository();
@@ -29,3 +30,7 @@ export const requestPasswordResetOtpUseCase = new RequestPasswordResetOtpUseCase
 export const verifyPasswordResetOtpUseCase = new VerifyPasswordResetOtpUseCase (otpServiceAdapter);
 
 export const resetPasswordUseCase = new ResetPasswordUseCase(userRepository);
+
+export const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository);
+
+

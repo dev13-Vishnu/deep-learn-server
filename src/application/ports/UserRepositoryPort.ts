@@ -5,4 +5,5 @@ export interface UserRepositoryPort {
   findByEmail(email: Email): Promise<User | null>;
   create(user: User): Promise<User>;
   update(user: User): Promise<void>;
+  findById(id: string): Promise<User | null>;
 }
