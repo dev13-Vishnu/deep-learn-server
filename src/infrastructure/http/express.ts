@@ -4,6 +4,8 @@ import { globalErrorHandler } from '../../presentation/middlewares/error.middlew
 import authRoutes from '../../presentation/routes/auth.routes'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { instructorRoutes } from '../../presentation/instructor.routes';
+import { buildInstructorController } from '../composition/instructor.composition';
 
 export function createExpressApp() {
   const app = express();
@@ -20,6 +22,11 @@ export function createExpressApp() {
 
   app.use('/api', apiRoutes);
   app.use('/auth', authRoutes)
+  app.use(
+  '/instructor',
+  instructorRoutes(buildInstructorController())
+);
+
 
   // 404 handler
   app.use((req, res) => {
