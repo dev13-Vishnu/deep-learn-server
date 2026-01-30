@@ -43,4 +43,11 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             throw new AppError('Failed to revoke refresh token', 500);
         }
     }
+    async revokeAllForUser(userId: string): Promise<void> {
+        try {
+            await RefreshTokenModel.deleteMany({userId});
+        } catch (error) {
+            throw new AppError('Failed to revoke refresh token for users', 500);
+        }
+    }
 }

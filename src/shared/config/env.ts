@@ -36,4 +36,8 @@ export const env = {
   jwtSecret: requireEnv('JWT_SECRET'),
   jwtExpiresIn: (process.env.JWT_EXPIRES_IN ??
     '1d') as SignOptions['expiresIn'],
+
+  //nodemailer
+  deepLearnEmail: requireEnv('DEEP_LEARN_EMAIL'),
+  deepLearnPassword: requireEnv('DEEP_LEARN_PASS')
 };
