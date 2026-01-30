@@ -4,6 +4,9 @@ export const TYPES = {
   // ======================
   UserRepositoryPort: Symbol.for('UserRepositoryPort'),
   RefreshTokenRepositoryPort: Symbol.for('RefreshTokenRepositoryPort'),
+  InstructorApplicationRepository: Symbol.for(
+  'InstructorApplicationRepository'
+),
 
   // ======================
   // Services (Ports)
@@ -23,6 +26,7 @@ export const TYPES = {
 
   // Instructor-related (add more later as needed)
   ApplyInstructorUseCase: Symbol.for('ApplyInstructorUseCase'),
+  
 
   // ======================
   // Controllers

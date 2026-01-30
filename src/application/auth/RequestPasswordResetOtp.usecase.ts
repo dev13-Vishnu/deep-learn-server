@@ -1,10 +1,16 @@
+import { inject, injectable } from "inversify";
 import { Email } from "../../domain/value-objects/Email";
 import { OtpServicePort } from "../ports/OtpServicePort";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
+import { TYPES } from "../../shared/di/types";
 
+@injectable()
 export class RequestPasswordResetOtpUseCase {
     constructor (
+        @inject(TYPES.UserRepositoryPort)
         private readonly userRepo: UserRepositoryPort,
+
+        @inject(TYPES.UserRepositoryPort)
         private readonly otpService: OtpServicePort
     ) {}
 

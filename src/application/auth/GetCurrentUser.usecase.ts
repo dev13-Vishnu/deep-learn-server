@@ -1,7 +1,13 @@
+import { inject, injectable } from "inversify";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
+import { TYPES } from "../../shared/di/types";
 
+@injectable()
 export class GetCurrentUserUseCase {
-    constructor (private readonly userRepo: UserRepositoryPort) {}
+    constructor (
+        @inject(TYPES.UserRepositoryPort)
+        private readonly userRepo: UserRepositoryPort
+    ) {}
     
     async execute(userId: string) {
         const user = await this.userRepo.findById(userId);

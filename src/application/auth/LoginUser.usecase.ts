@@ -4,8 +4,8 @@ import { Password } from '../../domain/value-objects/Password';
 import { AppError } from '../../shared/errors/AppError';
 
 import { inject, injectable } from 'inversify';
-
 import { TYPES } from '../../shared/di/types'
+
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
 

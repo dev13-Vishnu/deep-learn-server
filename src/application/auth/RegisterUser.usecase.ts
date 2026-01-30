@@ -1,11 +1,12 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
+import { TYPES } from "../../shared/di/types";
+
 import { User } from "../../domain/entities/User";
 import { UserRole } from "../../domain/entities/UserRole";
 import { Email } from "../../domain/value-objects/Email";
 import { Password } from "../../domain/value-objects/Password";
 import { AppError } from "../../shared/errors/AppError";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
-import { TYPES } from "../../shared/di/types";
 import { PasswordHasherPort } from "../ports/PasswordHasherPort";
 
 
@@ -14,7 +15,7 @@ interface RegisterUserInput{
     email: string;
     password: string;
 }
-
+@injectable()
 export class RegisterUserUseCase{
     constructor(
         @inject(TYPES.UserRepositoryPort)

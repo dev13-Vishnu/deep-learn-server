@@ -1,10 +1,20 @@
+import { inject, injectable } from "inversify";
+import { TYPES } from "../../shared/di/types";
+
 import { Email } from "../../domain/value-objects/Email";
 import { Password } from "../../domain/value-objects/Password";
-import { PasswordHasher } from "../../infrastructure/security/password-hasher";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
+import { PasswordHasherPort } from "../ports/PasswordHasherPort";
 
+@injectable()
 export class ResetPasswordUseCase {
-  constructor(private readonly userRepo: UserRepositoryPort) {}
+  constructor(
+    @inject(TYPES.UserRepositoryPort)
+    private readonly userRepo: UserRepositoryPort,
+
+    @inject(TYPES.PasswordHasherPort)
+    private readonly passwordHasher: PasswordHasherPort
+  ) {}
 
   async execute(emailRaw: string, newPasswordRaw: string): Promise<void> {
     const email = new Email(emailRaw);
@@ -15,7 +25,7 @@ export class ResetPasswordUseCase {
       return; // silent success
     }
 
-    const hashedPassword = await PasswordHasher.hash(
+    const hashedPassword = await this.passwordHasher.hash(
       newPassword.getValue()
     );
 

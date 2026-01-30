@@ -1,6 +1,8 @@
 import { InstructorApplicationRepository } from '../../domain/instructor/InstructorApplicationRepository';
 import { InstructorApplication } from '../../domain/instructor/InstructorApplication';
 import { AppError } from '../../shared/errors/AppError';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../../shared/di/types';
 
 interface ApplyForInstructorInput {
   userId: string;
@@ -12,8 +14,10 @@ interface ApplyForInstructorInput {
   language: string;
 }
 
+@injectable()
 export class ApplyForInstructorUseCase {
   constructor(
+    @inject(TYPES.InstructorApplicationRepository)
     private instructorRepo: InstructorApplicationRepository
   ) {}
 
