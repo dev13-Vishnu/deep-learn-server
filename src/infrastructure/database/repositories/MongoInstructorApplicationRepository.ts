@@ -1,7 +1,9 @@
+import { injectable } from 'inversify';
 import { InstructorApplication, InstructorApplicationStatus } from '../../../domain/instructor/InstructorApplication';
 import { InstructorApplicationRepository } from '../../../domain/instructor/InstructorApplicationRepository';
 import { InstructorApplicationModel } from '../models/InstructorApplicationModel';
 
+@injectable
 export class MongoInstructorApplicationRepository
   implements InstructorApplicationRepository
 {
