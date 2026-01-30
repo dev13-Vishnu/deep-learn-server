@@ -1,9 +1,11 @@
+import { injectable } from "inversify";
 import { UserRepositoryPort } from "../../../application/ports/UserRepositoryPort";
 import { User } from "../../../domain/entities/User";
 import { UserRole } from "../../../domain/entities/UserRole";
 import { Email } from "../../../domain/value-objects/Email";
 import { UserModel } from "../models/user.model";
 
+@injectable()
 export class MongoUserRepository implements UserRepositoryPort {
 
   async findByEmail(email: Email): Promise<User | null> {
