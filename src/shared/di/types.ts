@@ -20,8 +20,16 @@ export const TYPES = {
   // ======================
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
   RegisterUserUseCase: Symbol.for('RegisterUserUseCase'),
+  ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
+  GetCurrentUserUseCase: Symbol.for('GetCurrentUserUseCase'),
   RequestSignupOtpUseCase: Symbol.for('RequestSignupOtpUseCase'),
   VerifySignupOtpUseCase: Symbol.for('VerifySignupOtpUseCase'),
+  RequestPasswordResetOtpUseCase: Symbol.for('RequestPasswordResetOtpUseCase'),
+  VerifyPasswordResetOtpUseCase: Symbol.for('VerifyPasswordResetOtpUseCase'),
+  CreateRefreshTokenUseCase: Symbol.for('CreateRefreshTokenUseCase'),
+  ReFreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
+  RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
+  GetInstructorStatusUseCase: Symbol.for('GetInstructorStatusUseCase'),
   LogoutUserUseCase: Symbol.for('LogoutUserUseCase'),
 
   // Instructor-related (add more later as needed)
