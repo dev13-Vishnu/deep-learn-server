@@ -1,10 +1,14 @@
+import { inject } from "inversify";
 import { User } from "../../domain/entities/User";
 import { UserRole } from "../../domain/entities/UserRole";
 import { Email } from "../../domain/value-objects/Email";
 import { Password } from "../../domain/value-objects/Password";
-import { PasswordHasher } from "../../infrastructure/security/password-hasher";
 import { AppError } from "../../shared/errors/AppError";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
+import { TYPES } from "../../shared/di/types";
+import { PasswordHasherPort } from "../ports/PasswordHasherPort";
+
+
 
 interface RegisterUserInput{
     email: string;
@@ -12,7 +16,13 @@ interface RegisterUserInput{
 }
 
 export class RegisterUserUseCase{
-    constructor(private readonly userRepo: UserRepositoryPort) {}
+    constructor(
+        @inject(TYPES.UserRepositoryPort)
+        private readonly userRepo: UserRepositoryPort,
+
+        @inject(TYPES.PasswordHasherPort)
+        private readonly passwordHasher: PasswordHasherPort
+    ) {}
     async execute(input: RegisterUserInput): Promise<User> {
         const email = new Email(input.email);
         const password = new Password(input.password);
@@ -22,7 +32,7 @@ export class RegisterUserUseCase{
             throw new AppError ('User already exists', 409);
         }
 
-        const passwordHash = await PasswordHasher.hash(password.getValue());
+        const passwordHash =await this.passwordHasher.hash(password.getValue());
 
         const user = new User(
             email,
