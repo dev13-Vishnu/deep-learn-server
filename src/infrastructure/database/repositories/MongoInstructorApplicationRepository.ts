@@ -3,7 +3,7 @@ import { InstructorApplication, InstructorApplicationStatus } from '../../../dom
 import { InstructorApplicationRepository } from '../../../domain/instructor/InstructorApplicationRepository';
 import { InstructorApplicationModel } from '../models/InstructorApplicationModel';
 
-@injectable
+@injectable()
 export class MongoInstructorApplicationRepository
   implements InstructorApplicationRepository
 {
