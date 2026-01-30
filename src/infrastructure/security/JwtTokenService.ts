@@ -1,46 +1,44 @@
-import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
-import { env } from '../../shared/config/env';
-import { UserRole } from '../../domain/entities/UserRole';
+import { injectable } from "inversify";
+import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
-export interface AuthTokenPayload {
-  userId: string;
-  role:UserRole;
-}
+import { TokenPayload, TokenServicePort } from "../../application/ports/TokenServicePort";
+import { env } from "../../shared/config/env";
+import { AppError } from "../../shared/errors/AppError";
 
-export class JwtService {
-  static sign(payload: AuthTokenPayload): string {
-    const options: SignOptions = {
-      expiresIn: env.jwtExpiresIn,
-    };
+@injectable()
+export class JwtTokenService implements TokenServicePort {
+  generateAccessToken (payload: TokenPayload): string{
+    const secret = env.jwtSecret
 
-    return jwt.sign(
-      payload,
-      env.jwtSecret,
-      options,
-    );
+    if(!secret) {
+      throw new AppError('JWT access secret not configured', 500);
+    }
+
+    return jwt.sign(payload,secret,{
+      expiresIn:env.jwtExpiresIn
+    });
   }
 
-  static verify(token: string): AuthTokenPayload {
-    const decoded = jwt.verify(
-      token,
-      env.jwtSecret,
-    ) as JwtPayload;
+  verifyAccessToken(token: string): TokenPayload {
+      const secret = env.jwtSecret;
 
-    return {
-      userId: decoded.userId as string,
-      role: decoded.role as UserRole
-    };
+      if(!secret) {
+        throw new AppError('JWT access secret not configure', 500);
+      }
+
+      try {
+        return jwt.verify(token, secret) as TokenPayload;
+      } catch  {
+        throw new AppError('Invalid or expired access token', 401);
+      }
   }
 
-  static generateRefreshToken(): string{
-    return crypto.randomBytes(64).toString('hex');
+  generateRefreshToken(): string {
+      return crypto.randomBytes(64).toString('hex');
   }
 
-  static hashToken(token: string) : string{
-    return crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex');
+  hashToken(token: string): string {
+      return crypto.createHash('sha256').update(token).digest('hex');
   }
 }
