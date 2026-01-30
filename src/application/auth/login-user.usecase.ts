@@ -2,17 +2,31 @@ import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { Email } from '../../domain/value-objects/Email';
 import { Password } from '../../domain/value-objects/Password';
 import { AppError } from '../../shared/errors/AppError';
-import { PasswordHasher } from '../../infrastructure/security/password-hasher';
-import { JwtService } from '../../infrastructure/security/jwt.services';
+
+import { inject, injectable } from 'inversify';
+
+import { TYPES } from '../../shared/di/types'
+import { PasswordHasherPort } from '../ports/PasswordHasherPort';
+import { TokenServicePort } from '../ports/TokenServicePort';
+
 
 interface LoginUserInput {
   email: string;
   password: string;
 }
 
+@injectable()
 export class LoginUserUseCase {
-  constructor(private readonly userRepo: UserRepositoryPort) {}
+  constructor (
+    @inject(TYPES.UserRepositoryPort)
+    private readonly userRepo: UserRepositoryPort,
 
+    @inject(TYPES.PasswordHasherPort)
+    private readonly passwordHasher: PasswordHasherPort,
+
+    @inject(TYPES.TokenServicePort)
+    private readonly tokenService: TokenServicePort
+  ) {}
   async execute(input: LoginUserInput) {
     const email = new Email(input.email);
     const password = new Password(input.password);
@@ -23,7 +37,7 @@ export class LoginUserUseCase {
       throw new AppError('Invalid email or password', 401);
     }
 
-    const passwordMatch = await PasswordHasher.compare(
+    const passwordMatch = this.passwordHasher.compare(
       password.getValue(),
       user.passwordHash,
     );
@@ -36,7 +50,7 @@ export class LoginUserUseCase {
   throw new AppError('User identity not initialized', 500);
 }
 
-const accessToken = JwtService.sign({
+const accessToken = this.tokenService.generateAccessToken({
   userId: user.id,
   role: user.role,
 });
