@@ -45,7 +45,7 @@ export class RefreshAccessTokenUseCase {
 
     const user = await this.userRepository.findById(existingToken.userId);
 
-    if (!user) {
+    if (!user || !user.id) {
       await this.refreshTokenRepository.revoke(tokenHash);
       throw new AppError('User not found', 401);
     }
