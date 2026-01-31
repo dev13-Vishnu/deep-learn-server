@@ -27,13 +27,13 @@ export const TYPES = {
   RequestPasswordResetOtpUseCase: Symbol.for('RequestPasswordResetOtpUseCase'),
   VerifyPasswordResetOtpUseCase: Symbol.for('VerifyPasswordResetOtpUseCase'),
   CreateRefreshTokenUseCase: Symbol.for('CreateRefreshTokenUseCase'),
-  ReFreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
+  RefreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
   RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
   GetInstructorStatusUseCase: Symbol.for('GetInstructorStatusUseCase'),
   LogoutUserUseCase: Symbol.for('LogoutUserUseCase'),
 
   // Instructor-related (add more later as needed)
-  ApplyInstructorUseCase: Symbol.for('ApplyInstructorUseCase'),
+  ApplyForInstructorUseCase: Symbol.for('ApplyForInstructorUseCase'),
   
 
   // ======================
