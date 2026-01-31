@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+
 import { createExpressApp } from './infrastructure/http/express';
 import { env } from './shared/config/env';
 import { logger } from './shared/utils/logger';
@@ -7,6 +8,7 @@ import {
   disconnectDatabase,
 } from './infrastructure/database/mongoose.connection';
 import { initRedis } from './infrastructure/redis/redis.client';
+import './infrastructure/di/container';
 
 
 

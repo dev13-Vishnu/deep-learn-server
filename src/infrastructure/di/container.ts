@@ -31,6 +31,7 @@ import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshT
 // Use cases (Instructor)
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
+import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
 
@@ -125,3 +126,7 @@ container
 container
   .bind(TYPES.GetInstructorStatusUseCase)
   .to(GetInstructorStatusUseCase);
+
+  container.bind<JwtAuthMiddleware>(
+    TYPES.JwtAuthMiddleware
+  ).to(JwtAuthMiddleware);
