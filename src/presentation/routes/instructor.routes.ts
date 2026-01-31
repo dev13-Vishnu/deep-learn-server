@@ -1,22 +1,28 @@
-import { Router } from 'express';
-import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
-import { InstructorController } from '../controllers/InstructorController';
-import { validateRequest } from '../middlewares/validationRequest';
-import { instructorApplySchema } from '../validators/instructorApply.schema';
+import { Router } from "express";
+import { container } from "../../infrastructure/di/container";
+import { InstructorController } from "../controllers/InstructorController";
+import { TYPES } from "../../shared/di/types";
+import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
 
-export function instructorRoutes(controller: InstructorController) {
-  const router = Router();
+const router = Router();
 
-  router.post(
-    '/apply',
-    jwtAuthMiddleware,
-    validateRequest(instructorApplySchema),
-    controller.apply);
+//Resolve controller from DI container
+const instructorController = container.get<InstructorController>(
+    TYPES.InstructorController
+);
 
-  router.get(
-    '/status',
-    jwtAuthMiddleware,
-    controller.getStatus.bind(controller));
+/* ================= INSTRUCTOR ================= */
 
-  return router;
-}
+router.post(
+  '/apply',
+  jwtAuthMiddleware,
+  instructorController.apply.bind(instructorController)
+);
+
+router.get(
+  '/status',
+  jwtAuthMiddleware,
+  instructorController.getStatus.bind(instructorController)
+);
+
+export default router;
