@@ -1,27 +1,48 @@
-import { Response } from 'express';
+import { Request,Response } from 'express';
+import { inject, injectable } from 'inversify';
+
+import { TYPES } from '../../shared/di/types';
+
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
 import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 
+@injectable()
 export class InstructorController {
   constructor(
-    private applyUseCase: ApplyForInstructorUseCase,
-    private statusUseCase: GetInstructorStatusUseCase
+    @inject(TYPES.ApplyForInstructorUseCase)
+    private readonly applyForInstructorUseCase: ApplyForInstructorUseCase,
+
+    @inject(TYPES.GetInstructorStatusUseCase)
+    private readonly getInstructorStatusUseCase: GetInstructorStatusUseCase
   ) {}
 
-  apply = async (req: AuthenticatedRequest, res: Response) => {
-    await this.applyUseCase.execute({
-      userId: req.user!.userId,
+    /* ================= APPLY ================= */
+
+  async apply (req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const application = await this.applyForInstructorUseCase.execute({
+      userId: authReq.user!.userId,
       ...req.body,
     });
 
-    res.status(201).json({ message: 'Application submitted' });
-  };
+    return res.status(201).json({
+      message: 'Instructor application submitted',
+      application,
+    });
+  }
 
-  status = async (req: AuthenticatedRequest, res: Response) => {
-    const result = await this.statusUseCase.execute(
-      req.user!.userId
+    /* ================= STATUS ================= */
+    
+
+  async getStatus (req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const status = await this.getInstructorStatusUseCase.execute(
+      authReq.user!.userId
     );
-    res.json(result);
-  };
+
+    return res.status(200).json({ status });
+  }
 }

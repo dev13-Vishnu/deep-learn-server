@@ -16,7 +16,7 @@ export function instructorRoutes(controller: InstructorController) {
   router.get(
     '/status',
     jwtAuthMiddleware,
-    controller.status);
+    controller.getStatus.bind(controller));
 
   return router;
 }
