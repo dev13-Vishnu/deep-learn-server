@@ -101,15 +101,33 @@ export class AuthController{
   async signup(req: Request, res: Response): Promise<Response> {
     const { email, otp, password } = req.body;
 
+    if(!email || !otp || !password) {
+      return res.status(400).json({
+        message: 'Missing required fields',
+      });
+    }
+
+    //Verify OTP
     await this.verifySignupOtpUseCase.execute(email, otp);
 
+    //Register user
     const user =
-      await this.registerUserUseCase.execute({ email, password });
+      await this.registerUserUseCase.execute({
+        email,
+        password,
+      });
     
     if(!user.id){
       throw new Error('User ID missng');
     }
 
+    //Generate access token via login use cas (NO duplicate login logic)
+    const { accessToken } = await this.loginUserUseCase.execute({
+      email,
+      password,
+    })
+
+    //create refresh token
     const { token: refreshToken } =
       await this.createRefreshTokenUseCase.execute(user.id);
 
@@ -122,6 +140,7 @@ export class AuthController{
     return res.status(201).json({
       message: 'Signup successful',
       user,
+      accessToken,
     });
   }
 
