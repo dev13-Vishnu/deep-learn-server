@@ -23,8 +23,8 @@ import { CookieHelper } from "../utils/cookie.helper";
 import { authConfig } from "../../shared/config/auth.config";
 
 @injectable()
-export class AuthController{
-  constructor (
+export class AuthController {
+  constructor(
     @inject(TYPES.LoginUserUseCase)
     private readonly loginUserUseCase: LoginUserUseCase,
 
@@ -57,7 +57,7 @@ export class AuthController{
 
     @inject(TYPES.RevokeRefreshTokenUseCase)
     private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase
-  ){}
+  ) {}
 
   /* ================= LOGIN ================= */
 
@@ -66,6 +66,10 @@ export class AuthController{
 
     const { user, accessToken } =
       await this.loginUserUseCase.execute({ email, password });
+
+    if (!user.id) {
+      throw new Error('User ID missing after login');
+    }
 
     const { token: refreshToken } =
       await this.createRefreshTokenUseCase.execute(user.id);
@@ -100,33 +104,23 @@ export class AuthController{
   async signup(req: Request, res: Response): Promise<Response> {
     const { email, otp, password } = req.body;
 
-    if(!email || !otp || !password) {
-      return res.status(400).json({
-        message: 'Missing required fields',
-      });
-    }
-
-    //Verify OTP
     await this.verifySignupOtpUseCase.execute(email, otp);
 
-    //Register user
-    const user =
-      await this.registerUserUseCase.execute({
-        email,
-        password,
-      });
-    
-    if(!user.id){
-      throw new Error('User ID missng');
+    const user = await this.registerUserUseCase.execute({
+      email,
+      password,
+    });
+
+    if (!user.id) {
+      throw new Error('User ID missing');
     }
 
-    //Generate access token via login use cas (NO duplicate login logic)
+    // Generate access token via login use case
     const { accessToken } = await this.loginUserUseCase.execute({
       email,
       password,
-    })
+    });
 
-    //create refresh token
     const { token: refreshToken } =
       await this.createRefreshTokenUseCase.execute(user.id);
 
@@ -145,10 +139,7 @@ export class AuthController{
 
   /* ================= PASSWORD RESET ================= */
 
-  async requestPasswordResetOtp(
-    req: Request,
-    res: Response
-  ): Promise<Response> {
+  async requestPasswordResetOtp(req: Request, res: Response): Promise<Response> {
     const { email } = req.body;
 
     await this.requestPasswordResetOtpUseCase.execute(email);
@@ -158,10 +149,7 @@ export class AuthController{
     });
   }
 
-  async verifyPasswordResetOtp(
-    req: Request,
-    res: Response
-  ): Promise<Response> {
+  async verifyPasswordResetOtp(req: Request, res: Response): Promise<Response> {
     const { email, otp } = req.body;
 
     await this.verifyPasswordResetOtpUseCase.execute(email, otp);
@@ -171,10 +159,7 @@ export class AuthController{
     });
   }
 
-  async resetPassword(
-    req: Request,
-    res: Response
-  ): Promise<Response> {
+  async resetPassword(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
 
     await this.resetPasswordUseCase.execute(email, password);
@@ -189,10 +174,9 @@ export class AuthController{
   async me(req: Request, res: Response): Promise<Response> {
     const authReq = req as AuthenticatedRequest;
 
-    const user =
-      await this.getCurrentUserUseCase.execute(
-        authReq.user!.userId
-      );
+    const user = await this.getCurrentUserUseCase.execute(
+      authReq.user!.userId
+    );
 
     return res.status(200).json({ user });
   }
@@ -206,9 +190,8 @@ export class AuthController{
 
     const {
       accessToken,
-      refreshToken: newRefreshToken
-    } =
-      await this.refreshAccessTokenUseCase.execute(refreshToken);
+      refreshToken: newRefreshToken,
+    } = await this.refreshAccessTokenUseCase.execute(refreshToken);
 
     CookieHelper.setRefreshTokenCookie(
       res,
@@ -230,5 +213,4 @@ export class AuthController{
 
     return res.status(200).json({ message: 'Logged out' });
   }
-
 }
