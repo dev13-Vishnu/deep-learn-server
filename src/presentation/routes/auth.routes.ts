@@ -2,10 +2,16 @@ import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
 import { rootCertificates } from "node:tls";
+import { container } from "../../infrastructure/di/container";
+import { TYPES } from "../../shared/di/types";
+
+const authController  = container.get<AuthController>(
+  TYPES.AuthController
+);
 
 const router = Router();
 // router.post ('/register', AuthController.register);
-router.post('/login', AuthController.login);
+router.post('/login', authController.login.bind(authController));
 
 // router.get('/me', jwtAuthMiddleware,(req,res) => {
 //     const user = (req as any). user;
@@ -15,37 +21,37 @@ router.post('/login', AuthController.login);
 //         user,
 //     });
 // })
-router.post("/request-otp", AuthController.requestOtp)
+router.post("/request-otp", authController.requestSignupOtp.bind(authController))
 
-router.post("/signup", AuthController.signup);
+router.post("/signup", authController.signup.bind(authController));
 router.post(
   "/forgot-password/request-otp",
-  AuthController.requestPasswordResetOtp
+  authController.requestPasswordResetOtp.bind(authController)
 );
 
 router.post(
   "/forgot-password/verify-otp",
-  AuthController.verifyPasswordResetOtp
+  authController.verifyPasswordResetOtp.bind(authController)
 );
 
 router.post(
   "/forgot-password/reset",
-  AuthController.resetPassword
+  authController.resetPassword.bind(authController)
 );
 
 router.get(
   '/me', 
   jwtAuthMiddleware,
-  AuthController.me
+  authController.me.bind(authController)
 )
 router.post(
   '/refresh',
-  AuthController.refresh
+  authController.refresh.bind(authController)
 )
 
 router.post(
   '/logout',
-  AuthController.logout
+  authController.logout.bind(authController)
 )
 
 
