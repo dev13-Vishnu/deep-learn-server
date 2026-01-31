@@ -1,4 +1,8 @@
 import 'reflect-metadata';
+
+import { AuthController } from '../../presentation/controllers/auth.controller';
+import { InstructorController } from '../../presentation/controllers/InstructorController';
+
 import { Container } from 'inversify';
 
 import { TYPES } from '../../shared/di/types';
@@ -126,6 +130,10 @@ container
 container
   .bind(TYPES.GetInstructorStatusUseCase)
   .to(GetInstructorStatusUseCase);
+
+  /* -----------------------------
+            Middleware
+----------------------------- */
 
   container.bind<JwtAuthMiddleware>(
     TYPES.JwtAuthMiddleware
