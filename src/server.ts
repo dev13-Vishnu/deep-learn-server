@@ -1,4 +1,4 @@
-import 'reflect-metadata'
+import 'reflect-metadata';
 
 import { createExpressApp } from './infrastructure/http/express';
 import { env } from './shared/config/env';
