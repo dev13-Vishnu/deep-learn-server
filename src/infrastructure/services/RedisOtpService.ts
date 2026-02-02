@@ -47,6 +47,7 @@ export class RedisOtpService implements OtpServicePort {
 
   async requestOtp(email: string, purpose: OtpPurpose): Promise<Date> {
     const otp = this.generateOtp();
+    
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -89,8 +90,8 @@ export class RedisOtpService implements OtpServicePort {
 
   async verifyOtp(
     email: string,
-    purpose: OtpPurpose,
-    inputOtp: string
+    inputOtp: string,
+    purpose: OtpPurpose
   ): Promise<void> {
     const redisKey = this.key(email, purpose);
 
