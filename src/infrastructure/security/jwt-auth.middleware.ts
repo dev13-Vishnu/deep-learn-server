@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { JwtService } from "./jwt.services";
 import { UserRole } from "../../domain/entities/UserRole";
+import { container } from "../di/container";
+import { TYPES } from "../../shared/di/types";
+import { TokenServicePort } from "../../application/ports/TokenServicePort";
+
 
 export interface AuthenticatedRequest extends Request {
     user?: {
@@ -25,7 +28,11 @@ export function jwtAuthMiddleware (
     const token = authHeader.split(' ')[1];
 
     try{
-        const payload = JwtService.verify(token);
+        const tokenService =
+  container.get<TokenServicePort>(TYPES.TokenServicePort);
+
+const payload = tokenService.verifyAccessToken(token);
+
 
         req.user = {
             userId: payload.userId,
