@@ -33,6 +33,9 @@ export class CreateRefreshTokenUseCase {
             tokenHash,
             expiresAt
         }
+
+        await this.refreshTokenRepository.create(refreshToken);
+        
         return {
             token,
             expiresAt
