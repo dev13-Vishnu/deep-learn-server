@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["reflect-metadata"],
+    // "types": ["reflect-metadata"],
     "lib": ["ES2021"],   // or higher
   }
 }

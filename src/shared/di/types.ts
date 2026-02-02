@@ -35,7 +35,7 @@ export const TYPES = {
   // Instructor-related (add more later as needed)
   ApplyForInstructorUseCase: Symbol.for('ApplyForInstructorUseCase'),
 
-  JwtAuthMiddleware: Symbol.for('JwtAuthMiddleware'),
+  // JwtAuthMiddleware: Symbol.for('JwtAuthMiddleware'),
   
 
   // ======================
