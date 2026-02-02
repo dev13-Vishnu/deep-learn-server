@@ -4,8 +4,8 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../../shared/di/types";
 
 import { LoginUserUseCase } from "../../application/auth/LoginUser.usecase";
-import { RegisterUserUseCase } from "../../application/auth/RegisterUser.usecase";
 import { GetCurrentUserUseCase } from "../../application/auth/GetCurrentUser.usecase";
+import { RegisterUserUseCase } from "../../application/auth/RegisterUser.usecase";
 
 import { RequestSignupOtpUseCase } from "../../application/auth/RequestSignupOtp.usecase";
 import { VerifySignupOtpUseCase } from "../../application/auth/VerifySignupOtp.usecase";
@@ -18,8 +18,8 @@ import { CreateRefreshTokenUseCase } from "../../application/auth/CreateRefreshT
 import { RefreshAccessTokenUseCase } from "../../application/auth/RefreshAccessToken.usecase";
 import { RevokeRefreshTokenUseCase } from "../../application/auth/RevokeRefreshToken.usecase";
 
-import { CookieHelper } from "../utils/cookie.helper";
 import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
+import { CookieHelper } from "../utils/cookie.helper";
 import { authConfig } from "../../shared/config/auth.config";
 
 @injectable()
@@ -59,12 +59,18 @@ export class AuthController {
     private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase
   ) {}
 
-  async login(req: Request, res: Response) {
+  /* ================= LOGIN ================= */
+
+  async login(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
 
     const { user, accessToken } =
       await this.loginUserUseCase.execute({ email, password });
 
+    if (!user.id) {
+      throw new Error('User ID missing after login');
+    }
+
     const { token: refreshToken } =
       await this.createRefreshTokenUseCase.execute(user.id);
 
@@ -74,24 +80,46 @@ export class AuthController {
       authConfig.refreshToken.expiresInMs
     );
 
-    return res.status(200).json({ user, accessToken });
+    return res.status(200).json({
+      message: 'Login successful',
+      user,
+      accessToken,
+    });
   }
 
-  async requestSignupOtp(req: Request, res: Response) {
+  /* ================= SIGNUP ================= */
+
+  async requestSignupOtp(req: Request, res: Response): Promise<Response> {
     const { email } = req.body;
-    const expiresAt = await this.requestSignupOtpUseCase.execute(email);
-    return res.status(200).json({ expiresAt });
+
+    const expiresAt =
+      await this.requestSignupOtpUseCase.execute(email);
+
+    return res.status(200).json({
+      message: 'OTP sent successfully',
+      expiresAt,
+    });
   }
 
-  async signup(req: Request, res: Response) {
+  async signup(req: Request, res: Response): Promise<Response> {
     const { email, otp, password } = req.body;
 
     await this.verifySignupOtpUseCase.execute(email, otp);
 
-    const user = await this.registerUserUseCase.execute({ email, password });
+    const user = await this.registerUserUseCase.execute({
+      email,
+      password,
+    });
 
-    const { accessToken } =
-      await this.loginUserUseCase.execute({ email, password });
+    if (!user.id) {
+      throw new Error('User ID missing');
+    }
+
+    // Generate access token via login use case
+    const { accessToken } = await this.loginUserUseCase.execute({
+      email,
+      password,
+    });
 
     const { token: refreshToken } =
       await this.createRefreshTokenUseCase.execute(user.id);
@@ -102,42 +130,68 @@ export class AuthController {
       authConfig.refreshToken.expiresInMs
     );
 
-    return res.status(201).json({ user, accessToken });
+    return res.status(201).json({
+      message: 'Signup successful',
+      user,
+      accessToken,
+    });
   }
 
-  async requestPasswordResetOtp(req: Request, res: Response) {
+  /* ================= PASSWORD RESET ================= */
+
+  async requestPasswordResetOtp(req: Request, res: Response): Promise<Response> {
     const { email } = req.body;
+
     await this.requestPasswordResetOtpUseCase.execute(email);
-    return res.status(200).json({ message: "OTP sent if user exists" });
+
+    return res.status(200).json({
+      message: 'If the email exists, an OTP has been sent',
+    });
   }
 
-  async verifyPasswordResetOtp(req: Request, res: Response) {
+  async verifyPasswordResetOtp(req: Request, res: Response): Promise<Response> {
     const { email, otp } = req.body;
+
     await this.verifyPasswordResetOtpUseCase.execute(email, otp);
-    return res.status(200).json({ message: "OTP verified" });
+
+    return res.status(200).json({
+      message: 'OTP verified successfully',
+    });
   }
 
-  async resetPassword(req: Request, res: Response) {
+  async resetPassword(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
+
     await this.resetPasswordUseCase.execute(email, password);
-    return res.status(200).json({ message: "Password reset successful" });
+
+    return res.status(200).json({
+      message: 'Password reset successful',
+    });
   }
 
-  async me(req: Request, res: Response) {
+  /* ================= AUTH SESSION ================= */
+
+  async me(req: Request, res: Response): Promise<Response> {
     const authReq = req as AuthenticatedRequest;
-    const user =
-      await this.getCurrentUserUseCase.execute(authReq.user!.userId);
+
+    const user = await this.getCurrentUserUseCase.execute(
+      authReq.user!.userId
+    );
+
     return res.status(200).json({ user });
   }
 
-  async refresh(req: Request, res: Response) {
+  async refresh(req: Request, res: Response): Promise<Response> {
     const refreshToken = CookieHelper.getRefreshToken(req);
+
     if (!refreshToken) {
-      return res.status(401).json({ message: "Missing refresh token" });
+      return res.status(401).json({ message: 'Missing refresh token' });
     }
 
-    const { accessToken, refreshToken: newRefreshToken } =
-      await this.refreshAccessTokenUseCase.execute(refreshToken);
+    const {
+      accessToken,
+      refreshToken: newRefreshToken,
+    } = await this.refreshAccessTokenUseCase.execute(refreshToken);
 
     CookieHelper.setRefreshTokenCookie(
       res,
@@ -148,13 +202,15 @@ export class AuthController {
     return res.status(200).json({ accessToken });
   }
 
-  async logout(req: Request, res: Response) {
+  async logout(req: Request, res: Response): Promise<Response> {
     const refreshToken = CookieHelper.getRefreshToken(req);
+
     if (refreshToken) {
       await this.revokeRefreshTokenUseCase.execute(refreshToken);
     }
 
     CookieHelper.clearRefreshTokenCookie(res);
-    return res.status(200).json({ message: "Logged out" });
+
+    return res.status(200).json({ message: 'Logged out' });
   }
 }

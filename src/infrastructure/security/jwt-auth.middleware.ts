@@ -1,25 +1,25 @@
 import { NextFunction, Request, Response } from "express";
+import { container } from '../di/container';
+import { TYPES } from '../../shared/di/types';
+import { TokenServicePort } from '../../application/ports/TokenServicePort';
 import { UserRole } from "../../domain/entities/UserRole";
-import { container } from "../di/container";
-import { TYPES } from "../../shared/di/types";
-import { TokenServicePort } from "../../application/ports/TokenServicePort";
-
 
 export interface AuthenticatedRequest extends Request {
     user?: {
         userId: string;
-        role:UserRole;
+        role: UserRole;
     };
 }
 
-export function jwtAuthMiddleware (
+// Keep as function - resolve from container when needed
+export function jwtAuthMiddleware(
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
 ) {
     const authHeader = req.headers.authorization;
 
-    if(!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({
             message: 'Authorization token missing or invalid',
         });
@@ -27,12 +27,10 @@ export function jwtAuthMiddleware (
 
     const token = authHeader.split(' ')[1];
 
-    try{
-        const tokenService =
-  container.get<TokenServicePort>(TYPES.TokenServicePort);
-
-const payload = tokenService.verifyAccessToken(token);
-
+    try {
+        // Get token service from container
+        const tokenService = container.get<TokenServicePort>(TYPES.TokenServicePort);
+        const payload = tokenService.verifyAccessToken(token);
 
         req.user = {
             userId: payload.userId,

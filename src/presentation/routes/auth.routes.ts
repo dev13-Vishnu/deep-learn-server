@@ -1,17 +1,27 @@
 import { Router } from "express";
+
+import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
 import { container } from "../../infrastructure/di/container";
 import { TYPES } from "../../shared/di/types";
 import { AuthController } from "../controllers/auth.controller";
-import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
 
 const router = Router();
 
-const authController =
-  container.get<AuthController>(TYPES.AuthController);
+const authController = container.get<AuthController>(
+  TYPES.AuthController
+);
 
-router.post("/login", authController.login.bind(authController));
-router.post("/request-otp", authController.requestSignupOtp.bind(authController));
-router.post("/signup", authController.signup.bind(authController));
+router.post('/login', authController.login.bind(authController));
+
+router.post(
+  "/request-otp",
+  authController.requestSignupOtp.bind(authController)
+);
+
+router.post(
+  "/signup",
+  authController.signup.bind(authController)
+);
 
 router.post(
   "/forgot-password/request-otp",
@@ -29,18 +39,18 @@ router.post(
 );
 
 router.get(
-  "/me",
+  '/me',
   jwtAuthMiddleware,
   authController.me.bind(authController)
 );
 
 router.post(
-  "/refresh",
+  '/refresh',
   authController.refresh.bind(authController)
 );
 
 router.post(
-  "/logout",
+  '/logout',
   authController.logout.bind(authController)
 );
 

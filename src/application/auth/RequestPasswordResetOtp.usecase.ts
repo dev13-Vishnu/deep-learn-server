@@ -10,7 +10,7 @@ export class RequestPasswordResetOtpUseCase {
         @inject(TYPES.UserRepositoryPort)
         private readonly userRepo: UserRepositoryPort,
 
-        @inject(TYPES.UserRepositoryPort)
+        @inject(TYPES.OtpServicePort)
         private readonly otpService: OtpServicePort
     ) {}
 
