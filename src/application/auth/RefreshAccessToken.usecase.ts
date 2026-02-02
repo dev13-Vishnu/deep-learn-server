@@ -6,12 +6,9 @@ import { RefreshTokenRepository } from '../../domain/auth/RefreshTokenRepository
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
+import { authConfig } from '../../shared/config/auth.config';
 
-/**
- * Refresh-token TTL must match CreateRefreshTokenUseCase
- * Keep centralized in application layer.
- */
-const REFRESH_TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+
 
 @injectable()
 export class RefreshAccessTokenUseCase {
@@ -62,7 +59,7 @@ export class RefreshAccessTokenUseCase {
       this.tokenService.hashToken(newRefreshToken);
 
     const refreshTokenExpiresAt = new Date(
-      Date.now() + REFRESH_TOKEN_TTL_MS
+      Date.now() + authConfig.refreshToken.expiresInMs
     );
 
     await this.refreshTokenRepository.create({
