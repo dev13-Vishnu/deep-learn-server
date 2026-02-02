@@ -26,11 +26,14 @@ export class RefreshAccessTokenUseCase {
     private readonly userRepository: UserRepositoryPort
   ) {}
 
-  async execute(tokenHash: string): Promise<{
+  async execute(plainToken: string): Promise<{
     accessToken: string;
     refreshToken: string;
     refreshTokenExpiresAt: Date;
   }> {
+
+    const tokenHash = this.tokenService.hashToken(plainToken);
+    
     const existingToken =
       await this.refreshTokenRepository.findByHash(tokenHash);
 
