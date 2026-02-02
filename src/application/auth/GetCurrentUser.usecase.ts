@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
 import { TYPES } from "../../shared/di/types";
+import { AppError } from "../../shared/errors/AppError";
 
 @injectable()
 export class GetCurrentUserUseCase {
@@ -13,11 +14,11 @@ export class GetCurrentUserUseCase {
         const user = await this.userRepo.findById(userId);
 
         if(!user){
-            throw new Error ("Authenticated user not found");
+            throw new AppError ("Authenticated user not found",404);
         }
 
         if(!user.isActive) {
-            throw new Error('User accound is inactive');
+            throw new AppError('User accound is inactive',403);
         }
 
         return {
