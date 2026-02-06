@@ -9,7 +9,15 @@ export class GetInstructorStatusUseCase {
     private instructorRepo: InstructorApplicationRepository
   ) {}
 
-  async execute(userId: string) {
-    return this.instructorRepo.findByUserId(userId);
+  async execute(userId: string): Promise<{
+    status: 'pending' | 'approved' | 'rejected' | 'blocked' | null;
+  }> {
+    const application = await this.instructorRepo.findByUserId(userId);
+
+    if (!application) {
+      return { status: null };
+    }
+
+    return { status: application.status };
   }
 }

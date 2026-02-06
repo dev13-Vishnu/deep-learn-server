@@ -36,13 +36,14 @@ export class InstructorController {
     /* ================= STATUS ================= */
     
 
-  async getStatus (req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
+  async getStatus(req: Request, res: Response) {
+  const authReq = req as AuthenticatedRequest;
 
-    const status = await this.getInstructorStatusUseCase.execute(
-      authReq.user!.userId
-    );
+  const result = await this.getInstructorStatusUseCase.execute(
+    authReq.user!.userId
+  );
 
-    return res.status(200).json({ status });
-  }
+  return res.status(200).json(result);
+}
+
 }
