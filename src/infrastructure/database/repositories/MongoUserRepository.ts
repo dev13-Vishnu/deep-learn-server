@@ -19,6 +19,11 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc.isActive,
       doc.emailVerified,
       doc._id.toString(),
+      doc.firstName ?? undefined,
+      doc.lastName ?? undefined,
+      doc.bio ?? undefined,
+      doc.avatarUrl ?? undefined,
+
     );
   }
 
@@ -68,7 +73,11 @@ async findById(id: string): Promise<User | null> {
       doc.passwordHash,
       doc.isActive,
       doc.emailVerified,
-      doc._id.toString()
+      doc._id.toString(),
+      doc.firstName ?? undefined,
+      doc.lastName ?? undefined,
+      doc.bio ?? undefined,
+      doc.avatarUrl ?? undefined,
     );
 }
 

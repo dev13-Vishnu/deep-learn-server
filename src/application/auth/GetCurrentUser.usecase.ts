@@ -25,6 +25,12 @@ export class GetCurrentUserUseCase {
             id: user.id,
             email: user.email.getValue(),
             role: user.role,
+            profile: {
+                firstName: user.firstName?? null,
+                lastName: user.lastName?? null,
+                bio: user.bio ?? null,
+                avatarUrl: user.avatarUrl,
+            }
         };
     }
 }
