@@ -35,6 +35,8 @@ import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshT
 // Use cases (Instructor)
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
+import { UserController } from '../../presentation/controllers/UserController';
+import { UpdateMyProfileUseCase } from '../../application/profile/UpdateMyProfile.usecase';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -149,3 +151,10 @@ container
 container
   .bind(TYPES.InstructorController)
   .to(InstructorController);
+
+
+container.bind<UserController>(TYPES.UserController).to(UserController);
+
+container
+  .bind<UpdateMyProfileUseCase>(TYPES.UpdateMyProfileUseCase)
+  .to(UpdateMyProfileUseCase);
