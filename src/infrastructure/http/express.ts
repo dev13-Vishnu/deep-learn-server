@@ -4,8 +4,9 @@ import cookieParser from 'cookie-parser';
 
 import authRoutes from '../../presentation/routes/auth.routes'
 import instructorRoutes  from '../../presentation/routes/instructor.routes';
-
 import apiRoutes from '../../presentation/routes';
+import userRoutes from "../../presentation/routes"
+
 import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
 
 export function createExpressApp() {
@@ -23,6 +24,7 @@ export function createExpressApp() {
 
   app.use('/api', apiRoutes);
   app.use('/auth', authRoutes)
+  app.use('/users',userRoutes)
   app.use(
   '/instructor',
   instructorRoutes

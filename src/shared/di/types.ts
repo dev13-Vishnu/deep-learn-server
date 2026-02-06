@@ -43,4 +43,7 @@ export const TYPES = {
   // ======================
   AuthController: Symbol.for('AuthController'),
   InstructorController: Symbol.for('InstructorController'),
+
+  UserController: Symbol.for('UserController'),
+  UpdateMyProfileUseCase: Symbol.for('UpdateMyProfileUseCase'),
 };
