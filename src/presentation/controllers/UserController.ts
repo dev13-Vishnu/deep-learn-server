@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { TYPES } from "../../shared/di/types";
-import { UpdateMyProfileUseCase } from "../../application/profile/UpdateMyProfile.usecase";
+import { UpdateMyProfileUseCase } from "../../application/profile/UpdateProfileUseCase";
 import { Request,Response } from "express";
 import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
 

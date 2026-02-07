@@ -36,7 +36,7 @@ import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshT
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
 import { UserController } from '../../presentation/controllers/UserController';
-import { UpdateMyProfileUseCase } from '../../application/profile/UpdateMyProfile.usecase';
+import { UpdateMyProfileUseCase } from '../../application/profile/UpdateProfileUseCase';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
