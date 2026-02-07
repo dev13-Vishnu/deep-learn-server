@@ -19,10 +19,10 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc.isActive,
       doc.emailVerified,
       doc._id.toString(),
-      doc.firstName ?? undefined,
-      doc.lastName ?? undefined,
-      doc.bio ?? undefined,
-      doc.avatarUrl ?? undefined,
+      doc.firstName || null,
+      doc.lastName || null,
+      doc.bio || null,
+      doc.avatarUrl || null,
 
     );
   }
@@ -34,6 +34,10 @@ export class MongoUserRepository implements UserRepositoryPort {
       role: user.role,
       isActive: user.isActive,
       emailVerified: user.emailVerified,
+      firstName:user.firstName || null,
+      lastName:user.lastName || null,
+      bio:user.bio || null,
+      avatarUrl:user.avatarUrl || null,
     });
 
     return new User(
@@ -43,6 +47,10 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc.isActive,
       doc.emailVerified,
       doc._id.toString(), // ID assigned here
+      doc.firstName || null,
+      doc.lastName || null,
+      doc.bio || null,
+      doc.avatarUrl || null,
     );
   }
 
@@ -52,6 +60,10 @@ export class MongoUserRepository implements UserRepositoryPort {
   {
     $set: {
       passwordHash: user.passwordHash,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
       updatedAt: new Date(),
     },
   }
@@ -74,11 +86,27 @@ async findById(id: string): Promise<User | null> {
       doc.isActive,
       doc.emailVerified,
       doc._id.toString(),
-      doc.firstName ?? undefined,
-      doc.lastName ?? undefined,
-      doc.bio ?? undefined,
-      doc.avatarUrl ?? undefined,
+      doc.firstName || null,
+      doc.lastName || null,
+      doc.bio || null,
+      doc.avatarUrl || null,
     );
+}
+
+async updateRole(userId: string, role: number): Promise<void> {
+  const result = await UserModel.updateOne(
+    { _id: userId },
+    {
+      $set: {
+        role: role,
+        updatedAt: new Date(),
+      },
+    }
+  );
+
+  if (result.matchedCount === 0) {
+    throw new Error('User not found');
+  }
 }
 
 }
