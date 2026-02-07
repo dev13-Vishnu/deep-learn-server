@@ -10,10 +10,10 @@ export class User {
     public readonly emailVerified: boolean = false,
     public readonly id?: string, // assigned by repository
 
-    public firstName?:string,
-    public lastName?: string,
-    public bio?: string,
-    public avatarUrl?: string,
+    public firstName?:string | null,
+    public lastName?: string | null,
+    public bio?: string | null,
+    public avatarUrl?: string | null,
     
   ) {}
 
@@ -25,15 +25,17 @@ export class User {
     return this.passwordHash;
   }
 
-  updateProfile (data: {
-    firstName?:string;
-    lastName?:string;
-    bio?:string;
-    avatarUrl?:string;
-  }) {
-    if (data.firstName !== undefined) this.firstName = data.firstName;
-    if (data.lastName !== undefined) this.lastName = data.lastName;
-    if (data.bio !== undefined) this.bio = data.bio;
-    if (data.avatarUrl !== undefined) this.avatarUrl = data.avatarUrl;
+  public updateProfile (
+    firstName?:string,
+    lastName?:string,
+    bio?:string,
+  ):void {
+    if (firstName !== undefined) this.firstName = firstName;
+    if (lastName !== undefined) this.lastName = lastName;
+    if (bio !== undefined) this.bio = bio;
+  }
+
+  public updateAvatar(avatarUrl: string | null) : void {
+    this.avatarUrl = avatarUrl;
   }
 }
