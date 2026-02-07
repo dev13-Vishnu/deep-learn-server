@@ -39,5 +39,12 @@ export const env = {
 
   //nodemailer
   deepLearnEmail: requireEnv('DEEP_LEARN_EMAIL'),
-  deepLearnPassword: requireEnv('DEEP_LEARN_PASS')
+  deepLearnPassword: requireEnv('DEEP_LEARN_PASS'),
+  
+  //s3
+  storageProvider: requireEnv('STORAGE_PROVIDER'),
+  awsRegion: requireEnv('AWS_REGION'),
+  awsAccessKeyId: requireEnv('AWS_ACCESS_KEY_ID'),
+  awsSecretAccessKey:requireEnv('AWS_SECRET_ACCESS_KEY'),
+  awsBucketName: requireEnv('AWS_BUCKET_NAME')
 };
