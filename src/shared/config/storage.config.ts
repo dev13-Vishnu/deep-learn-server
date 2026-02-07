@@ -11,7 +11,7 @@ export const  storageConfig = {
     },
 
     limits: {
-        maxfileSize: 5 * 1024 * 1024, //5MB
+        maxFileSize: 5 * 1024 * 1024, //5MB
         allowedMimeTypes: ['image/jped', 'image/png', 'image/webp', 'image/gif'],
     },
 }
