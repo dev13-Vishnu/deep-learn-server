@@ -1,12 +1,7 @@
 import { Schema, model } from 'mongoose';
 
 const UserSchema = new Schema(
-  {
-    firstName: {type: String},
-    lastName: {type: String},
-    bio: {type: String},
-    avatarUrl: {type: String},
-    
+  {  
     email: {
       type: String,
       required: true,
@@ -31,6 +26,10 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    firstName: { type: String, default : null },
+    lastName: { type: String, default : null },
+    avatarUrl: { type: String, default : null },
+    bio: { type: String, default : null },
   },
   {
     timestamps: true,
