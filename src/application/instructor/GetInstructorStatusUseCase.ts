@@ -6,18 +6,16 @@ import { TYPES } from '../../shared/di/types';
 export class GetInstructorStatusUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepository)
-    private instructorRepo: InstructorApplicationRepository
+    private readonly applicationRepository: InstructorApplicationRepository
   ) {}
 
-  async execute(userId: string): Promise<{
-    status: 'pending' | 'approved' | 'rejected' | 'blocked' | null;
-  }> {
-    const application = await this.instructorRepo.findByUserId(userId);
+  async execute(userId: string): Promise<string | null> {
+    const application = await this.applicationRepository.findByUserId(userId);
 
     if (!application) {
-      return { status: null };
+      return null
     }
 
-    return { status: application.status };
+    return application.status;
   }
 }
