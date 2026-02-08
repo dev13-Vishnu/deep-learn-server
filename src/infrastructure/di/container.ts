@@ -44,7 +44,7 @@ import { S3StorageService } from '../storage/s3.storage';
 import { RejectInstructorApplicationUseCase } from '../../application/instructor/RejectInstructorApplicationUseCase';
 import { ApproveInstructorApplicationUseCase } from '../../application/instructor/ApproveInstructorApplicationUseCase';
 import { ListInstructorApplicationsUseCase } from '../../application/instructor/ListInstructorApplicationsUseCase';
-import { LoginController } from '../../presentation/controllers/LoginControllers';
+import { LoginController } from '../../presentation/controllers/LoginController';
 import { SignupController } from '../../presentation/controllers/SignupController';
 import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';

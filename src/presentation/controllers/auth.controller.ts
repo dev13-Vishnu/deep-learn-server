@@ -3,20 +3,20 @@ import { inject, injectable } from "inversify";
 
 import { TYPES } from "../../shared/di/types";
 
-import { LoginUserUseCase } from "../../application/auth/LoginUser.usecase";
-import { GetCurrentUserUseCase } from "../../application/auth/GetCurrentUser.usecase";
-import { RegisterUserUseCase } from "../../application/auth/RegisterUser.usecase";
+import { LoginUserUseCase } from "../../application/auth/LoginUserUseCase";
+import { GetCurrentUserUseCase } from "../../application/auth/GetCurrentUserUseCase";
+import { RegisterUserUseCase } from "../../application/auth/RegisterUserUseCase";
 
-import { RequestSignupOtpUseCase } from "../../application/auth/RequestSignupOtp.usecase";
-import { VerifySignupOtpUseCase } from "../../application/auth/VerifySignupOtp.usecase";
+import { RequestSignupOtpUseCase } from "../../application/auth/RequestSignupOtpUseCase";
+import { VerifySignupOtpUseCase } from "../../application/auth/VerifySignupOtpUseCase";
 
-import { RequestPasswordResetOtpUseCase } from "../../application/auth/RequestPasswordResetOtp.usecase";
-import { VerifyPasswordResetOtpUseCase } from "../../application/auth/VerifyPasswordResetOtp.usecase";
-import { ResetPasswordUseCase } from "../../application/auth/ResetPassword.usecase";
+import { RequestPasswordResetOtpUseCase } from "../../application/auth/RequestPasswordResetOtpUseCase";
+import { VerifyPasswordResetOtpUseCase } from "../../application/auth/VerifyPasswordResetOtpUseCase";
+import { ResetPasswordUseCase } from "../../application/auth/ResetPasswordUseCase";
 
-import { CreateRefreshTokenUseCase } from "../../application/auth/CreateRefreshToken.usecase";
-import { RefreshAccessTokenUseCase } from "../../application/auth/RefreshAccessToken.usecase";
-import { RevokeRefreshTokenUseCase } from "../../application/auth/RevokeRefreshToken.usecase";
+import { CreateRefreshTokenUseCase } from "../../application/auth/CreateRefreshTokenUseCase";
+import { RefreshAccessTokenUseCase } from "../../application/auth/RefreshAccessTokenUseCase";
+import { RevokeRefreshTokenUseCase } from "../../application/auth/RevokeRefreshTokenUseCase";
 
 import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
 import { CookieHelper } from "../utils/cookie.helper";
