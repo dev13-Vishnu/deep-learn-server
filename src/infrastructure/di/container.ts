@@ -184,3 +184,8 @@ container.bind(TYPES.StorageServicePort).to(S3StorageService);
 container.bind(TYPES.LoginController).to(LoginController);
 container.bind(TYPES.SignupController).to(SignupController);
 container.bind(TYPES.PasswordResetController).to(PasswordResetController);
+
+// Bind to same implementation (backward compatible)
+container.bind(TYPES.UserReaderPort).to(MongoUserRepository);
+container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
+container.bind(TYPES.UserRepositoryPort).to(MongoUserRepository);
