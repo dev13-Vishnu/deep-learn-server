@@ -1,7 +1,8 @@
 import { injectable } from 'inversify';
-import { InstructorApplication, InstructorApplicationStatus } from '../../../domain/instructor/InstructorApplication';
+import { InstructorApplicationStatus } from '../../../domain/instructor/InstructorApplication';
 import { InstructorApplicationRepository } from '../../../domain/instructor/InstructorApplicationRepository';
 import { InstructorApplicationModel } from '../models/InstructorApplicationModel';
+import { InstructorApplication } from '../../../domain/entities/InstructorApplication';
 
 @injectable()
 export class MongoInstructorApplicationRepository
@@ -44,6 +45,56 @@ export class MongoInstructorApplicationRepository
   async create(application: InstructorApplication): Promise<void> {
     await InstructorApplicationModel.create(application);
   }
+
+async findAll(
+  filter: any,
+  skip: number,
+  limit: number
+): Promise<InstructorApplication[]> {
+  const docs = await InstructorApplicationModel.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  return docs.map(this.toDomain);
+}
+
+async count(filter: any): Promise<number> {
+  return await InstructorApplicationModel.countDocuments(filter);
+}
+
+private toDomain(doc: IInstructorApplicationDocument): InstructorApplication {
+  return new InstructorApplication(
+    doc._id.toString(),
+    doc.userId.toString(),
+    doc.bio,
+    doc.experienceYears,
+    doc.teachingExperience,
+    doc.courseIntent,
+    doc.level,
+    doc.language,
+    doc.status,
+    doc.rejectionReason || null,  // ← ADD
+    doc.createdAt,
+    doc.updatedAt
+  );
+}
+
+private toPersistence(app: InstructorApplication): Partial<IInstructorApplicationDocument> {
+  return {
+    userId: app.userId as any,
+    bio: app.bio,
+    experienceYears: app.experienceYears,
+    teachingExperience: app.teachingExperience,
+    courseIntent: app.courseIntent,
+    level: app.level,
+    language: app.language,
+    status: app.status,
+    rejectionReason: app.rejectionReason,  // ← ADD
+    updatedAt: new Date(),
+  };
+}
+
 }
 
 function isTeachingExperience(
@@ -71,6 +122,8 @@ function isStatus(
     value === 'rejected' ||
     value === 'blocked'
   );
+
+  
 }
 
 
