@@ -60,4 +60,7 @@ export const TYPES = {
   PasswordResetController: Symbol.for('PasswordResetController'),
   InstructorController: Symbol.for('InstructorController'),
   ProfileController: Symbol.for('ProfileController'),
+
+  UserReaderPort: Symbol.for('UserReaderPort'),
+  UserWriterPort: Symbol.for('UserWriterPort'),
 };

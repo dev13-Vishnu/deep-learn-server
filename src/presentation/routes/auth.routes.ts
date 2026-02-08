@@ -8,10 +8,10 @@ import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middle
 import { validateRequest } from '../middlewares/validationRequest';
 import {
   loginSchema,
-  signupSchema,
   requestOtpSchema,
-  verifyOtpSchema,
   resetPasswordSchema,
+  signupSchema,
+  verifyOtpSchema 
 } from '../validators/auth.validators';
 
 const router = Router();

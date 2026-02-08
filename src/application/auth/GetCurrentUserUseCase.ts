@@ -29,7 +29,7 @@ export class GetCurrentUserUseCase {
                 firstName: user.firstName ?? null,
                 lastName: user.lastName ?? null,
                 bio: user.bio ?? null,
-                avatarUrl: user.avatarUrl ?? null,
+                avatar: user.avatar ?? null,
             }
         };
     }

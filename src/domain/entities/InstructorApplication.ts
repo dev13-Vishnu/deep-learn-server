@@ -1,3 +1,5 @@
+import { DomainError } from "../errors/DomainError";
+
 export class InstructorApplication {
   private constructor(
     public readonly id: string,

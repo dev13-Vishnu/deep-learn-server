@@ -22,9 +22,9 @@ export class UploadAvatarUseCase {
     }
 
     // Delete old avatar if exists
-    if (user.avatarUrl) {
+    if (user.avatar) {
       try {
-        await this.storageService.deleteFile(user.avatarUrl);
+        await this.storageService.deleteFile(user.avatar);
       } catch (err) {
         // Ignore deletion errors
         console.error('Failed to delete old avatarUrl:', err);

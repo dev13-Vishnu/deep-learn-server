@@ -1,3 +1,4 @@
+import { DomainError } from "../errors/DomainError";
 import { Email } from "../value-objects/Email";
 import { UserRole } from "./UserRole";
 

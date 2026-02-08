@@ -1,40 +1,34 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
-const UserSchema = new Schema(
-  {  
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    passwordHash: {
-      type: String,
-      required: true,
-    },
-    role: {
-    type: Number,
-    enum: [0, 1, 2],
-    required: true,
-  },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    emailVerified: {
-      type: Boolean,
-      default: false,
-    },
-    firstName: { type: String, default : null },
-    lastName: { type: String, default : null },
-    avatarUrl: { type: String, default : null },
-    bio: { type: String, default : null },
-  },
+// ← ADD THIS INTERFACE
+export interface IUserDocument extends Document {
+  _id: any;
+  email: string;
+  passwordHash: string;
+  role: number;
+  isActive: boolean;
+  emailVerified: boolean;
+  firstName?: string | null;
+  lastName?: string | null;
+  avatar?: string | null;
+  bio?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const userSchema = new Schema(
   {
-    timestamps: true,
-    versionKey: false,
-  }
+    email: { type: String, required: true, unique: true },
+    passwordHash: { type: String, required: true },
+    role: { type: Number, enum: [0, 1, 2], required: true, default: 0 },
+    isActive: { type: Boolean, default: true },
+    emailVerified: { type: Boolean, default: false },
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
+    avatar: { type: String, default: null },
+    bio: { type: String, default: null },
+  },
+  { timestamps: true }
 );
 
-export const UserModel = model('User', UserSchema);
+export const UserModel = model<IUserDocument>('User', userSchema);

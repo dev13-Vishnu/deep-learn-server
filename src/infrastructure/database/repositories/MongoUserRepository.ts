@@ -56,7 +56,8 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc.isActive,
       doc.emailVerified,
       doc._id.toString(),
-      doc.name || null,
+      doc.firstName || null,
+      doc.lastName || null,
       doc.avatar || null,
       doc.bio || null
     );
@@ -70,7 +71,8 @@ export class MongoUserRepository implements UserRepositoryPort {
       role: user.role,
       isActive: user.isActive,
       emailVerified: user.emailVerified,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       avatar: user.avatar,
       bio: user.bio,
       updatedAt: new Date(),

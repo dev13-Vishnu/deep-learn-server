@@ -18,19 +18,18 @@ import { JwtTokenService } from '../security/JwtTokenService';
 import { RedisOtpService } from '../services/RedisOtpService';
 
 // Use cases (Auth)
-import { LoginUserUseCase } from '../../application/auth/LoginUser.usecase';
-import { RegisterUserUseCase } from '../../application/auth/RegisterUser.usecase';
-import { ResetPasswordUseCase } from '../../application/auth/ResetPassword.usecase';
-import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUser.usecase';
+import { LoginUserUseCase } from '../../application/auth/LoginUserUseCase';
+import { RegisterUserUseCase } from '../../application/auth/RegisterUserUseCase';
+import { ResetPasswordUseCase } from '../../application/auth/ResetPasswordUseCase';
+import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
 
-import { RequestSignupOtpUseCase } from '../../application/auth/RequestSignupOtp.usecase';
-import { VerifySignupOtpUseCase } from '../../application/auth/VerifySignupOtp.usecase';
-import { RequestPasswordResetOtpUseCase } from '../../application/auth/RequestPasswordResetOtp.usecase';
-import { VerifyPasswordResetOtpUseCase } from '../../application/auth/VerifyPasswordResetOtp.usecase';
+import { RequestSignupOtpUseCase } from '../../application/auth/RequestSignupOtpUseCase';
+import { VerifySignupOtpUseCase } from '../../application/auth/VerifySignupOtpUseCase';
+import { RequestPasswordResetOtpUseCase } from '../../application/auth/RequestPasswordResetOtpUseCase';
+import { VerifyPasswordResetOtpUseCase } from '../../application/auth/VerifyPasswordResetOtpUseCase';
 
-import { CreateRefreshTokenUseCase } from '../../application/auth/CreateRefreshToken.usecase';
-import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessToken.usecase';
-import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshToken.usecase';
+import { CreateRefreshTokenUseCase } from '../../application/auth/CreateRefreshTokenUseCase';
+import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
 
 // Use cases (Instructor)
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
@@ -48,6 +47,7 @@ import { ListInstructorApplicationsUseCase } from '../../application/instructor/
 import { LoginController } from '../../presentation/controllers/LoginControllers';
 import { SignupController } from '../../presentation/controllers/SignupController';
 import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
+import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();

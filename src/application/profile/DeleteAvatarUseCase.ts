@@ -21,12 +21,12 @@ export class DeleteAvatarUseCase {
       throw new AppError('User not found', 404);
     }
 
-    if (!user.avatarUrl) {
+    if (!user.avatar) {
       throw new AppError('No avatar to delete', 400);
     }
 
     // Delete from cloud storage
-    await this.storageService.deleteFile(user.avatarUrl);
+    await this.storageService.deleteFile(user.avatar);
 
     // Update user entity
     user.updateAvatar(null);
