@@ -36,6 +36,10 @@ export class ApproveInstructorApplicationUseCase {
       throw new AppError('User not found', 404);
     }
 
+    if (!user.id) {
+        throw new AppError('User ID not found', 500);
+    }
+
     // Assuming role 1 = Instructor
     // Note: You might need to add a setRole method to User entity
     await this.userRepository.updateRole(user.id, 1);
