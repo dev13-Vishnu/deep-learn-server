@@ -18,7 +18,7 @@ export class InstructorController {
     private readonly applyForInstructorUseCase: ApplyForInstructorUseCase,
 
     @inject(TYPES.GetInstructorStatusUseCase)
-    private readonly getInstructorStatusUseCase: GetInstructorStatusUseCase
+    private readonly getInstructorStatusUseCase: GetInstructorStatusUseCase,
 
      @inject(TYPES.ListInstructorApplicationsUseCase)
     private readonly listApplicationsUseCase: ListInstructorApplicationsUseCase,
