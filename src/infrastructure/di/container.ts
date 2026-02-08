@@ -35,8 +35,12 @@ import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshT
 // Use cases (Instructor)
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
-import { UserController } from '../../presentation/controllers/UserController';
-import { UpdateMyProfileUseCase } from '../../application/profile/UpdateProfileUseCase';
+import { GetProfileUseCase } from '../../application/profile/GetProfileUseCase';
+import { UpdateProfileUseCase } from '../../application/profile/UpdateProfileUseCase';
+import { UploadAvatarUseCase } from '../../application/profile/UploadAvatarUseCase';
+import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCase';
+import { ProfileController } from '../../presentation/controllers/ProfileController';
+import { S3StorageService } from '../storage/s3.storage';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -153,8 +157,14 @@ container
   .to(InstructorController);
 
 
-container.bind<UserController>(TYPES.UserController).to(UserController);
+// Use cases
+container.bind(TYPES.GetProfileUseCase).to(GetProfileUseCase);
+container.bind(TYPES.UpdateProfileUseCase).to(UpdateProfileUseCase);
+container.bind(TYPES.UploadAvatarUseCase).to(UploadAvatarUseCase);
+container.bind(TYPES.DeleteAvatarUseCase).to(DeleteAvatarUseCase);
 
-container
-  .bind<UpdateMyProfileUseCase>(TYPES.UpdateMyProfileUseCase)
-  .to(UpdateMyProfileUseCase);
+// Controller
+container.bind(TYPES.ProfileController).to(ProfileController);
+
+// Storage service
+container.bind(TYPES.StorageServicePort).to(S3StorageService);
