@@ -3,6 +3,7 @@ import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
+import { UserRole } from '../../domain/entities/UserRole';
 
 @injectable()
 export class ApproveInstructorApplicationUseCase {
@@ -21,15 +22,20 @@ export class ApproveInstructorApplicationUseCase {
       throw new AppError('Application not found', 404);
     }
 
-    if (application.status === 'approved') {
-      throw new AppError('Application already approved', 400);
+    // ✅ Use entity's business logic
+    try {
+      application.approve();  // Throws DomainError if invalid
+    } catch (error: any) {
+      if (error.name === 'DomainError') {
+        throw new AppError(error.message, 400);
+      }
+      throw error;
     }
 
-    // Update application status
-    application.status = 'approved';
+    // Save updated application
     await this.applicationRepository.update(application);
 
-    // Upgrade user role to instructor (1)
+    // Upgrade user role
     const user = await this.userRepository.findById(application.userId);
 
     if (!user) {
@@ -37,12 +43,10 @@ export class ApproveInstructorApplicationUseCase {
     }
 
     if (!user.id) {
-        throw new AppError('User ID not found', 500);
+      throw new AppError('User ID not found', 500);
     }
 
-    // Assuming role 1 = Instructor
-    // Note: You might need to add a setRole method to User entity
-    await this.userRepository.updateRole(user.id, 1);
+    await this.userRepository.updateRole(user.id, UserRole.TUTOR);
 
     return {
       message: 'Application approved successfully',
