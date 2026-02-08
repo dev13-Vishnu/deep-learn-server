@@ -56,37 +56,37 @@ export class MongoInstructorApplicationRepository
 
   // ← FIX THIS METHOD
   private toDomain(doc: IInstructorApplicationDocument): InstructorApplication {
-    return new InstructorApplication(
-      doc._id.toString(),
-      doc.userId.toString(),
-      doc.bio,
-      doc.experienceYears,
-      doc.teachingExperience,  // Already typed as 'yes' | 'no'
-      doc.courseIntent,
-      doc.level,  // Already typed as 'beginner' | 'intermediate' | 'advanced'
-      doc.language,
-      doc.status,  // Already typed as 'pending' | 'approved' | 'rejected'
-      doc.rejectionReason || null,  // ← ADD
-      doc.createdAt,
-      doc.updatedAt
-    );
-  }
+  // ✅ Use entity's reconstruct factory method
+  return InstructorApplication.reconstruct(
+    doc._id.toString(),
+    doc.userId.toString(),
+    doc.bio,
+    doc.experienceYears,
+    doc.teachingExperience,
+    doc.courseIntent,
+    doc.level,
+    doc.language,
+    doc.status,
+    doc.rejectionReason || null,
+    doc.createdAt,
+    doc.updatedAt
+  );
+}
 
-  // ← FIX THIS METHOD
-  private toPersistence(
-    app: InstructorApplication
-  ): Partial<IInstructorApplicationDocument> {
-    return {
-      userId: app.userId as any,
-      bio: app.bio,
-      experienceYears: app.experienceYears,
-      teachingExperience: app.teachingExperience,
-      courseIntent: app.courseIntent,
-      level: app.level,
-      language: app.language,
-      status: app.status,
-      rejectionReason: app.rejectionReason,  // ← ADD
-      updatedAt: new Date(),
-    };
-  }
+private toPersistence(
+  app: InstructorApplication
+): Partial<IInstructorApplicationDocument> {
+  return {
+    userId: app.userId as any,
+    bio: app.bio,
+    experienceYears: app.experienceYears,
+    teachingExperience: app.teachingExperience,
+    courseIntent: app.courseIntent,
+    level: app.level,
+    language: app.language,
+    status: app.status as any,
+    rejectionReason: app.rejectionReason,
+    updatedAt: new Date(),
+  };
+}
 }
