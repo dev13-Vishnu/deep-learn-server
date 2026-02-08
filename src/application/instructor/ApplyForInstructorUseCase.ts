@@ -44,6 +44,7 @@ private readonly applicationRepository: InstructorApplicationRepositoryPort
       level: input.level,
       language: input.language,
       status: 'pending',
+      rejectionReason: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
