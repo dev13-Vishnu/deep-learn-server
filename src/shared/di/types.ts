@@ -44,15 +44,20 @@ export const TYPES = {
   // Controllers
   // ======================
   AuthController: Symbol.for('AuthController'),
-  InstructorController: Symbol.for('InstructorController'),
 
   // Profile
   GetProfileUseCase: Symbol.for('GetProfileUseCase'),
   UpdateProfileUseCase: Symbol.for('UpdateProfileUseCase'),
   UploadAvatarUseCase: Symbol.for('UploadAvatarUseCase'),
   DeleteAvatarUseCase: Symbol.for('DeleteAvatarUseCase'),
-  ProfileController: Symbol.for('ProfileController'),
   
   // Storage
   StorageServicePort: Symbol.for('StorageServicePort'),
+  
+  // Controllers (updated)
+  LoginController: Symbol.for('LoginController'),
+  SignupController: Symbol.for('SignupController'),
+  PasswordResetController: Symbol.for('PasswordResetController'),
+  InstructorController: Symbol.for('InstructorController'),
+  ProfileController: Symbol.for('ProfileController'),
 };

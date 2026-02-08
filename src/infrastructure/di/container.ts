@@ -45,6 +45,9 @@ import { S3StorageService } from '../storage/s3.storage';
 import { RejectInstructorApplicationUseCase } from '../../application/instructor/RejectInstructorApplicationUseCase';
 import { ApproveInstructorApplicationUseCase } from '../../application/instructor/ApproveInstructorApplicationUseCase';
 import { ListInstructorApplicationsUseCase } from '../../application/instructor/ListInstructorApplicationsUseCase';
+import { LoginController } from '../../presentation/controllers/LoginControllers';
+import { SignupController } from '../../presentation/controllers/SignupController';
+import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -175,3 +178,9 @@ container.bind(TYPES.ProfileController).to(ProfileController);
 
 // Storage service
 container.bind(TYPES.StorageServicePort).to(S3StorageService);
+
+
+// Add new controller bindings
+container.bind(TYPES.LoginController).to(LoginController);
+container.bind(TYPES.SignupController).to(SignupController);
+container.bind(TYPES.PasswordResetController).to(PasswordResetController);
