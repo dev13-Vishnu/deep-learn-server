@@ -28,7 +28,7 @@ export function createExpressApp() {
   '/instructor',
   instructorRoutes
 );
-app.use('/api/profile', profileRoutes)
+app.use('/profile', profileRoutes)
 
 
   // 404 handler
