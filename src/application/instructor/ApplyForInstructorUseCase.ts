@@ -1,8 +1,9 @@
-import { InstructorApplicationRepository } from '../../domain/instructor/InstructorApplicationRepository';
+
 import { AppError } from '../../shared/errors/AppError';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { InstructorApplication } from '../../domain/entities/InstructorApplication';
+import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 
 interface ApplyForInstructorInput {
   userId: string;
@@ -17,13 +18,14 @@ interface ApplyForInstructorInput {
 @injectable()
 export class ApplyForInstructorUseCase {
   constructor(
-    @inject(TYPES.InstructorApplicationRepository)
-    private instructorRepo: InstructorApplicationRepository
+    @inject(TYPES.InstructorApplicationRepositoryPort)
+private readonly applicationRepository: InstructorApplicationRepositoryPort
+
   ) {}
 
   async execute(input: ApplyForInstructorInput): Promise<void> {
     const existing =
-      await this.instructorRepo.findByUserId(input.userId);
+      await this.applicationRepository.findByUserId(input.userId);
 
     if (existing && existing.status === 'pending') {
       throw new AppError(
@@ -46,6 +48,6 @@ export class ApplyForInstructorUseCase {
       updatedAt: new Date(),
     };
 
-    await this.instructorRepo.create(application);
+    await this.applicationRepository.create(application);
   }
 }

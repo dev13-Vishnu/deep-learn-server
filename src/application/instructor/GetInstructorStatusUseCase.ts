@@ -1,12 +1,13 @@
 import { inject, injectable } from 'inversify';
-import { InstructorApplicationRepository } from '../../domain/instructor/InstructorApplicationRepository';
 import { TYPES } from '../../shared/di/types';
+import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 
 @injectable()
 export class GetInstructorStatusUseCase {
   constructor(
-    @inject(TYPES.InstructorApplicationRepository)
-    private readonly applicationRepository: InstructorApplicationRepository
+    @inject(TYPES.InstructorApplicationRepositoryPort)
+private readonly applicationRepository: InstructorApplicationRepositoryPort
+
   ) {}
 
   async execute(userId: string): Promise<string | null> {
