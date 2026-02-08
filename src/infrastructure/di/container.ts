@@ -62,9 +62,8 @@ container
   .to(MongoRefreshTokenRepository);
 
 container
-  .bind(TYPES.InstructorApplicationRepository)
+  .bind(TYPES.InstructorApplicationRepositoryPort)  
   .to(MongoInstructorApplicationRepository);
-
 /* -----------------------------
    Service bindings
 ----------------------------- */
