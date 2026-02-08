@@ -3,6 +3,10 @@ import { container } from "../../infrastructure/di/container";
 import { InstructorController } from "../controllers/InstructorController";
 import { TYPES } from "../../shared/di/types";
 import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
+import { adminAuthMiddleware } from '../../infrastructure/security/admin-auth.middleware';
+import { validateRequest } from '../middlewares/validationRequest';
+import { applyForInstructorSchema } from '../validators/instructor.validators';
+
 
 const router = Router();
 
@@ -16,6 +20,7 @@ const instructorController = container.get<InstructorController>(
 router.post(
   '/apply',
   jwtAuthMiddleware,
+  validateRequest(applyForInstructorSchema),
   instructorController.apply.bind(instructorController)
 );
 
@@ -25,4 +30,26 @@ router.get(
   instructorController.getStatus.bind(instructorController)
 );
 
+
+// Admin routes (admin only)
+router.get(
+  '/applications',
+  jwtAuthMiddleware,
+  adminAuthMiddleware,
+  instructorController.listApplications.bind(instructorController)
+);
+
+router.post(
+  '/applications/:applicationId/approve',
+  jwtAuthMiddleware,
+  adminAuthMiddleware,
+  instructorController.approveApplication.bind(instructorController)
+);
+
+router.post(
+  '/applications/:applicationId/reject',
+  jwtAuthMiddleware,
+  adminAuthMiddleware,
+  instructorController.rejectApplication.bind(instructorController)
+);
 export default router;
