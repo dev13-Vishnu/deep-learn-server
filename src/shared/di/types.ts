@@ -44,6 +44,13 @@ export const TYPES = {
   AuthController: Symbol.for('AuthController'),
   InstructorController: Symbol.for('InstructorController'),
 
-  UserController: Symbol.for('UserController'),
-  UpdateMyProfileUseCase: Symbol.for('UpdateMyProfileUseCase'),
+  // Profile
+  GetProfileUseCase: Symbol.for('GetProfileUseCase'),
+  UpdateProfileUseCase: Symbol.for('UpdateProfileUseCase'),
+  UploadAvatarUseCase: Symbol.for('UploadAvatarUseCase'),
+  DeleteAvatarUseCase: Symbol.for('DeleteAvatarUseCase'),
+  ProfileController: Symbol.for('ProfileController'),
+  
+  // Storage
+  StorageServicePort: Symbol.for('StorageServicePort'),
 };
