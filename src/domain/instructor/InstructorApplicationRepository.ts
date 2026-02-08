@@ -1,4 +1,4 @@
-import { InstructorApplication } from './InstructorApplication';
+import { InstructorApplication } from "../entities/InstructorApplication";
 
 export interface InstructorApplicationRepository {
   findByUserId(userId: string): Promise<InstructorApplication | null>;
