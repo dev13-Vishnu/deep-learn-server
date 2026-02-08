@@ -1,13 +1,35 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
+
+export interface IInstructorApplicationDocument extends Document {
+  userId: Schema.Types.ObjectId;
+  bio: string;
+  experienceYears: string;
+  teachingExperience: 'yes' | 'no';
+  courseIntent: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  language: string;
+  status: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const instructorApplicationSchema = new Schema<IInstructorApplicationDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     bio: { type: String, required: true },
     experienceYears: { type: String, required: true },
-    teachingExperience: { type: String, required: true },
+    teachingExperience: { 
+      type: String, 
+      enum: ['yes', 'no'], 
+      required: true 
+    },
     courseIntent: { type: String, required: true },
-    level: { type: String, required: true },
+    level: {
+      type: String,
+      enum: ['beginner', 'intermediate', 'advanced'],
+      required: true,
+    },
     language: { type: String, required: true },
     status: {
       type: String,
@@ -19,5 +41,9 @@ const instructorApplicationSchema = new Schema<IInstructorApplicationDocument>(
   { timestamps: true }
 );
 
-// Add index for admin queries
 instructorApplicationSchema.index({ status: 1, createdAt: -1 });
+
+export const InstructorApplicationModel = model<IInstructorApplicationDocument>(
+  'InstructorApplication',
+  instructorApplicationSchema
+);
