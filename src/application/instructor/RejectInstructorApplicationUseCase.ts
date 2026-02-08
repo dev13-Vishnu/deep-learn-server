@@ -11,23 +11,31 @@ export class RejectInstructorApplicationUseCase {
   ) {}
 
   async execute(applicationId: string, reason?: string) {
-    const application = await this.applicationRepository.findById(applicationId);
+  const application = await this.applicationRepository.findById(applicationId);
 
-    if (!application) {
-      throw new AppError('Application not found', 404);
-    }
-
-    if (application.status === 'rejected') {
-      throw new AppError('Application already rejected', 400);
-    }
-
-    application.status = 'rejected';
-    application.rejectionReason = reason || null;
-    await this.applicationRepository.update(application);
-
-    return {
-      message: 'Application rejected',
-      application,
-    };
+  if (!application) {
+    throw new AppError('Application not found', 404);
   }
+
+  if (!reason || reason.trim().length === 0) {
+    throw new AppError('Rejection reason is required', 400);
+  }
+
+  // ✅ Use entity's business logic
+  try {
+    application.reject(reason);  // Throws DomainError if invalid
+  } catch (error: any) {
+    if (error.name === 'DomainError') {
+      throw new AppError(error.message, 400);
+    }
+    throw error;
+  }
+
+  await this.applicationRepository.update(application);
+
+  return {
+    message: 'Application rejected',
+    application,
+  };
+}
 }
