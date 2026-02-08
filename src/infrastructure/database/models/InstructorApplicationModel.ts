@@ -1,7 +1,7 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
 export interface IInstructorApplicationDocument extends Document {
-  userId: Schema.Types.ObjectId;
+  userId: Types.ObjectId;
   bio: string;
   experienceYears: string;
   teachingExperience: 'yes' | 'no';

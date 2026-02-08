@@ -5,18 +5,20 @@ import {
   InstructorApplicationModel,
   IInstructorApplicationDocument 
 } from '../models/InstructorApplicationModel';
+import { Types } from 'mongoose';
 
 @injectable()
 export class MongoInstructorApplicationRepository
   implements InstructorApplicationRepositoryPort
 {
-  async findByUserId(
-    userId: string
-  ): Promise<InstructorApplication | null> {
-    const doc = await InstructorApplicationModel.findOne({ userId });
-    if (!doc) return null;
-    return this.toDomain(doc);
-  }
+  async findByUserId(userId: string): Promise<InstructorApplication | null> {
+  const doc = await InstructorApplicationModel.findOne({
+    userId: new Types.ObjectId(userId),
+  });
+
+  if (!doc) return null;
+  return this.toDomain(doc);
+}
 
   async findById(id: string): Promise<InstructorApplication | null> {
     const doc = await InstructorApplicationModel.findById(id);
