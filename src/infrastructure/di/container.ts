@@ -41,6 +41,10 @@ import { UploadAvatarUseCase } from '../../application/profile/UploadAvatarUseCa
 import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCase';
 import { ProfileController } from '../../presentation/controllers/ProfileController';
 import { S3StorageService } from '../storage/s3.storage';
+
+import { RejectInstructorApplicationUseCase } from '../../application/instructor/RejectInstructorApplicationUseCase';
+import { ApproveInstructorApplicationUseCase } from '../../application/instructor/ApproveInstructorApplicationUseCase';
+import { ListInstructorApplicationsUseCase } from '../../application/instructor/ListInstructorApplicationsUseCase';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -162,6 +166,10 @@ container.bind(TYPES.GetProfileUseCase).to(GetProfileUseCase);
 container.bind(TYPES.UpdateProfileUseCase).to(UpdateProfileUseCase);
 container.bind(TYPES.UploadAvatarUseCase).to(UploadAvatarUseCase);
 container.bind(TYPES.DeleteAvatarUseCase).to(DeleteAvatarUseCase);
+
+container.bind(TYPES.ListInstructorApplicationsUseCase).to(ListInstructorApplicationsUseCase);
+container.bind(TYPES.ApproveInstructorApplicationUseCase).to(ApproveInstructorApplicationUseCase);
+container.bind(TYPES.RejectInstructorApplicationUseCase).to(RejectInstructorApplicationUseCase);
 
 // Controller
 container.bind(TYPES.ProfileController).to(ProfileController);
