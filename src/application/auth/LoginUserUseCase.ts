@@ -4,14 +4,15 @@ import { Password } from '../../domain/value-objects/Password';
 import { AppError } from '../../shared/errors/AppError';
 
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../../shared/di/types'
+import { TYPES } from '../../shared/di/types';
 
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRole } from '../../domain/entities/UserRole';
 import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
 
-export interface LoginUserInput {
+// ✅ ADD THIS MISSING INTERFACE
+interface LoginUserInput {
   email: string;
   password: string;
 }
@@ -23,7 +24,7 @@ interface LoginUserOutput {
     role: UserRole;
   };
   accessToken: string;
-  refreshToken: string;  // ← ADD THIS
+  refreshToken: string;
 }
 
 @injectable()
@@ -37,9 +38,9 @@ export class LoginUserUseCase {
 
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
-    
-    @inject(TYPES.CreateRefreshTokenUseCase)  // ← ADD THIS
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase  // ← ADD THIS
+
+    @inject(TYPES.CreateRefreshTokenUseCase)
+    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
   ) {}
 
   async execute(input: LoginUserInput): Promise<LoginUserOutput> {
@@ -71,8 +72,9 @@ export class LoginUserUseCase {
       role: user.role,
     });
 
-    // ✅ CREATE REFRESH TOKEN
-    const { token: refreshToken } = await this.createRefreshTokenUseCase.execute(user.id);
+    // Create refresh token
+    const { token: refreshToken } =
+      await this.createRefreshTokenUseCase.execute(user.id);
 
     return {
       user: {
@@ -81,7 +83,7 @@ export class LoginUserUseCase {
         role: user.role,
       },
       accessToken,
-      refreshToken,  // ← ADD THIS
+      refreshToken,
     };
   }
 }

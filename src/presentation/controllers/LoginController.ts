@@ -60,7 +60,7 @@ export class LoginController {
     const result = await this.refreshAccessTokenUseCase.execute(refreshToken);
 
     // Set new refresh token cookie
-    res.cookie('refreshToken', result.newRefreshToken, {
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

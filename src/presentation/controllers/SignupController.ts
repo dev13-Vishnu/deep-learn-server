@@ -1,65 +1,83 @@
-import { Request, Response } from 'express';
-import { injectable, inject } from 'inversify';
+import { Request, Response, NextFunction } from 'express';
+import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
+import { RegisterUserUseCase } from '../../application/auth/RegisterUserUseCase';
 import { RequestSignupOtpUseCase } from '../../application/auth/RequestSignupOtpUseCase';
 import { VerifySignupOtpUseCase } from '../../application/auth/VerifySignupOtpUseCase';
-import { RegisterUserUseCase } from '../../application/auth/RegisterUserUseCase';
 
 @injectable()
 export class SignupController {
   constructor(
-    @inject(TYPES.RequestSignupOtpUseCase)
-    private readonly requestSignupOtpUseCase: RequestSignupOtpUseCase,
-
-    @inject(TYPES.VerifySignupOtpUseCase)
-    private readonly verifySignupOtpUseCase: VerifySignupOtpUseCase,
-
     @inject(TYPES.RegisterUserUseCase)
-    private readonly registerUserUseCase: RegisterUserUseCase
+    private registerUserUseCase: RegisterUserUseCase,
+    @inject(TYPES.RequestSignupOtpUseCase)
+    private requestSignupOtpUseCase: RequestSignupOtpUseCase,
+    @inject(TYPES.VerifySignupOtpUseCase)
+    private verifySignupOtpUseCase: VerifySignupOtpUseCase
   ) {}
 
-  async requestOtp(req: Request, res: Response): Promise<Response> {
-    const { email } = req.body;
+  async requestOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { email } = req.body;
+      
+      // RequestSignupOtpUseCase returns a Date directly, not an object with expiresAt property
+      const expiresAt = await this.requestSignupOtpUseCase.execute(email);
 
-    const result = await this.requestSignupOtpUseCase.execute(email);
-
-    return res.status(200).json({
-      message: 'OTP sent successfully',
-      expiresAt: result.expiresAt,
-    });
+      res.status(200).json({
+        message: 'OTP sent to email',
+        expiresAt, // This is already a Date object
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async verifyOtp(req: Request, res: Response): Promise<Response> {
-    const { email, otp } = req.body;
+  async verifyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { email, otp } = req.body;
+      await this.verifySignupOtpUseCase.execute(email, otp);
 
-    await this.verifySignupOtpUseCase.execute(email, otp);
-
-    return res.status(200).json({
-      message: 'OTP verified successfully',
-    });
+      res.status(200).json({
+        message: 'OTP verified successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async signup(req: Request, res: Response): Promise<Response> {
-    const { email, otp, password } = req.body;
+  async signup(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { email, password, otp } = req.body;
 
-    const result = await this.registerUserUseCase.execute({
-      email,
-      otp,
-      password,
-    });
+      // Verify OTP first
+      await this.verifySignupOtpUseCase.execute(email, otp);
 
-    // Set refresh token cookie
-    res.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+      // Register user (returns User entity, not a structured DTO)
+      const user = await this.registerUserUseCase.execute({
+        email,
+        password,
+      });
 
-    return res.status(201).json({
-      message: 'User registered successfully',
-      user: result.user,
-      accessToken: result.accessToken,
-    });
+      // Return simple success response
+      // Note: In your actual codebase, auth.controller handles token generation differently
+      res.status(201).json({
+        message: 'User registered successfully',
+        user,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
