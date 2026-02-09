@@ -8,16 +8,23 @@ import { TYPES } from '../../shared/di/types'
 
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
+import { UserRole } from '../../domain/entities/UserRole';
+import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
 
 
-interface LoginUserInput {
-  email: string;
-  password: string;
+interface LoginUserOutput {
+  user: {
+    id: string;
+    email: string;
+    role: UserRole;
+  };
+  accessToken: string;
+  refreshToken: string;  // ← ADD THIS
 }
 
 @injectable()
 export class LoginUserUseCase {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,
 
@@ -25,9 +32,13 @@ export class LoginUserUseCase {
     private readonly passwordHasher: PasswordHasherPort,
 
     @inject(TYPES.TokenServicePort)
-    private readonly tokenService: TokenServicePort
+    private readonly tokenService: TokenServicePort,
+    
+    @inject(TYPES.CreateRefreshTokenUseCase)  // ← ADD THIS
+    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase  // ← ADD THIS
   ) {}
-  async execute(input: LoginUserInput) {
+
+  async execute(input: LoginUserInput): Promise<LoginUserOutput> {
     const email = new Email(input.email);
     const password = new Password(input.password);
 
@@ -39,7 +50,7 @@ export class LoginUserUseCase {
 
     const passwordMatch = this.passwordHasher.compare(
       password.getValue(),
-      user.passwordHash,
+      user.passwordHash
     );
 
     if (!passwordMatch) {
@@ -47,14 +58,17 @@ export class LoginUserUseCase {
     }
 
     if (!user.id) {
-  throw new AppError('User identity not initialized', 500);
-}
+      throw new AppError('User ID not found', 500);
+    }
 
-const accessToken = this.tokenService.generateAccessToken({
-  userId: user.id,
-  role: user.role,
-});
+    // Generate access token
+    const accessToken = this.tokenService.generateAccessToken({
+      userId: user.id,
+      role: user.role,
+    });
 
+    // ✅ CREATE REFRESH TOKEN
+    const { token: refreshToken } = await this.createRefreshTokenUseCase.execute(user.id);
 
     return {
       user: {
@@ -63,6 +77,7 @@ const accessToken = this.tokenService.generateAccessToken({
         role: user.role,
       },
       accessToken,
+      refreshToken,  // ← ADD THIS
     };
   }
 }
