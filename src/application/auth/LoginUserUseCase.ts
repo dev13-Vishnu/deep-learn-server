@@ -11,6 +11,10 @@ import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRole } from '../../domain/entities/UserRole';
 import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
 
+export interface LoginUserInput {
+  email: string;
+  password: string;
+}
 
 interface LoginUserOutput {
   user: {
