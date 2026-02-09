@@ -48,6 +48,7 @@ import { LoginController } from '../../presentation/controllers/LoginController'
 import { SignupController } from '../../presentation/controllers/SignupController';
 import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
+import { LogoutUserUseCase } from '../../application/auth/LogoutUserUseCase';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -188,4 +189,7 @@ container.bind(TYPES.PasswordResetController).to(PasswordResetController);
 // Bind to same implementation (backward compatible)
 container.bind(TYPES.UserReaderPort).to(MongoUserRepository);
 container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
-container.bind(TYPES.UserRepositoryPort).to(MongoUserRepository);
+// container.bind(TYPES.UserRepositoryPort).to(MongoUserRepository);
+container
+  .bind(TYPES.LogoutUserUseCase)
+  .to(LogoutUserUseCase);
