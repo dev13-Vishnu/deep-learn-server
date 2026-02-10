@@ -53,7 +53,7 @@ export class LoginUserUseCase {
       throw new AppError('Invalid email or password', 401);
     }
 
-    const passwordMatch = this.passwordHasher.compare(
+    const passwordMatch = await this.passwordHasher.compare(
       password.getValue(),
       user.passwordHash
     );
