@@ -11,7 +11,7 @@ import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRole } from '../../domain/entities/UserRole';
 import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
 
-// ✅ ADD THIS MISSING INTERFACE
+// ADD THIS MISSING INTERFACE
 interface LoginUserInput {
   email: string;
   password: string;

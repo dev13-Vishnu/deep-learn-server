@@ -19,7 +19,7 @@ export class InstructorApplication {
     this.validateCourseIntent(courseIntent);
   }
 
-  // ✅ Factory method for creation
+  //  Factory method for creation
   public static create(
     id: string,
     userId: string,
@@ -46,7 +46,7 @@ export class InstructorApplication {
     );
   }
 
-  // ✅ Factory method for reconstruction (from DB)
+  // Factory method for reconstruction (from DB)
   public static reconstruct(
     id: string,
     userId: string,
@@ -77,7 +77,7 @@ export class InstructorApplication {
     );
   }
 
-  // ✅ Business validation
+  // Business validation
   private validateBio(bio: string): void {
     if (bio.length < 50) {
       throw new DomainError('Bio must be at least 50 characters');
@@ -96,7 +96,7 @@ export class InstructorApplication {
     }
   }
 
-  // ✅ Business behavior: Approve
+  // Business behavior: Approve
   public approve(): void {
     if (this._status === 'approved') {
       throw new DomainError('Application is already approved');
@@ -108,7 +108,7 @@ export class InstructorApplication {
     this._rejectionReason = null;
   }
 
-  // ✅ Business behavior: Reject
+  // Business behavior: Reject
   public reject(reason: string): void {
     if (!reason || reason.trim().length === 0) {
       throw new DomainError('Rejection reason is required');
@@ -123,22 +123,22 @@ export class InstructorApplication {
     this._rejectionReason = reason;
   }
 
-  // ✅ Business query: Can be approved?
+  // Business query: Can be approved?
   public canBeApproved(): boolean {
     return this._status === 'pending';
   }
 
-  // ✅ Business query: Is approved?
+  // Business query: Is approved?
   public isApproved(): boolean {
     return this._status === 'approved';
   }
 
-  // ✅ Business query: Is pending?
+  // Business query: Is pending?
   public isPending(): boolean {
     return this._status === 'pending';
   }
 
-  // ✅ Getters (encapsulation)
+  // Getters (encapsulation)
   public get status(): string {
     return this._status;
   }

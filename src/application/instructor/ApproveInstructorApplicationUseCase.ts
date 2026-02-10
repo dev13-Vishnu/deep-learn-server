@@ -22,7 +22,7 @@ export class ApproveInstructorApplicationUseCase {
       throw new AppError('Application not found', 404);
     }
 
-    // ✅ Use entity's business logic
+    // Use entity's business logic
     try {
       application.approve();  // Throws DomainError if invalid
     } catch (error: any) {
@@ -47,6 +47,9 @@ export class ApproveInstructorApplicationUseCase {
     }
 
     await this.userRepository.updateRole(user.id, UserRole.TUTOR);
+
+    user.instructorState = 'approved';
+    await this.userRepository.update(user);
 
     return {
       message: 'Application approved successfully',

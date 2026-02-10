@@ -11,18 +11,18 @@ export class MongoUserRepository implements UserRepositoryPort {
   async findByEmail(email: Email): Promise<User | null> {
     const doc = await UserModel.findOne({ email: email.getValue() });
     if (!doc) return null;
-    return this.toDomain(doc);  // ✅ Use helper
+    return this.toDomain(doc);  // Use helper
   }
 
   async create(user: User): Promise<User> {
-    const doc = await UserModel.create(this.toPersistence(user));  // ✅ Use helper
-    return this.toDomain(doc);  // ✅ Use helper
+    const doc = await UserModel.create(this.toPersistence(user));  // Use helper
+    return this.toDomain(doc);  // Use helper
   }
 
   async update(user: User): Promise<void> {
     const result = await UserModel.updateOne(
       { _id: user.id },
-      { $set: this.toPersistence(user) }  // ✅ Use helper
+      { $set: this.toPersistence(user) }  // Use helper
     );
 
     if (result.matchedCount === 0) {
@@ -33,7 +33,7 @@ export class MongoUserRepository implements UserRepositoryPort {
   async findById(id: string): Promise<User | null> {
     const doc = await UserModel.findById(id);
     if (!doc) return null;
-    return this.toDomain(doc);  // ✅ Use helper
+    return this.toDomain(doc);  // Use helper
   }
 
   async updateRole(userId: string, role: number): Promise<void> {
@@ -47,7 +47,7 @@ export class MongoUserRepository implements UserRepositoryPort {
     }
   }
 
-  // ✅ HELPER: Convert DB document to Domain entity
+  // HELPER: Convert DB document to Domain entity
   private toDomain(doc: IUserDocument): User {
     return new User(
       new Email(doc.email),
@@ -59,11 +59,12 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc.firstName || null,
       doc.lastName || null,
       doc.avatar || null,
-      doc.bio || null
+      doc.bio || null,
+      doc.instructorState || 'not_applied'
     );
   }
 
-  // ✅ HELPER: Convert Domain entity to DB document
+  // HELPER: Convert Domain entity to DB document
   private toPersistence(user: User): Partial<IUserDocument> {
     return {
       email: user.email.getValue(),
@@ -75,6 +76,7 @@ export class MongoUserRepository implements UserRepositoryPort {
       lastName: user.lastName,
       avatar: user.avatar,
       bio: user.bio,
+      instructorState: user.instructorState ?? 'not_applied',
       updatedAt: new Date(),
     };
   }

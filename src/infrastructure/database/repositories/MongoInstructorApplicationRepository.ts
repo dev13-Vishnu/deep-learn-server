@@ -56,7 +56,7 @@ export class MongoInstructorApplicationRepository
 
   // ← FIX THIS METHOD
   private toDomain(doc: IInstructorApplicationDocument): InstructorApplication {
-  // ✅ Use entity's reconstruct factory method
+  // Use entity's reconstruct factory method
   return InstructorApplication.reconstruct(
     doc._id.toString(),
     doc.userId.toString(),

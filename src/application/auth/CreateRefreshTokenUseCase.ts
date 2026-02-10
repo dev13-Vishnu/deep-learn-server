@@ -22,7 +22,7 @@ export class CreateRefreshTokenUseCase {
     const tokenHash = this.hashToken(token);
     const expiresAt = this.calculateExpiration();
 
-    // ✅ Create domain entity
+    // Create domain entity
     const refreshToken = new RefreshToken(
       undefined,  // ID assigned by repository
       userId,
@@ -31,7 +31,7 @@ export class CreateRefreshTokenUseCase {
       new Date()
     );
 
-    // ✅ SAVE TO DATABASE
+    // SAVE TO DATABASE
     await this.refreshTokenRepository.create(refreshToken);
 
     return { token, expiresAt };

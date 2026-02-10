@@ -12,7 +12,7 @@ interface UpdateProfileDTO {
 @injectable()
 export class UpdateProfileUseCase {
   constructor(
-    @inject(TYPES.UserRepositoryPort)  // ✅ Needs both read and write
+    @inject(TYPES.UserRepositoryPort)  //  Needs both read and write
     private readonly userRepository: UserRepositoryPort
   ) {}
 

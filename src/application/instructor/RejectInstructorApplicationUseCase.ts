@@ -2,12 +2,16 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
+import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 
 @injectable()
 export class RejectInstructorApplicationUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
-    private readonly applicationRepository: InstructorApplicationRepositoryPort
+    private readonly applicationRepository: InstructorApplicationRepositoryPort,
+
+    @inject(TYPES.UserReaderPort)
+    private readonly userRepository: UserRepositoryPort
   ) {}
 
   async execute(applicationId: string, reason?: string) {
@@ -21,7 +25,7 @@ export class RejectInstructorApplicationUseCase {
     throw new AppError('Rejection reason is required', 400);
   }
 
-  // ✅ Use entity's business logic
+  // Use entity's business logic
   try {
     application.reject(reason);  // Throws DomainError if invalid
   } catch (error: any) {
@@ -32,6 +36,14 @@ export class RejectInstructorApplicationUseCase {
   }
 
   await this.applicationRepository.update(application);
+
+  // Update users's instructor state to rejected
+  const user = await this.userRepository.findById(application.userId);
+
+  if(user) {
+    user.instructorState = 'rejected';
+    await this.userRepository.update(user);
+  }
 
   return {
     message: 'Application rejected',

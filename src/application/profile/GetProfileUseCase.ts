@@ -6,7 +6,7 @@ import { UserReaderPort } from '../ports/UserReaderPort';
 @injectable()
 export class GetProfileUseCase {
   constructor(
-    @inject(TYPES.UserReaderPort)  // ✅ Only inject what's needed
+    @inject(TYPES.UserReaderPort)  // Only inject what's needed
     private readonly userReader: UserReaderPort
   ) {}
 

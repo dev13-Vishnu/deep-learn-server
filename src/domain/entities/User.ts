@@ -16,14 +16,15 @@ export class User {
     public bio?: string | null,
     public avatar?: string | null,
     
+    public instructorState?: 'not_applied' | 'pending' | 'approved' | 'rejected' | null
   ) {}
 
-   // ✅ Business behavior: Can apply as instructor?
+   // Business behavior: Can apply as instructor?
   public canApplyAsInstructor(): boolean {
     return this.role === UserRole.STUDENT && this.isActive && this.emailVerified;
   }
 
-  // ✅ Business behavior: Upgrade to instructor
+  // Business behavior: Upgrade to instructor
   public upgradeToInstructor(): void {
     if (this.role !== UserRole.STUDENT) {
       throw new DomainError('Only students can be upgraded to instructors');
@@ -38,7 +39,7 @@ export class User {
     // We'll handle this in the use case with repository.updateRole()
   }
 
-  // ✅ Business behavior: Change password
+  // Business behavior: Change password
   public changePassword(hashedPassword: string): void {
     if (!hashedPassword || hashedPassword.trim().length === 0) {
       throw new DomainError('Hashed password cannot be empty');
@@ -84,7 +85,7 @@ export class User {
     }
   }
 
-  // ✅ Business validation: Avatar
+  // Business validation: Avatar
   public updateAvatar(avatarUrl: string | null): void {
     if (avatarUrl !== null && !this.isValidUrl(avatarUrl)) {
       throw new DomainError('Invalid avatar URL');

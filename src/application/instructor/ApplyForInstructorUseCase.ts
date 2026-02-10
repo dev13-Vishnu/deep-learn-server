@@ -4,6 +4,7 @@ import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicat
 import { InstructorApplication } from '../../domain/entities/InstructorApplication';
 import { AppError } from '../../shared/errors/AppError';
 import { generateId } from '../../shared/utils/idGenerator';
+import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 
 interface ApplyForInstructorDTO {
   userId: string;
@@ -19,7 +20,10 @@ interface ApplyForInstructorDTO {
 export class ApplyForInstructorUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
-    private readonly applicationRepository: InstructorApplicationRepositoryPort
+    private readonly applicationRepository: InstructorApplicationRepositoryPort,
+
+    @inject(TYPES.UserRepositoryPort)
+    private readonly userRepository: UserRepositoryPort
   ) {}
 
   async execute(dto: ApplyForInstructorDTO) {
@@ -30,7 +34,7 @@ export class ApplyForInstructorUseCase {
       throw new AppError('You have already submitted an application', 400);
     }
 
-    // ✅ Use entity's create factory method (validates business rules)
+    // Use entity's create factory method (validates business rules)
     let application: InstructorApplication;
     try {
       application = InstructorApplication.create(
@@ -51,6 +55,16 @@ export class ApplyForInstructorUseCase {
     }
 
     await this.applicationRepository.create(application);
+
+    // UPDATE USER'S INSTRUCTOR STATE TO PENDING
+    const user = await this.userRepository.findById(dto.userId);
+    
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    user.instructorState = 'pending';
+    await this.userRepository.update(user);
 
     return { application };
   }

@@ -14,13 +14,20 @@ export interface IUserDocument extends Document {
   bio?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  instructorState: 'not_applied' | 'pending' | 'approved' | 'rejected';
 }
 
 const userSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
-    role: { type: Number, enum: [0, 1, 2], required: true, default: 0 },
+    role: { type: Number, enum: [0, 1, 2], required: true,
+   default: 0 },
+   instructorState: {
+      type: String,
+      enum: ['not_applied', 'pending', 'approved', 'rejected'],
+      default: 'not_applied'
+    },
     isActive: { type: Boolean, default: true },
     emailVerified: { type: Boolean, default: false },
     firstName: { type: String, default: null },
