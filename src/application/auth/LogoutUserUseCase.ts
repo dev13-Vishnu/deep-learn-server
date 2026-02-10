@@ -15,7 +15,7 @@ export class LogoutUserUseCase {
     const tokenHash = this.hashToken(refreshToken);
 
     // Delete the refresh token from database
-    await this.refreshTokenRepository.deleteByTokenHash(tokenHash);
+    await this.refreshTokenRepository.revoke(tokenHash);
   }
 
   private hashToken(token: string): string {

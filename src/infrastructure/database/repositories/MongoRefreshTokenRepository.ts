@@ -1,11 +1,12 @@
 import { injectable } from "inversify";
-import { RefreshTokenRepository } from "../../../domain/auth/RefreshTokenRepository";
-import { RefreshToken } from "../../../domain/auth/RefreshToken";
+// import { RefreshToken } from "../../../domain/auth/RefreshToken";
 import { RefreshTokenModel } from "../models/RefreshTokenModel";
 import { AppError } from "../../../shared/errors/AppError";
+import { RefreshTokenRepositoryPort } from "../../../application/ports/RefreshTokenRepositoryPort";
+import { RefreshToken } from "../../../domain/entities/RefreshToken";
 
 @injectable()
-export class MongoRefreshTokenRepository implements RefreshTokenRepository {
+export class MongoRefreshTokenRepository implements RefreshTokenRepositoryPort {
     async create (token: RefreshToken): Promise <void> {
         try {
             await RefreshTokenModel.create({
@@ -26,11 +27,13 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
                 return null;
             }
 
-            return {
-                userId: doc.userId.toString(),
-                tokenHash: doc.tokenHash,
-                expiresAt: new Date(doc.expiresAt)
-            }
+            return new RefreshToken(
+                doc._id.toString(),
+                doc?.userId.toString(),
+                doc?.tokenHash,
+                doc?.expiresAt,
+                doc?.createdAt,
+            )
         } catch {
             throw new AppError('Failed to find refresh token', 500);
         }

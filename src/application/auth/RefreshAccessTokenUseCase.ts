@@ -1,12 +1,12 @@
 import { injectable, inject } from 'inversify';
 
 import { TYPES } from '../../shared/di/types';
-
-import { RefreshTokenRepository } from '../../domain/auth/RefreshTokenRepository';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
 import { authConfig } from '../../shared/config/auth.config';
+import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
+import { RefreshToken } from '../../domain/entities/RefreshToken';
 
 
 
@@ -14,7 +14,7 @@ import { authConfig } from '../../shared/config/auth.config';
 export class RefreshAccessTokenUseCase {
   constructor(
     @inject(TYPES.RefreshTokenRepositoryPort)
-    private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
 
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
@@ -62,11 +62,14 @@ export class RefreshAccessTokenUseCase {
       Date.now() + authConfig.refreshToken.expiresInMs
     );
 
-    await this.refreshTokenRepository.create({
-      userId: user.id,
-      tokenHash: newRefreshTokenHash,
-      expiresAt: refreshTokenExpiresAt,
-    });
+    const refreshToken = new RefreshToken(
+      undefined,
+      user.id,
+      newRefreshTokenHash,
+      refreshTokenExpiresAt,
+      new Date(),
+    );
+    await this.refreshTokenRepository.create(refreshToken);
 
     // Generate new access token
     const accessToken = this.tokenService.generateAccessToken({

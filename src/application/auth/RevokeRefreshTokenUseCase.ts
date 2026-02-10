@@ -1,13 +1,13 @@
 import { inject, injectable } from "inversify";
 import { TYPES } from "../../shared/di/types";
-import { RefreshTokenRepository } from "../../domain/auth/RefreshTokenRepository";
 import { TokenServicePort } from "../ports/TokenServicePort";
+import { RefreshTokenRepositoryPort } from "../ports/RefreshTokenRepositoryPort";
 
 @injectable()
 export class RevokeRefreshTokenUseCase {
     constructor (
         @inject(TYPES.RefreshTokenRepositoryPort)
-        private readonly refreshTokenRepository: RefreshTokenRepository,
+        private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
         
         @inject(TYPES.TokenServicePort)
         private readonly tokenService: TokenServicePort,
