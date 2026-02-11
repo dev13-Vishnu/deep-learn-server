@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { AuthController } from '../../presentation/controllers/auth.controller';
+// import { AuthController } from '../../presentation/controllers/auth.controller';
 import { InstructorController } from '../../presentation/controllers/InstructorController';
 
 import { Container } from 'inversify';
@@ -155,9 +155,9 @@ container
    Controller bindings
 ----------------------------- */
 
-container
-  .bind(TYPES.AuthController)
-  .to(AuthController);
+// container
+//   .bind(TYPES.AuthController)
+//   .to(AuthController);
 
 container
   .bind(TYPES.InstructorController)

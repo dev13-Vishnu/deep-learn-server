@@ -70,15 +70,19 @@ export class SignupController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { email, password, otp } = req.body;
+      const { email, password, otp,firstName, lastName } = req.body;
 
       // 1. Verify OTP first
       await this.verifySignupOtpUseCase.execute(email, otp);
+
+          console.log(firstName, lastName)
 
       // 2. Register user (returns User entity)
       const user = await this.registerUserUseCase.execute({
         email,
         password,
+        firstName,
+        lastName
       });
 
       // 3. Type safety check - ensure user.id exists

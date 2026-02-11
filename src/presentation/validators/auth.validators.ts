@@ -30,6 +30,18 @@ export const signupSchema = z.object({
       passwordRegex,
       'Password must contain uppercase, lowercase, number, and special character'
     ),
+  
+  firstName: z
+    .string()
+    .min(1, 'First name cannot be empty if provided')
+    .max(100, 'First name cannot exceed 100 characters')
+    .optional(),
+  
+  lastName: z
+    .string()
+    .min(1, 'Last name cannot be empty if provided')
+    .max(100, 'Last name cannot exceed 100 characters')
+    .optional(),
 });
 
 export const requestOtpSchema = z.object({

@@ -14,6 +14,8 @@ import { PasswordHasherPort } from "../ports/PasswordHasherPort";
 interface RegisterUserInput{
     email: string;
     password: string;
+    firstName: string;
+    lastName: string;
 }
 @injectable()
 export class RegisterUserUseCase{
@@ -41,6 +43,12 @@ export class RegisterUserUseCase{
             passwordHash,
             true,
             true,
+            undefined,
+            input.firstName,
+            input.lastName,
+            null,
+            null,
+            'not_applied'
         );
         return this.userRepo.create(user);
     }

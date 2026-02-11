@@ -58,8 +58,8 @@ export class MongoUserRepository implements UserRepositoryPort {
       doc._id.toString(),
       doc.firstName || null,
       doc.lastName || null,
-      doc.avatar || null,
       doc.bio || null,
+      doc.avatar || null,
       doc.instructorState || 'not_applied'
     );
   }
