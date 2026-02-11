@@ -97,10 +97,10 @@ export class SignupController {
       });
 
       // 5. Create refresh token
-      const refreshToken = await this.createRefreshTokenUseCase.execute(user.id);
+      const {token} = await this.createRefreshTokenUseCase.execute(user.id);
 
       // 6. Set refresh token as HTTP-only cookie (same as login)
-      res.cookie('refreshToken', refreshToken, {
+      res.cookie('refreshToken', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
