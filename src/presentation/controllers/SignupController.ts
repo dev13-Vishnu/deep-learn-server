@@ -75,7 +75,7 @@ export class SignupController {
       // 1. Verify OTP first
       await this.verifySignupOtpUseCase.execute(email, otp);
 
-          console.log(firstName, lastName)
+          // console.log(firstName, lastName)
 
       // 2. Register user (returns User entity)
       const user = await this.registerUserUseCase.execute({
