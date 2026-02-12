@@ -49,7 +49,7 @@ export const requestOtpSchema = z.object({
     .string()
     .min(1, 'Email is required')
     .regex(emailRegex, 'Invalid email format'),
-  purpose: z.enum(['signup', 'password-reset']).optional(),
+  purpose: z.enum(['signup', 'forgot-password']).optional(),
 });
 
 export const verifyOtpSchema = z.object({

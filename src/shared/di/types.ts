@@ -1,3 +1,5 @@
+import { SignupUseCase } from "../../application/auth/SignupUseCase";
+
 export const TYPES = {
   // ======================
   // Repositories (Ports)
@@ -63,4 +65,5 @@ export const TYPES = {
 
   UserReaderPort: Symbol.for('UserReaderPort'),
   UserWriterPort: Symbol.for('UserWriterPort'),
+  SignupUseCase: Symbol.for('SignupUseCase'),
 };

@@ -49,6 +49,7 @@ import { SignupController } from '../../presentation/controllers/SignupControlle
 import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
 import { LogoutUserUseCase } from '../../application/auth/LogoutUserUseCase';
+import { SignupUseCase } from '../../application/auth/SignupUseCase';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -193,3 +194,6 @@ container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
 container
   .bind(TYPES.LogoutUserUseCase)
   .to(LogoutUserUseCase);
+
+
+  container.bind(TYPES.SignupUseCase).to(SignupUseCase);
