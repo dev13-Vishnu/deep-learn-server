@@ -6,6 +6,8 @@ import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessT
 import { LogoutUserUseCase } from '../../application/auth/LogoutUserUseCase';
 import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
 import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
+import { env } from '../../shared/config/env';
+import { authConfig } from '../../shared/config/auth.config';
 
 @injectable()
 export class LoginController {
@@ -31,10 +33,11 @@ export class LoginController {
     // Set refresh token cookie
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: true,
+      sameSite: 'none',
+      maxAge: authConfig.refreshToken.expiresInMs,
     });
+
 
     return res.status(200).json({
       message: 'Login successful',

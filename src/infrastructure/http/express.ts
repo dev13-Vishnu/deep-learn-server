@@ -8,15 +8,29 @@ import apiRoutes from '../../presentation/routes';
 import profileRoutes from "../../presentation/routes/profile.routes"
 
 import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
+import { env } from '../../shared/config/env';
 
 export function createExpressApp() {
   const app = express();
 
-  app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials
-    :true,
-  }));
+  const allowedOrigins = [
+  env.frontendOrigin,
+  "http://localhost:5173"
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
   
 
   app.use(express.json());

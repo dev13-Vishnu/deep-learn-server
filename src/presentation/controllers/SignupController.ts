@@ -174,8 +174,8 @@ export class SignupController {
 
     res.cookie('refreshToken', result.refreshToken,{
       httpOnly: true,
-      secure: env.nodeEnv === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: authConfig.refreshToken.expiresInMs,
     });
 

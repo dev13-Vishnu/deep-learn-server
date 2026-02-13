@@ -22,6 +22,7 @@ function requireNumberEnv(key: string): number{
 export const env = {
   // Server
   port: Number(requireEnv('PORT')),
+  frontendOrigin: requireEnv('FRONTEND_ORIGIN'),
   nodeEnv: requireEnv('NODE_ENV'),
 
   // Database
