@@ -31,10 +31,12 @@ export class LoginController {
     const result = await this.loginUserUseCase.execute({ email, password });
 
     // Set refresh token cookie
-    res.cookie('refreshToken', result.refreshToken, {
+      const isCrossSite = env.isProduction || env.isTunnel;
+
+    res.cookie('refreshToken', result.refreshToken,{
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: isCrossSite,
+      sameSite: isCrossSite ? 'none' : 'lax',
       maxAge: authConfig.refreshToken.expiresInMs,
     });
 

@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import { SignOptions } from 'jsonwebtoken';
 
-dotenv.config();
+dotenv.config({
+  path: `.env.${process.env.NODE_ENV || 'development'}`
+});
 
 function requireEnv(key: string): string {
   const value = process.env[key];
@@ -19,11 +21,16 @@ function requireNumberEnv(key: string): number{
   return value;
 }
 
+const nodeEnv = process.env.NODE_ENV || 'development';
+
 export const env = {
+  nodeEnv,
+  isDevelopment: nodeEnv === 'development',
+  isTunnel: nodeEnv === 'tunnel',
+  isProduction: nodeEnv ==='production',
   // Server
   port: Number(requireEnv('PORT')),
   frontendOrigin: requireEnv('FRONTEND_ORIGIN'),
-  nodeEnv: requireEnv('NODE_ENV'),
 
   // Database
   mongoUri: requireEnv('MONGO_URI'),

@@ -126,8 +126,8 @@ import { RequestSignupOtpUseCase } from "../../application/auth/RequestSignupOtp
 import { VerifySignupOtpUseCase } from "../../application/auth/VerifySignupOtpUseCase";
 import { SignupUseCase } from "../../application/auth/SignupUseCase";
 import { Request , Response} from "express";
-import { env } from "../../shared/config/env";
 import { authConfig } from "../../shared/config/auth.config";
+import { env } from "../../shared/config/env";
 
 @injectable()
 export class SignupController {
@@ -172,10 +172,12 @@ export class SignupController {
       lastName,
     });
 
+    const isCrossSite = env.isProduction || env.isTunnel;
+
     res.cookie('refreshToken', result.refreshToken,{
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: isCrossSite,
+      sameSite: isCrossSite ? 'none' : 'lax',
       maxAge: authConfig.refreshToken.expiresInMs,
     });
 
