@@ -4,6 +4,7 @@ import { User } from '../../../domain/entities/User';
 import { UserRole } from '../../../domain/entities/UserRole';
 import { Email } from '../../../domain/value-objects/Email';
 import { UserModel, IUserDocument } from '../models/user.model';
+import { OAuthProvider } from '../../../domain/entities/OAuthConnnection';
 
 @injectable()
 export class MongoUserRepository implements UserRepositoryPort {
@@ -79,5 +80,17 @@ export class MongoUserRepository implements UserRepositoryPort {
       instructorState: user.instructorState ?? 'not_applied',
       updatedAt: new Date(),
     };
+  }
+  async createOAuthUser(data: { email: string; firstName: string; lastName?: string; avatar?: string; provider: OAuthProvider; providerId: string; }): Promise<User> {
+    const doc = await UserModel.create({
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      avatar: data.avatar,
+      passwordHash: null,   // no password for OAuth users
+      isActive: true,
+      role: UserRole.STUDENT,
+    });
+    return this.toDomain(doc);
   }
 }
