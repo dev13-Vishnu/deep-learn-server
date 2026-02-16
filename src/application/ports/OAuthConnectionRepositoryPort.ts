@@ -1,4 +1,4 @@
-import { OAuthConnection, OAuthProvider } from "../../domain/entities/OAuthConnnection";
+import { OAuthConnection, OAuthProvider } from "../../domain/entities/OAuthConnection";
 
 export interface OAuthConnectionRepositoryPort {
     findByProvider(provider: OAuthProvider, providerId: string): Promise<OAuthConnection | null>;

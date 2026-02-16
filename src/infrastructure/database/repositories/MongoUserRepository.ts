@@ -4,7 +4,7 @@ import { User } from '../../../domain/entities/User';
 import { UserRole } from '../../../domain/entities/UserRole';
 import { Email } from '../../../domain/value-objects/Email';
 import { UserModel, IUserDocument } from '../models/user.model';
-import { OAuthProvider } from '../../../domain/entities/OAuthConnnection';
+import { OAuthProvider } from '../../../domain/entities/OAuthConnection';
 
 @injectable()
 export class MongoUserRepository implements UserRepositoryPort {

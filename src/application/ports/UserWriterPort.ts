@@ -1,4 +1,4 @@
-import { OAuthProvider } from '../../domain/entities/OAuthConnnection';
+import { OAuthProvider } from '../../domain/entities/OAuthConnection';
 import { User } from '../../domain/entities/User';
 
 export interface UserWriterPort {

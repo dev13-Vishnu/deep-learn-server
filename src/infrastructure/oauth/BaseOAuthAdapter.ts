@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { OAuthProviderPort, OAuthUserProfile } from '../../application/ports/OAuthProviderPort';
-import { OAuthProvider } from '../../domain/entities/OAuthConnnection';
+import { OAuthProvider } from '../../domain/entities/OAuthConnection';
 import { AppError } from '../../shared/errors/AppError';
 
 export interface ProviderEndpoints {
