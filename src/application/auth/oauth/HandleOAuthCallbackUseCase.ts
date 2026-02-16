@@ -56,7 +56,7 @@ export class HandleOAuthCallbackUseCase {
     private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
   ) {}
 
-/  async execute(input: HandleOAuthCallbackInput): Promise<HandleOAuthCallbackOutput> {
+  async execute(input: HandleOAuthCallbackInput): Promise<HandleOAuthCallbackOutput> {
     const { provider, code, state } = input;
 
     const stateValid = await this.stateStore.consume(state);
