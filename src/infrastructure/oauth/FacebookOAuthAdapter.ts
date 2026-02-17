@@ -36,7 +36,7 @@ export class FacebookOAuthAdapter extends BaseOAuthAdapter {
   }
 
   protected normalizeProfile(raw: Record<string, unknown>): OAuthUserProfile {
-    const profile = raw as FacebookRawProfile;
+    const profile = raw as unknown as FacebookRawProfile;
     return {
       providerId: profile.id,
       email: profile.email,

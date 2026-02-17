@@ -32,7 +32,7 @@ export class GoogleOAuthAdapter extends BaseOAuthAdapter {
   }
 
   protected normalizeProfile(raw: Record<string, unknown>): OAuthUserProfile {
-    const profile = raw as GoogleRawProfile;
+    const profile = raw as unknown as GoogleRawProfile;
     return {
       providerId: profile.sub,
       email: profile.email,

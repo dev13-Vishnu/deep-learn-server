@@ -33,7 +33,7 @@ export class MicrosoftOAuthAdapter extends BaseOAuthAdapter {
   }
 
   protected normalizeProfile(raw: Record<string, unknown>): OAuthUserProfile {
-    const profile = raw as MicrosoftRawProfile;
+    const profile = raw as unknown as  MicrosoftRawProfile;
     // Microsoft uses `mail` for personal accounts, `userPrincipalName` for org accounts
     const email = profile.mail ?? profile.userPrincipalName ?? '';
 
