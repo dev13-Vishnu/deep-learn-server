@@ -8,15 +8,13 @@ const STATE_PREFIX = 'oauth:state:';
 @injectable()
 export class RedisOAuthStateStore implements OAuthStateStorePort {
   async save(state: string, ttlSeconds = 600): Promise<void> {
-    const redis = redisClient;
-    await redis.set(`${STATE_PREFIX}${state}`, '1', { EX: ttlSeconds });
+    await redisClient.set(`${STATE_PREFIX}${state}`, '1', { EX: ttlSeconds });
   }
 
   async consume(state: string): Promise<boolean> {
-    const redis = redisClient;
     const key = `${STATE_PREFIX}${state}`;
 
-    const value = await redis.getDel(key);
+    const value = await redisClient.getDel(key);
     return value !== null;
   }
 }
