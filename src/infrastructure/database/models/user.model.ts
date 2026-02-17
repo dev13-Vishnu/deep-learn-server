@@ -1,10 +1,9 @@
 import { Schema, model, Document } from 'mongoose';
 
-// ← ADD THIS INTERFACE
 export interface IUserDocument extends Document {
   _id: any;
   email: string;
-  passwordHash: string;
+  passwordHash: string | null;
   role: number;
   isActive: boolean;
   emailVerified: boolean;
@@ -20,7 +19,7 @@ export interface IUserDocument extends Document {
 const userSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
+    passwordHash: { type: String, default: null },
     role: { type: Number, enum: [0, 1, 2], required: true,
    default: 0 },
    instructorState: {
