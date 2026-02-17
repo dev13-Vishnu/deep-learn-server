@@ -54,5 +54,10 @@ export const env = {
   awsRegion: requireEnv('AWS_REGION'),
   awsAccessKeyId: requireEnv('AWS_ACCESS_KEY_ID'),
   awsSecretAccessKey:requireEnv('AWS_SECRET_ACCESS_KEY'),
-  awsBucketName: requireEnv('AWS_BUCKET_NAME')
+  awsBucketName: requireEnv('AWS_BUCKET_NAME'),
+
+ //Oauth
+ googleClientId: requireEnv('GOOGLE_CLIENT_ID'),
+ googleClientSecret: requireEnv('GOOGLE_CLIENT_SECRET'),
+ 
 };

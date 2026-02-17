@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// INFRASTRUCTURE: FacebookOAuthAdapter
-// Facebook-specific: fields query param on profile URL, token in URL not header.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { injectable } from 'inversify';
 import { BaseOAuthAdapter, BaseAdapterConfig } from './BaseOAuthAdapter';
 import { OAuthUserProfile } from '../../application/ports/OAuthProviderPort';
@@ -28,7 +23,6 @@ export class FacebookOAuthAdapter extends BaseOAuthAdapter {
     super({ ...config, scopes: ['email', 'public_profile'] });
   }
 
-  // Facebook requires fields + access_token as query params on the profile URL
   protected buildProfileUrl(accessToken: string): string {
     const params = new URLSearchParams({
       fields: 'id,name,email,picture',
@@ -37,7 +31,6 @@ export class FacebookOAuthAdapter extends BaseOAuthAdapter {
     return `${this.endpoints.profileUrl}?${params.toString()}`;
   }
 
-  // Token is in URL, no Authorization header needed
   protected buildProfileHeaders(_accessToken: string): Record<string, string> {
     return {};
   }

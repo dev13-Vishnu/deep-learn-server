@@ -66,4 +66,16 @@ export const TYPES = {
   UserReaderPort: Symbol.for('UserReaderPort'),
   UserWriterPort: Symbol.for('UserWriterPort'),
   SignupUseCase: Symbol.for('SignupUseCase'),
+
+
+  OAuthConnectionRepositoryPort: Symbol.for('OAuthConnectionRepositoryPort'),
+  OAuthStateStorePort: Symbol.for('OAuthStateStorePort'),
+  OAuthProviderRegistry: Symbol.for('OAuthProviderRegistry'),
+  InitiateOAuthUseCase: Symbol.for('InitiateOAuthUseCase'),
+  HandleOAuthCallbackUseCase: Symbol.for('HandleOAuthCallbackUseCase'),
+  OAuthController: Symbol.for('OAuthController'),
+  GoogleOAuthAdapter: Symbol.for('GoogleOAuthAdapter'),
+  FacebookOAuthAdapter: Symbol.for('FacebookOAuthAdapter'),
+  MicrosoftOAuthAdapter: Symbol.for('MicrosoftOAuthAdapter'),
+
 };

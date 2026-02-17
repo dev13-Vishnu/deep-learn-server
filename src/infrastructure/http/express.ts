@@ -3,6 +3,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import authRoutes from '../../presentation/routes/auth.routes'
+import oauthRoutes from '../../presentation/routes/oauth.routes'
+
 import instructorRoutes  from '../../presentation/routes/instructor.routes';
 import apiRoutes from '../../presentation/routes';
 import profileRoutes from "../../presentation/routes/profile.routes"
@@ -33,6 +35,7 @@ export function createExpressApp() {
   instructorRoutes
 );
 app.use('/profile', profileRoutes)
+app.use('/auth/oauth', oauthRoutes)
 
 
   // 404 handler
