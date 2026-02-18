@@ -5,9 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only src/bootstrap.ts",
-  "dev:tunnel": "cross-env NODE_ENV=tunnel ts-node-dev --respawn --transpile-only src/bootstrap.ts",
-  "build": "tsc",
-  "start": "cross-env NODE_ENV=production node dist/bootstrap.js"
+    "dev:tunnel": "cross-env NODE_ENV=tunnel ts-node-dev --respawn --transpile-only src/bootstrap.ts",
+    "build": "tsc",
+    "start": "cross-env NODE_ENV=production node dist/bootstrap.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.985.0",
     "@aws-sdk/s3-request-presigner": "^3.985.0",
+    "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
