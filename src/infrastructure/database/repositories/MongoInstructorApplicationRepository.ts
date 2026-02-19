@@ -68,6 +68,7 @@ export class MongoInstructorApplicationRepository
     doc.language,
     doc.status,
     doc.rejectionReason || null,
+    doc.cooldownExpiresAt ?? null,
     doc.createdAt,
     doc.updatedAt
   );
@@ -86,6 +87,7 @@ private toPersistence(
     language: app.language,
     status: app.status as any,
     rejectionReason: app.rejectionReason,
+    cooldownExpiresAt: app.cooldownExpiresAt ?? null,
     updatedAt: new Date(),
   };
 }

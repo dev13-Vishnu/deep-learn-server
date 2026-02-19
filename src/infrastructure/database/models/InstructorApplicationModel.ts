@@ -10,6 +10,7 @@ export interface IInstructorApplicationDocument extends Document {
   language: string;
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string | null;
+  cooldownExpiresAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,7 +37,8 @@ const instructorApplicationSchema = new Schema<IInstructorApplicationDocument>(
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
     },
-    rejectionReason: { type: String, default: null },  // ← ADD
+    rejectionReason: { type: String, default: null },
+    cooldownExpiresAt: {type: Date, default: null},
   },
   { timestamps: true }
 );
