@@ -12,6 +12,7 @@ export class InstructorApplication {
     public readonly language: string,
     private _status: 'pending' | 'approved' | 'rejected',
     private _rejectionReason: string | null,
+    private _cooldownExpiresAt: Date | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date
   ) {
@@ -41,6 +42,7 @@ export class InstructorApplication {
       language,
       'pending',  // Always starts as pending
       null,
+      null,
       new Date(),
       new Date()
     );
@@ -58,6 +60,7 @@ export class InstructorApplication {
     language: string,
     status: 'pending' | 'approved' | 'rejected',
     rejectionReason: string | null,
+    cooldownExpiresAt: Date | null,
     createdAt: Date,
     updatedAt: Date
   ): InstructorApplication {
@@ -72,6 +75,7 @@ export class InstructorApplication {
       language,
       status,
       rejectionReason,
+      cooldownExpiresAt,
       createdAt,
       updatedAt
     );
@@ -106,10 +110,11 @@ export class InstructorApplication {
     }
     this._status = 'approved';
     this._rejectionReason = null;
+    this._cooldownExpiresAt = null;
   }
 
   // Business behavior: Reject
-  public reject(reason: string): void {
+  public reject(reason: string, cooldownExpiresAt: Date): void {
     if (!reason || reason.trim().length === 0) {
       throw new DomainError('Rejection reason is required');
     }
@@ -121,6 +126,7 @@ export class InstructorApplication {
     }
     this._status = 'rejected';
     this._rejectionReason = reason;
+    this._cooldownExpiresAt = cooldownExpiresAt;
   }
 
   // Business query: Can be approved?
@@ -138,12 +144,12 @@ export class InstructorApplication {
     return this._status === 'pending';
   }
 
-  // Getters (encapsulation)
-  public get status(): string {
-    return this._status;
+  public isCooldownActive(): boolean {
+    return this._cooldownExpiresAt !== null && this._cooldownExpiresAt > new Date();
   }
 
-  public get rejectionReason(): string | null {
-    return this._rejectionReason;
-  }
+  // Getters (encapsulation)
+  public get status(): string { return this._status; }
+  public get rejectionReason(): string | null { return this._rejectionReason; }
+public get cooldownExpiresAt() : Date | null { return this._cooldownExpiresAt;}
 }
