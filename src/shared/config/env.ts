@@ -61,12 +61,12 @@ export const env = {
  googleClientSecret: requireEnv('GOOGLE_CLIENT_SECRET'),
  backendUrl: requireEnv('BACKEND_URL'),
 
- facebookAppId: requireEnv('FACEBOOK_APP_ID'),
- facebookAppSecret: requireEnv('FACEBOOK_APP_SECRET'),
+//  facebookAppId: requireEnv('FACEBOOK_APP_ID'),
+//  facebookAppSecret: requireEnv('FACEBOOK_APP_SECRET'),
 
 
- microsoftClientId: requireEnv('MICROSOFT_CLIENT_ID'),
- microsoftClientSecret: requireEnv('MICROSOFT_CLIENT_SECRET'),
- microsoftTenant:requireEnv('MICROSOFT_TENANT')
+//  microsoftClientId: requireEnv('MICROSOFT_CLIENT_ID'),
+//  microsoftClientSecret: requireEnv('MICROSOFT_CLIENT_SECRET'),
+//  microsoftTenant:requireEnv('MICROSOFT_TENANT')
  
 };

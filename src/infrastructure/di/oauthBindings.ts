@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// DI CONTAINER — OAuth bindings
-// Add this block to your existing src/infrastructure/di/container.ts
-// ─────────────────────────────────────────────────────────────────────────────
-
 import 'reflect-metadata';
 import { Container } from 'inversify';
 import { TYPES } from '../../shared/di/types';
@@ -12,9 +7,9 @@ import { OAuthProviderPort } from '../../application/ports/OAuthProviderPort';
 
 // Adapters
 import { GoogleOAuthAdapter } from '../oauth/GoogleOAuthAdapter';
-import { FacebookOAuthAdapter } from '../oauth/FacebookOAuthAdapter';
 
-import { MicrosoftOAuthAdapter } from '../oauth/MicrosoftOAuthAdapter';
+// import { FacebookOAuthAdapter } from '../oauth/FacebookOAuthAdapter';
+// import { MicrosoftOAuthAdapter } from '../oauth/MicrosoftOAuthAdapter';
 
 // Repository + State Store
 import { MongoOAuthConnectionRepository } from '../database/repositories/MongoOAuthConnectionRepository';
@@ -37,24 +32,24 @@ export function bindOAuthDependencies(container: Container): void {
     redirectUri: `${backendUrl}/auth/oauth/google/callback`,
   });
 
-  const facebookAdapter = new FacebookOAuthAdapter({
-    clientId: env.facebookAppId,
-    clientSecret: env.facebookAppSecret,
-    redirectUri: `${backendUrl}/auth/oauth/facebook/callback`,
-  });
+  // const facebookAdapter = new FacebookOAuthAdapter({
+  //   clientId: env.facebookAppId,
+  //   clientSecret: env.facebookAppSecret,
+  //   redirectUri: `${backendUrl}/auth/oauth/facebook/callback`,
+  // });
 
-  const microsoftAdapter = new MicrosoftOAuthAdapter({
-    clientId: env.microsoftClientId,
-    clientSecret: env.microsoftClientSecret,
-    redirectUri: `${backendUrl}/auth/oauth/microsoft/callback`,
-    tenant: env.microsoftTenant,
-  });
+  // const microsoftAdapter = new MicrosoftOAuthAdapter({
+  //   clientId: env.microsoftClientId,
+  //   clientSecret: env.microsoftClientSecret,
+  //   redirectUri: `${backendUrl}/auth/oauth/microsoft/callback`,
+  //   tenant: env.microsoftTenant,
+  // });
 
   // ── Provider Registry (Map injected into use cases) ───────────────────────
   const providerRegistry = new Map<OAuthProvider, OAuthProviderPort>([
     ['google', googleAdapter],
-    ['facebook', facebookAdapter],
-    ['microsoft', microsoftAdapter],
+    // ['facebook', facebookAdapter],
+    // ['microsoft', microsoftAdapter],
   ]);
 
   container

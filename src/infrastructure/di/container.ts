@@ -50,6 +50,7 @@ import { PasswordResetController } from '../../presentation/controllers/Password
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
 import { LogoutUserUseCase } from '../../application/auth/LogoutUserUseCase';
 import { SignupUseCase } from '../../application/auth/SignupUseCase';
+import { bindOAuthDependencies } from './oauthBindings';
 // import { JwtAuthMiddleware } from '../security/jwt-auth.middleware';
 
 export const container = new Container();
@@ -197,3 +198,4 @@ container
 
 
   container.bind(TYPES.SignupUseCase).to(SignupUseCase);
+  bindOAuthDependencies(container);

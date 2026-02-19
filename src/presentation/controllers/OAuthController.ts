@@ -65,7 +65,7 @@ export class OAuthController {
         maxAge: authConfig.refreshToken.expiresInMs,
       });
 
-      const redirectTo = result.isNewUser ? '/onboarding' : '/dashboard';
+      const redirectTo = '/home'
       res.redirect(
         `${env.frontendOrigin}/auth/callback?token=${result.accessToken}&redirect=${redirectTo}`
       );
