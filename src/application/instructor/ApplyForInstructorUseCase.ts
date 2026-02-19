@@ -31,7 +31,19 @@ export class ApplyForInstructorUseCase {
     const existing = await this.applicationRepository.findByUserId(dto.userId);
 
     if (existing) {
-      throw new AppError('You have already submitted an application', 400);
+      if(existing.status === 'rejected' && existing. isCooldownActive()){
+        throw new AppError(
+          `You cannot reapply until ${existing.cooldownExpiresAt!.toISOString()}.` + `Cooldown expires on ${existing.cooldownExpiresAt!.toLocaleDateString()}.`,
+          403
+        );
+      }
+
+       if (existing.status === 'pending') {
+        throw new AppError('You already have a pending application', 400);
+      }
+      if (existing.status === 'approved') {
+        throw new AppError('Your application has already been approved', 400);
+      }
     }
 
     // Use entity's create factory method (validates business rules)
