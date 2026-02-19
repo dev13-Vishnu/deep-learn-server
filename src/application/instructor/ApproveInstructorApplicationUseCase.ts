@@ -4,6 +4,7 @@ import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicat
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
 import { UserRole } from '../../domain/entities/UserRole';
+import { logger } from '../../shared/utils/logger';
 
 @injectable()
 export class ApproveInstructorApplicationUseCase {
@@ -50,6 +51,10 @@ export class ApproveInstructorApplicationUseCase {
 
     user.instructorState = 'approved';
     await this.userRepository.update(user);
+
+    logger.info(
+      `[AUDIT] Application approved | applicationId=${applicationId} userId=${application.userId} at=${new Date().toISOString()}`
+    )
 
     return {
       message: 'Application approved successfully',

@@ -3,6 +3,8 @@ import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
+import { instructorConfig } from '../../shared/config/instructor.config';
+import { logger } from '../../shared/utils/logger';
 
 @injectable()
 export class RejectInstructorApplicationUseCase {
@@ -25,9 +27,14 @@ export class RejectInstructorApplicationUseCase {
     throw new AppError('Rejection reason is required', 400);
   }
 
+  // ── COMPUTE COOLDOWN ────────────────────────────────────────────────────
+    const cooldownExpiresAt = new Date(
+      Date.now() + instructorConfig.cooldown.durationMs
+    );
+
   // Use entity's business logic
   try {
-    application.reject(reason);  // Throws DomainError if invalid
+    application.reject(reason, cooldownExpiresAt);  // Throws DomainError if invalid
   } catch (error: any) {
     if (error.name === 'DomainError') {
       throw new AppError(error.message, 400);
@@ -45,9 +52,18 @@ export class RejectInstructorApplicationUseCase {
     await this.userRepository.update(user);
   }
 
+  // ── AUDIT LOG ───────────────────────────────────────────────────────────
+    logger.info(
+      `[AUDIT] Application rejected | applicationId=${applicationId} userId=${application.userId} reason="${reason}" cooldownUntil=${cooldownExpiresAt.toISOString()} at=${new Date().toISOString()}`
+    );
+
   return {
     message: 'Application rejected',
     application,
+    cooldown: {
+      expiresAt: cooldownExpiresAt.toISOString(),
+      durationDays: instructorConfig.cooldown.durationDays,
+    }
   };
 }
 }

@@ -5,7 +5,7 @@ import { TYPES } from "../../shared/di/types";
 import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
 import { adminAuthMiddleware } from '../../infrastructure/security/admin-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
-import { applyForInstructorSchema } from '../validators/instructor.validators';
+import { applyForInstructorSchema, rejectApplicationSchema } from '../validators/instructor.validators';
 
 
 const router = Router();
@@ -50,6 +50,7 @@ router.post(
   '/applications/:applicationId/reject',
   jwtAuthMiddleware,
   adminAuthMiddleware,
+  validateRequest(rejectApplicationSchema),
   instructorController.rejectApplication.bind(instructorController)
 );
 export default router;
