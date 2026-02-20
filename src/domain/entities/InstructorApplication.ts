@@ -152,4 +152,22 @@ export class InstructorApplication {
   public get status(): string { return this._status; }
   public get rejectionReason(): string | null { return this._rejectionReason; }
 public get cooldownExpiresAt() : Date | null { return this._cooldownExpiresAt;}
+// Called automatically by JSON.stringify — maps private fields to public names
+public toJSON() {
+  return {
+    id: this.id,
+    userId: this.userId,
+    bio: this.bio,
+    experienceYears: this.experienceYears,
+    teachingExperience: this.teachingExperience,
+    courseIntent: this.courseIntent,
+    level: this.level,
+    language: this.language,
+    status: this._status,              // ← exposes as "status"
+    rejectionReason: this._rejectionReason,
+    cooldownExpiresAt: this._cooldownExpiresAt,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
+  };
+}
 }
