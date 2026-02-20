@@ -6,7 +6,7 @@ export class User {
   constructor(
     public readonly email: Email,
     public readonly role: UserRole,
-    public  passwordHash: string,
+    public  passwordHash: string | null,
     public readonly isActive: boolean = true,
     public readonly emailVerified: boolean = false,
     public readonly id?: string, // assigned by repository
@@ -47,7 +47,7 @@ export class User {
     this.passwordHash = hashedPassword;
   }
 
-  public getPassword(): string {
+  public getPassword(): string | null{
     return this.passwordHash;
   }
 

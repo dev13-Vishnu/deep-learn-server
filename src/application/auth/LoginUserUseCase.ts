@@ -52,6 +52,12 @@ export class LoginUserUseCase {
     if (!user) {
       throw new AppError('Invalid email or password', 401);
     }
+    if (!user.passwordHash) {
+  throw new AppError(
+    'This account uses social login. Please sign in with your provider.',
+    400
+  );
+}
 
     const passwordMatch = await this.passwordHasher.compare(
       password.getValue(),
