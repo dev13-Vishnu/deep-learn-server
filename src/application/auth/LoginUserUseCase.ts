@@ -4,20 +4,32 @@ import { Password } from '../../domain/value-objects/Password';
 import { AppError } from '../../shared/errors/AppError';
 
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../../shared/di/types'
+import { TYPES } from '../../shared/di/types';
 
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
+import { UserRole } from '../../domain/entities/UserRole';
+import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
 
-
+// ADD THIS MISSING INTERFACE
 interface LoginUserInput {
   email: string;
   password: string;
 }
 
+interface LoginUserOutput {
+  user: {
+    id: string;
+    email: string;
+    role: UserRole;
+  };
+  accessToken: string;
+  refreshToken: string;
+}
+
 @injectable()
 export class LoginUserUseCase {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,
 
@@ -25,9 +37,13 @@ export class LoginUserUseCase {
     private readonly passwordHasher: PasswordHasherPort,
 
     @inject(TYPES.TokenServicePort)
-    private readonly tokenService: TokenServicePort
+    private readonly tokenService: TokenServicePort,
+
+    @inject(TYPES.CreateRefreshTokenUseCase)
+    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
   ) {}
-  async execute(input: LoginUserInput) {
+
+  async execute(input: LoginUserInput): Promise<LoginUserOutput> {
     const email = new Email(input.email);
     const password = new Password(input.password);
 
@@ -37,9 +53,9 @@ export class LoginUserUseCase {
       throw new AppError('Invalid email or password', 401);
     }
 
-    const passwordMatch = this.passwordHasher.compare(
+    const passwordMatch = await this.passwordHasher.compare(
       password.getValue(),
-      user.passwordHash,
+      user.passwordHash
     );
 
     if (!passwordMatch) {
@@ -47,14 +63,18 @@ export class LoginUserUseCase {
     }
 
     if (!user.id) {
-  throw new AppError('User identity not initialized', 500);
-}
+      throw new AppError('User ID not found', 500);
+    }
 
-const accessToken = this.tokenService.generateAccessToken({
-  userId: user.id,
-  role: user.role,
-});
+    // Generate access token
+    const accessToken = this.tokenService.generateAccessToken({
+      userId: user.id,
+      role: user.role,
+    });
 
+    // Create refresh token
+    const { token: refreshToken } =
+      await this.createRefreshTokenUseCase.execute(user.id);
 
     return {
       user: {
@@ -63,6 +83,7 @@ const accessToken = this.tokenService.generateAccessToken({
         role: user.role,
       },
       accessToken,
+      refreshToken,
     };
   }
 }

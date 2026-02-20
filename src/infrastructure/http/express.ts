@@ -3,19 +3,26 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import authRoutes from '../../presentation/routes/auth.routes'
-import instructorRoutes  from '../../presentation/routes/instructor.routes';
+import oauthRoutes from '../../presentation/routes/oauth.routes'
 
+import instructorRoutes  from '../../presentation/routes/instructor.routes';
 import apiRoutes from '../../presentation/routes';
+import profileRoutes from "../../presentation/routes/profile.routes"
+
 import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
+import { env } from '../../shared/config/env';
 
 export function createExpressApp() {
   const app = express();
 
-  app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials
-    :true,
-  }));
+  app.use(
+  cors({
+    origin: env.frontendOrigin,
+    credentials: true,
+  })
+);
+
+
   
 
   app.use(express.json());
@@ -27,6 +34,8 @@ export function createExpressApp() {
   '/instructor',
   instructorRoutes
 );
+app.use('/profile', profileRoutes)
+app.use('/auth/oauth', oauthRoutes)
 
 
   // 404 handler

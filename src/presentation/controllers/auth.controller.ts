@@ -1,216 +1,219 @@
-import { Request, Response } from "express";
-import { inject, injectable } from "inversify";
+// import { Request, Response } from "express";
+// import { inject, injectable } from "inversify";
 
-import { TYPES } from "../../shared/di/types";
+// import { TYPES } from "../../shared/di/types";
 
-import { LoginUserUseCase } from "../../application/auth/LoginUser.usecase";
-import { GetCurrentUserUseCase } from "../../application/auth/GetCurrentUser.usecase";
-import { RegisterUserUseCase } from "../../application/auth/RegisterUser.usecase";
+// import { LoginUserUseCase } from "../../application/auth/LoginUserUseCase";
+// import { GetCurrentUserUseCase } from "../../application/auth/GetCurrentUserUseCase";
+// import { RegisterUserUseCase } from "../../application/auth/RegisterUserUseCase";
 
-import { RequestSignupOtpUseCase } from "../../application/auth/RequestSignupOtp.usecase";
-import { VerifySignupOtpUseCase } from "../../application/auth/VerifySignupOtp.usecase";
+// import { RequestSignupOtpUseCase } from "../../application/auth/RequestSignupOtpUseCase";
+// import { VerifySignupOtpUseCase } from "../../application/auth/VerifySignupOtpUseCase";
 
-import { RequestPasswordResetOtpUseCase } from "../../application/auth/RequestPasswordResetOtp.usecase";
-import { VerifyPasswordResetOtpUseCase } from "../../application/auth/VerifyPasswordResetOtp.usecase";
-import { ResetPasswordUseCase } from "../../application/auth/ResetPassword.usecase";
+// import { RequestPasswordResetOtpUseCase } from "../../application/auth/RequestPasswordResetOtpUseCase";
+// import { VerifyPasswordResetOtpUseCase } from "../../application/auth/VerifyPasswordResetOtpUseCase";
+// import { ResetPasswordUseCase } from "../../application/auth/ResetPasswordUseCase";
 
-import { CreateRefreshTokenUseCase } from "../../application/auth/CreateRefreshToken.usecase";
-import { RefreshAccessTokenUseCase } from "../../application/auth/RefreshAccessToken.usecase";
-import { RevokeRefreshTokenUseCase } from "../../application/auth/RevokeRefreshToken.usecase";
+// import { CreateRefreshTokenUseCase } from "../../application/auth/CreateRefreshTokenUseCase";
+// import { RefreshAccessTokenUseCase } from "../../application/auth/RefreshAccessTokenUseCase";
+// import { RevokeRefreshTokenUseCase } from "../../application/auth/RevokeRefreshTokenUseCase";
 
-import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
-import { CookieHelper } from "../utils/cookie.helper";
-import { authConfig } from "../../shared/config/auth.config";
+// import { AuthenticatedRequest } from "../../infrastructure/security/jwt-auth.middleware";
+// import { CookieHelper } from "../utils/cookie.helper";
+// import { authConfig } from "../../shared/config/auth.config";
 
-@injectable()
-export class AuthController {
-  constructor(
-    @inject(TYPES.LoginUserUseCase)
-    private readonly loginUserUseCase: LoginUserUseCase,
+// @injectable()
+// export class AuthController {
+//   constructor(
+//     @inject(TYPES.LoginUserUseCase)
+//     private readonly loginUserUseCase: LoginUserUseCase,
 
-    @inject(TYPES.RegisterUserUseCase)
-    private readonly registerUserUseCase: RegisterUserUseCase,
+//     @inject(TYPES.RegisterUserUseCase)
+//     private readonly registerUserUseCase: RegisterUserUseCase,
 
-    @inject(TYPES.GetCurrentUserUseCase)
-    private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+//     @inject(TYPES.GetCurrentUserUseCase)
+//     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
 
-    @inject(TYPES.RequestSignupOtpUseCase)
-    private readonly requestSignupOtpUseCase: RequestSignupOtpUseCase,
+//     @inject(TYPES.RequestSignupOtpUseCase)
+//     private readonly requestSignupOtpUseCase: RequestSignupOtpUseCase,
 
-    @inject(TYPES.VerifySignupOtpUseCase)
-    private readonly verifySignupOtpUseCase: VerifySignupOtpUseCase,
+//     @inject(TYPES.VerifySignupOtpUseCase)
+//     private readonly verifySignupOtpUseCase: VerifySignupOtpUseCase,
 
-    @inject(TYPES.RequestPasswordResetOtpUseCase)
-    private readonly requestPasswordResetOtpUseCase: RequestPasswordResetOtpUseCase,
+//     @inject(TYPES.RequestPasswordResetOtpUseCase)
+//     private readonly requestPasswordResetOtpUseCase: RequestPasswordResetOtpUseCase,
 
-    @inject(TYPES.VerifyPasswordResetOtpUseCase)
-    private readonly verifyPasswordResetOtpUseCase: VerifyPasswordResetOtpUseCase,
+//     @inject(TYPES.VerifyPasswordResetOtpUseCase)
+//     private readonly verifyPasswordResetOtpUseCase: VerifyPasswordResetOtpUseCase,
 
-    @inject(TYPES.ResetPasswordUseCase)
-    private readonly resetPasswordUseCase: ResetPasswordUseCase,
+//     @inject(TYPES.ResetPasswordUseCase)
+//     private readonly resetPasswordUseCase: ResetPasswordUseCase,
 
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase,
+//     @inject(TYPES.CreateRefreshTokenUseCase)
+//     private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase,
 
-    @inject(TYPES.RefreshAccessTokenUseCase)
-    private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
+//     @inject(TYPES.RefreshAccessTokenUseCase)
+//     private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
 
-    @inject(TYPES.RevokeRefreshTokenUseCase)
-    private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase
-  ) {}
+//     @inject(TYPES.RevokeRefreshTokenUseCase)
+//     private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase
+//   ) {}
 
-  /* ================= LOGIN ================= */
+//   /* ================= LOGIN ================= */
 
-  async login(req: Request, res: Response): Promise<Response> {
-    const { email, password } = req.body;
+//   async login(req: Request, res: Response): Promise<Response> {
+//     const { email, password } = req.body;
 
-    const { user, accessToken } =
-      await this.loginUserUseCase.execute({ email, password });
+//     const { user, accessToken } =
+//       await this.loginUserUseCase.execute({ email, password });
 
-    if (!user.id) {
-      throw new Error('User ID missing after login');
-    }
+//     if (!user.id) {
+//       throw new Error('User ID missing after login');
+//     }
 
-    const { token: refreshToken } =
-      await this.createRefreshTokenUseCase.execute(user.id);
+//     const { token: refreshToken } =
+//       await this.createRefreshTokenUseCase.execute(user.id);
 
-    CookieHelper.setRefreshTokenCookie(
-      res,
-      refreshToken,
-      authConfig.refreshToken.expiresInMs
-    );
+//     CookieHelper.setRefreshTokenCookie(
+//       res,
+//       refreshToken,
+//       authConfig.refreshToken.expiresInMs
+//     );
 
-    return res.status(200).json({
-      message: 'Login successful',
-      user,
-      accessToken,
-    });
-  }
+//     return res.status(200).json({
+//       message: 'Login successful',
+//       user,
+//       accessToken,
+//     });
+//   }
 
-  /* ================= SIGNUP ================= */
+//   /* ================= SIGNUP ================= */
 
-  async requestSignupOtp(req: Request, res: Response): Promise<Response> {
-    const { email } = req.body;
+//   async requestSignupOtp(req: Request, res: Response): Promise<Response> {
+//     const { email } = req.body;
 
-    const expiresAt =
-      await this.requestSignupOtpUseCase.execute(email);
+//     const expiresAt =
+//       await this.requestSignupOtpUseCase.execute(email);
 
-    return res.status(200).json({
-      message: 'OTP sent successfully',
-      expiresAt,
-    });
-  }
+//     return res.status(200).json({
+//       message: 'OTP sent successfully',
+//       expiresAt,
+//     });
+//   }
 
-  async signup(req: Request, res: Response): Promise<Response> {
-    const { email, otp, password } = req.body;
+//   async signup(req: Request, res: Response): Promise<Response> {
+//     const { email, otp, password, firstName, lastName } = req.body;
 
-    await this.verifySignupOtpUseCase.execute(email, otp);
+//     await this.verifySignupOtpUseCase.execute(email, otp);
 
-    const user = await this.registerUserUseCase.execute({
-      email,
-      password,
-    });
+//     console.log(firstName, lastName)
+//     const user = await this.registerUserUseCase.execute({
+//       email,
+//       password,
+//       firstName,
+//       lastName
+//     });
 
-    if (!user.id) {
-      throw new Error('User ID missing');
-    }
+//     if (!user.id) {
+//       throw new Error('User ID missing');
+//     }
 
-    // Generate access token via login use case
-    const { accessToken } = await this.loginUserUseCase.execute({
-      email,
-      password,
-    });
+//     // Generate access token via login use case
+//     const { accessToken } = await this.loginUserUseCase.execute({
+//       email,
+//       password,
+//     });
 
-    const { token: refreshToken } =
-      await this.createRefreshTokenUseCase.execute(user.id);
+//     const { token: refreshToken } =
+//       await this.createRefreshTokenUseCase.execute(user.id);
 
-    CookieHelper.setRefreshTokenCookie(
-      res,
-      refreshToken,
-      authConfig.refreshToken.expiresInMs
-    );
+//     CookieHelper.setRefreshTokenCookie(
+//       res,
+//       refreshToken,
+//       authConfig.refreshToken.expiresInMs
+//     );
 
-    return res.status(201).json({
-      message: 'Signup successful',
-      user,
-      accessToken,
-    });
-  }
+//     return res.status(201).json({
+//       message: 'Signup successful',
+//       user,
+//       accessToken,
+//     });
+//   }
 
-  /* ================= PASSWORD RESET ================= */
+//   /* ================= PASSWORD RESET ================= */
 
-  async requestPasswordResetOtp(req: Request, res: Response): Promise<Response> {
-    const { email } = req.body;
+//   async requestPasswordResetOtp(req: Request, res: Response): Promise<Response> {
+//     const { email } = req.body;
 
-    await this.requestPasswordResetOtpUseCase.execute(email);
+//     await this.requestPasswordResetOtpUseCase.execute(email);
 
-    return res.status(200).json({
-      message: 'If the email exists, an OTP has been sent',
-    });
-  }
+//     return res.status(200).json({
+//       message: 'If the email exists, an OTP has been sent',
+//     });
+//   }
 
-  async verifyPasswordResetOtp(req: Request, res: Response): Promise<Response> {
-    const { email, otp } = req.body;
+//   async verifyPasswordResetOtp(req: Request, res: Response): Promise<Response> {
+//     const { email, otp } = req.body;
 
-    await this.verifyPasswordResetOtpUseCase.execute(email, otp);
+//     await this.verifyPasswordResetOtpUseCase.execute(email, otp);
 
-    return res.status(200).json({
-      message: 'OTP verified successfully',
-    });
-  }
+//     return res.status(200).json({
+//       message: 'OTP verified successfully',
+//     });
+//   }
 
-  async resetPassword(req: Request, res: Response): Promise<Response> {
-    const { email, password } = req.body;
+//   async resetPassword(req: Request, res: Response): Promise<Response> {
+//     const { email, password } = req.body;
 
-    await this.resetPasswordUseCase.execute(email, password);
+//     await this.resetPasswordUseCase.execute(email, password);
 
-    return res.status(200).json({
-      message: 'Password reset successful',
-    });
-  }
+//     return res.status(200).json({
+//       message: 'Password reset successful',
+//     });
+//   }
 
-  /* ================= AUTH SESSION ================= */
+//   /* ================= AUTH SESSION ================= */
 
-  async me(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
+//   async me(req: Request, res: Response): Promise<Response> {
+//     const authReq = req as AuthenticatedRequest;
 
-    const user = await this.getCurrentUserUseCase.execute(
-      authReq.user!.userId
-    );
+//     const user = await this.getCurrentUserUseCase.execute(
+//       authReq.user!.userId
+//     );
 
-    return res.status(200).json({ user });
-  }
+//     return res.status(200).json({ user });
+//   }
 
-  async refresh(req: Request, res: Response): Promise<Response> {
-    const refreshToken = CookieHelper.getRefreshToken(req);
+//   async refresh(req: Request, res: Response): Promise<Response> {
+//     const refreshToken = CookieHelper.getRefreshToken(req);
 
-    if (!refreshToken) {
-      return res.status(401).json({ message: 'Missing refresh token' });
-    }
+//     if (!refreshToken) {
+//       return res.status(401).json({ message: 'Missing refresh token' });
+//     }
 
-    const {
-      accessToken,
-      refreshToken: newRefreshToken,
-    } = await this.refreshAccessTokenUseCase.execute(refreshToken);
+//     const {
+//       accessToken,
+//       refreshToken: newRefreshToken,
+//     } = await this.refreshAccessTokenUseCase.execute(refreshToken);
 
-    CookieHelper.setRefreshTokenCookie(
-      res,
-      newRefreshToken,
-      authConfig.refreshToken.expiresInMs
-    );
+//     CookieHelper.setRefreshTokenCookie(
+//       res,
+//       newRefreshToken,
+//       authConfig.refreshToken.expiresInMs
+//     );
 
-    return res.status(200).json({ accessToken });
-  }
+//     return res.status(200).json({ accessToken });
+//   }
 
-  async logout(req: Request, res: Response): Promise<Response> {
-    const refreshToken = CookieHelper.getRefreshToken(req);
+//   async logout(req: Request, res: Response): Promise<Response> {
+//     const refreshToken = CookieHelper.getRefreshToken(req);
 
-    if (refreshToken) {
-      await this.revokeRefreshTokenUseCase.execute(refreshToken);
-    }
+//     if (refreshToken) {
+//       await this.revokeRefreshTokenUseCase.execute(refreshToken);
+//     }
 
-    CookieHelper.clearRefreshTokenCookie(res);
+//     CookieHelper.clearRefreshTokenCookie(res);
 
-    return res.status(200).json({ message: 'Logged out' });
-  }
-}
+//     return res.status(200).json({ message: 'Logged out' });
+//   }
+// }

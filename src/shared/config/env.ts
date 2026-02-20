@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import { SignOptions } from 'jsonwebtoken';
 
-dotenv.config();
+dotenv.config({
+  path: `.env.${process.env.NODE_ENV || 'development'}`
+});
 
 function requireEnv(key: string): string {
   const value = process.env[key];
@@ -19,10 +21,16 @@ function requireNumberEnv(key: string): number{
   return value;
 }
 
+const nodeEnv = process.env.NODE_ENV || 'development';
+
 export const env = {
+  nodeEnv,
+  isDevelopment: nodeEnv === 'development',
+  isTunnel: nodeEnv === 'tunnel',
+  isProduction: nodeEnv ==='production',
   // Server
   port: Number(requireEnv('PORT')),
-  nodeEnv: requireEnv('NODE_ENV'),
+  frontendOrigin: requireEnv('FRONTEND_ORIGIN'),
 
   // Database
   mongoUri: requireEnv('MONGO_URI'),
@@ -39,5 +47,26 @@ export const env = {
 
   //nodemailer
   deepLearnEmail: requireEnv('DEEP_LEARN_EMAIL'),
-  deepLearnPassword: requireEnv('DEEP_LEARN_PASS')
+  deepLearnPassword: requireEnv('DEEP_LEARN_PASS'),
+  
+  //s3
+  storageProvider: requireEnv('STORAGE_PROVIDER'),
+  awsRegion: requireEnv('AWS_REGION'),
+  awsAccessKeyId: requireEnv('AWS_ACCESS_KEY_ID'),
+  awsSecretAccessKey:requireEnv('AWS_SECRET_ACCESS_KEY'),
+  awsBucketName: requireEnv('AWS_BUCKET_NAME'),
+
+ //Oauth
+ googleClientId: requireEnv('GOOGLE_CLIENT_ID'),
+ googleClientSecret: requireEnv('GOOGLE_CLIENT_SECRET'),
+ backendUrl: requireEnv('BACKEND_URL'),
+
+//  facebookAppId: requireEnv('FACEBOOK_APP_ID'),
+//  facebookAppSecret: requireEnv('FACEBOOK_APP_SECRET'),
+
+
+//  microsoftClientId: requireEnv('MICROSOFT_CLIENT_ID'),
+//  microsoftClientSecret: requireEnv('MICROSOFT_CLIENT_SECRET'),
+//  microsoftTenant:requireEnv('MICROSOFT_TENANT')
+ 
 };

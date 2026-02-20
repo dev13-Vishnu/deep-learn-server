@@ -1,9 +1,5 @@
-import { Email } from "../../domain/value-objects/Email";
-import { User } from "../../domain/entities/User";
+import { UserReaderPort } from './UserReaderPort';
+import { UserWriterPort } from './UserWriterPort';
 
-export interface UserRepositoryPort {
-  findByEmail(email: Email): Promise<User | null>;
-  create(user: User): Promise<User>;
-  update(user: User): Promise<void>;
-  findById(id: string): Promise<User | null>;
-}
+// Composite interface for backward compatibility
+export interface UserRepositoryPort extends UserReaderPort, UserWriterPort {}

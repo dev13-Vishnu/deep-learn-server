@@ -1,36 +1,40 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
-const UserSchema = new Schema(
+export interface IUserDocument extends Document {
+  _id: any;
+  email: string;
+  passwordHash: string | null;
+  role: number;
+  isActive: boolean;
+  emailVerified: boolean;
+  firstName?: string | null;
+  lastName?: string | null;
+  avatar?: string | null;
+  bio?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  instructorState: 'not_applied' | 'pending' | 'approved' | 'rejected';
+}
+
+const userSchema = new Schema(
   {
-    email: {
+    email: { type: String, required: true, unique: true },
+    passwordHash: { type: String, default: null },
+    role: { type: Number, enum: [0, 1, 2], required: true,
+   default: 0 },
+   instructorState: {
       type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
+      enum: ['not_applied', 'pending', 'approved', 'rejected'],
+      default: 'not_applied'
     },
-    passwordHash: {
-      type: String,
-      required: true,
-    },
-    role: {
-    type: Number,
-    enum: [0, 1, 2],
-    required: true,
+    isActive: { type: Boolean, default: true },
+    emailVerified: { type: Boolean, default: false },
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
+    avatar: { type: String, default: null },
+    bio: { type: String, default: null },
   },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    emailVerified: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
+  { timestamps: true }
 );
 
-export const UserModel = model('User', UserSchema);
+export const UserModel = model<IUserDocument>('User', userSchema);
