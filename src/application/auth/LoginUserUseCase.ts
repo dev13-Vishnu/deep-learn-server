@@ -10,6 +10,7 @@ import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRole } from '../../domain/entities/UserRole';
 import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
+import { InstructorState } from '../../domain/entities/InstructorState';
 
 // ADD THIS MISSING INTERFACE
 interface LoginUserInput {
@@ -22,6 +23,7 @@ interface LoginUserOutput {
     id: string;
     email: string;
     role: UserRole;
+    instructorState: InstructorState | null;
   };
   accessToken: string;
   refreshToken: string;
@@ -87,6 +89,7 @@ export class LoginUserUseCase {
         id: user.id,
         email: user.email.getValue(),
         role: user.role,
+        instructorState: user.instructorState ?? null,
       },
       accessToken,
       refreshToken,

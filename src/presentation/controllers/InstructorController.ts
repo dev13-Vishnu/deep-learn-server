@@ -52,13 +52,11 @@ export class InstructorController {
   async getStatus(req: Request, res: Response) : Promise <Response>{
   const authReq = req as AuthenticatedRequest;
 
-  const status = await this.getInstructorStatusUseCase.execute(
+  const result = await this.getInstructorStatusUseCase.execute(
     authReq.user!.userId
   );
 
-  return res.status(200).json({
-    status: status
-  });
+  return res.status(200).json(result);
 }
 
 async listApplications(req: Request, res: Response): Promise<Response> {

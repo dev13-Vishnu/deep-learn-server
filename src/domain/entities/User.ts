@@ -1,5 +1,6 @@
 import { DomainError } from "../errors/DomainError";
 import { Email } from "../value-objects/Email";
+import { InstructorState } from "./InstructorState";
 import { UserRole } from "./UserRole";
 
 export class User {
@@ -16,7 +17,7 @@ export class User {
     public bio?: string | null,
     public avatar?: string | null,
     
-    public instructorState?: 'not_applied' | 'pending' | 'approved' | 'rejected' | null
+    public instructorState?: InstructorState | null,
   ) {}
 
    // Business behavior: Can apply as instructor?
