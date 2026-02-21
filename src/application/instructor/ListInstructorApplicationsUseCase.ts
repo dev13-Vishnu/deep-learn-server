@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
+import { UserReaderPort } from '../ports/UserReaderPort';
 
 interface ListApplicationsQuery {
   page?: number;
@@ -12,7 +13,11 @@ interface ListApplicationsQuery {
 export class ListInstructorApplicationsUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
-    private readonly applicationRepository: InstructorApplicationRepositoryPort
+    private readonly applicationRepository: InstructorApplicationRepositoryPort,
+
+    // Inject the reader so we can fetch applicant user data for each card
+    @inject(TYPES.UserReaderPort)
+    private readonly userReader: UserReaderPort
   ) {}
 
   async execute(query: ListApplicationsQuery) {
@@ -33,8 +38,43 @@ export class ListInstructorApplicationsUseCase {
 
     const total = await this.applicationRepository.count(filter);
 
+    // Fetch the applicant's profile for each application so the admin card
+    // can display name, email, and avatar without a separate lookup.
+    const enriched = await Promise.all(
+      applications.map(async (app) => {
+        const user = await this.userReader.findById(app.userId);
+        return {
+          // Spread the flat application fields
+          id: app.id,
+          userId: app.userId,
+          bio: app.bio,
+          experienceYears: app.experienceYears,
+          teachingExperience: app.teachingExperience,
+          courseIntent: app.courseIntent,
+          level: app.level,
+          language: app.language,
+          status: app.status,
+          rejectionReason: app.rejectionReason ?? null,
+          cooldownExpiresAt: app.cooldownExpiresAt
+            ? app.cooldownExpiresAt.toISOString()
+            : null,
+          createdAt: app.createdAt,
+          updatedAt: app.updatedAt,
+          // Applicant snapshot — null-safe so a missing user never crashes the list
+          applicant: user
+            ? {
+                firstName: user.firstName ?? null,
+                lastName: user.lastName ?? null,
+                email: user.email.getValue(),
+                avatarUrl: user.avatar ?? null,
+              }
+            : null,
+        };
+      })
+    );
+
     return {
-      applications,
+      applications: enriched,
       pagination: {
         page,
         limit,
