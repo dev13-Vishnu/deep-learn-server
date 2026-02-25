@@ -1,9 +1,12 @@
 import { injectable } from 'inversify';
-import { InstructorApplicationRepositoryPort } from '../../../application/ports/InstructorApplicationRepositoryPort';
+import {
+  InstructorApplicationRepositoryPort,
+  InstructorApplicationFilter,
+} from '../../../application/ports/InstructorApplicationRepositoryPort';
 import { InstructorApplication } from '../../../domain/entities/InstructorApplication';
-import { 
+import {
   InstructorApplicationModel,
-  IInstructorApplicationDocument 
+  IInstructorApplicationDocument,
 } from '../models/InstructorApplicationModel';
 import { Types } from 'mongoose';
 
@@ -12,13 +15,13 @@ export class MongoInstructorApplicationRepository
   implements InstructorApplicationRepositoryPort
 {
   async findByUserId(userId: string): Promise<InstructorApplication | null> {
-  const doc = await InstructorApplicationModel.findOne({
-    userId: new Types.ObjectId(userId),
-  });
+    const doc = await InstructorApplicationModel.findOne({
+      userId: new Types.ObjectId(userId),
+    });
 
-  if (!doc) return null;
-  return this.toDomain(doc);
-}
+    if (!doc) return null;
+    return this.toDomain(doc);
+  }
 
   async findById(id: string): Promise<InstructorApplication | null> {
     const doc = await InstructorApplicationModel.findById(id);
@@ -27,11 +30,12 @@ export class MongoInstructorApplicationRepository
   }
 
   async findAll(
-    filter: any,
+    filter: InstructorApplicationFilter,
     skip: number,
     limit: number
   ): Promise<InstructorApplication[]> {
-    const docs = await InstructorApplicationModel.find(filter)
+    const mongoFilter = this.toMongoFilter(filter);
+    const docs = await InstructorApplicationModel.find(mongoFilter)
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -39,8 +43,9 @@ export class MongoInstructorApplicationRepository
     return docs.map((doc) => this.toDomain(doc));
   }
 
-  async count(filter: any): Promise<number> {
-    return await InstructorApplicationModel.countDocuments(filter);
+  async count(filter: InstructorApplicationFilter): Promise<number> {
+    const mongoFilter = this.toMongoFilter(filter);
+    return InstructorApplicationModel.countDocuments(mongoFilter);
   }
 
   async create(application: InstructorApplication): Promise<void> {
@@ -54,41 +59,53 @@ export class MongoInstructorApplicationRepository
     );
   }
 
-  // ← FIX THIS METHOD
-  private toDomain(doc: IInstructorApplicationDocument): InstructorApplication {
-  // Use entity's reconstruct factory method
-  return InstructorApplication.reconstruct(
-    doc._id.toString(),
-    doc.userId.toString(),
-    doc.bio,
-    doc.experienceYears,
-    doc.teachingExperience,
-    doc.courseIntent,
-    doc.level,
-    doc.language,
-    doc.status,
-    doc.rejectionReason || null,
-    doc.cooldownExpiresAt ?? null,
-    doc.createdAt,
-    doc.updatedAt
-  );
-}
+  /**
+   * Translates a typed application-layer filter into a MongoDB query object.
+   * This translation is intentionally isolated to the infrastructure adapter.
+   */
+  private toMongoFilter(
+    filter: InstructorApplicationFilter
+  ): Record<string, unknown> {
+    const mongoFilter: Record<string, unknown> = {};
+    if (filter.status !== undefined) {
+      mongoFilter.status = filter.status;
+    }
+    return mongoFilter;
+  }
 
-private toPersistence(
-  app: InstructorApplication
-): Partial<IInstructorApplicationDocument> {
-  return {
-    userId: app.userId as any,
-    bio: app.bio,
-    experienceYears: app.experienceYears,
-    teachingExperience: app.teachingExperience,
-    courseIntent: app.courseIntent,
-    level: app.level,
-    language: app.language,
-    status: app.status as any,
-    rejectionReason: app.rejectionReason,
-    cooldownExpiresAt: app.cooldownExpiresAt ?? null,
-    updatedAt: new Date(),
-  };
-}
+  private toDomain(doc: IInstructorApplicationDocument): InstructorApplication {
+    return InstructorApplication.reconstruct(
+      doc._id.toString(),
+      doc.userId.toString(),
+      doc.bio,
+      doc.experienceYears,
+      doc.teachingExperience,
+      doc.courseIntent,
+      doc.level,
+      doc.language,
+      doc.status,
+      doc.rejectionReason ?? null,
+      doc.cooldownExpiresAt ?? null,
+      doc.createdAt,
+      doc.updatedAt
+    );
+  }
+
+  private toPersistence(
+    app: InstructorApplication
+  ): Partial<IInstructorApplicationDocument> {
+    return {
+      userId: app.userId as unknown as Types.ObjectId,
+      bio: app.bio,
+      experienceYears: app.experienceYears,
+      teachingExperience: app.teachingExperience,
+      courseIntent: app.courseIntent,
+      level: app.level,
+      language: app.language,
+      status: app.status,
+      rejectionReason: app.rejectionReason,
+      cooldownExpiresAt: app.cooldownExpiresAt ?? null,
+      updatedAt: new Date(),
+    };
+  }
 }

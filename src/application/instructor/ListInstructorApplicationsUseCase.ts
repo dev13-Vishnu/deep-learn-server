@@ -1,13 +1,14 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
+import { InstructorApplicationRepositoryPort, InstructorApplicationFilter } from '../ports/InstructorApplicationRepositoryPort';
 import { UserReaderPort } from '../ports/UserReaderPort';
-
-interface ListApplicationsQuery {
-  page?: number;
-  limit?: number;
-  status?: 'pending' | 'approved' | 'rejected';
-}
+import {
+  ListInstructorApplicationsRequestDTO,
+  ListInstructorApplicationsResponseDTO,
+  ApplicationListItem,
+} from '../dto/instructor/ListInstructorApplications.dto';
+import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
+import { UserMapper } from '../mappers/UserMapper';
 
 @injectable()
 export class ListInstructorApplicationsUseCase {
@@ -15,17 +16,18 @@ export class ListInstructorApplicationsUseCase {
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort,
 
-    // Inject the reader so we can fetch applicant user data for each card
     @inject(TYPES.UserReaderPort)
     private readonly userReader: UserReaderPort
   ) {}
 
-  async execute(query: ListApplicationsQuery) {
-    const page = query.page || 1;
-    const limit = query.limit || 10;
+  async execute(
+    query: ListInstructorApplicationsRequestDTO
+  ): Promise<ListInstructorApplicationsResponseDTO> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
 
-    const filter: any = {};
+    const filter: InstructorApplicationFilter = {};
     if (query.status) {
       filter.status = query.status;
     }
@@ -38,37 +40,14 @@ export class ListInstructorApplicationsUseCase {
 
     const total = await this.applicationRepository.count(filter);
 
-    // Fetch the applicant's profile for each application so the admin card
-    // can display name, email, and avatar without a separate lookup.
-    const enriched = await Promise.all(
+    const enriched: ApplicationListItem[] = await Promise.all(
       applications.map(async (app) => {
         const user = await this.userReader.findById(app.userId);
+        const appData = InstructorApplicationMapper.toDTO(app);
+
         return {
-          // Spread the flat application fields
-          id: app.id,
-          userId: app.userId,
-          bio: app.bio,
-          experienceYears: app.experienceYears,
-          teachingExperience: app.teachingExperience,
-          courseIntent: app.courseIntent,
-          level: app.level,
-          language: app.language,
-          status: app.status,
-          rejectionReason: app.rejectionReason ?? null,
-          cooldownExpiresAt: app.cooldownExpiresAt
-            ? app.cooldownExpiresAt.toISOString()
-            : null,
-          createdAt: app.createdAt,
-          updatedAt: app.updatedAt,
-          // Applicant snapshot — null-safe so a missing user never crashes the list
-          applicant: user
-            ? {
-                firstName: user.firstName ?? null,
-                lastName: user.lastName ?? null,
-                email: user.email.getValue(),
-                avatarUrl: user.avatar ?? null,
-              }
-            : null,
+          ...appData,
+          applicant: user ? UserMapper.toApplicantSnapshot(user) : null,
         };
       })
     );
