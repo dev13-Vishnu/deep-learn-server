@@ -1,25 +1,19 @@
 // No application-class imports. Symbol constants only.
 
 export const TYPES = {
-  // ======================
   // Repositories (Ports)
-  // ======================
   UserRepositoryPort: Symbol.for('UserRepositoryPort'),
   RefreshTokenRepositoryPort: Symbol.for('RefreshTokenRepositoryPort'),
   InstructorApplicationRepositoryPort: Symbol.for(
     'InstructorApplicationRepositoryPort'
   ),
 
-  // ======================
   // Services (Ports)
-  // ======================
   OtpServicePort: Symbol.for('OtpServicePort'),
   PasswordHasherPort: Symbol.for('PasswordHasherPort'),
   TokenServicePort: Symbol.for('TokenServicePort'),
 
-  // ======================
   // Use Cases
-  // ======================
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
   RegisterUserUseCase: Symbol.for('RegisterUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
@@ -46,9 +40,7 @@ export const TYPES = {
     'RejectInstructorApplicationUseCase'
   ),
 
-  // ======================
   // Controllers
-  // ======================
   AuthController: Symbol.for('AuthController'),
   LoginController: Symbol.for('LoginController'),
   SignupController: Symbol.for('SignupController'),

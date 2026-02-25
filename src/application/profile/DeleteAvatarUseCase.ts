@@ -3,6 +3,10 @@ import { TYPES } from '../../shared/di/types';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
 import { AppError } from '../../shared/errors/AppError';
+import {
+  DeleteAvatarRequestDTO,
+  DeleteAvatarResponseDTO,
+} from '../dto/profile/DeleteAvatar.dto';
 
 @injectable()
 export class DeleteAvatarUseCase {
@@ -14,8 +18,8 @@ export class DeleteAvatarUseCase {
     private readonly storageService: StorageServicePort
   ) {}
 
-  async execute(userId: string) {
-    const user = await this.userRepository.findById(userId);
+  async execute(request: DeleteAvatarRequestDTO): Promise<DeleteAvatarResponseDTO> {
+    const user = await this.userRepository.findById(request.userId);
 
     if (!user) {
       throw new AppError('User not found', 404);
@@ -25,10 +29,8 @@ export class DeleteAvatarUseCase {
       throw new AppError('No avatar to delete', 400);
     }
 
-    // Delete from cloud storage
     await this.storageService.deleteFile(user.avatar);
 
-    // Update user entity
     user.updateAvatar(null);
 
     await this.userRepository.update(user);

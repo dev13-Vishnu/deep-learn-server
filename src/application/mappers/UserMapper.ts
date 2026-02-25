@@ -3,7 +3,7 @@ import { ApplicantSnapshot } from '../dto/instructor/InstructorApplicationData.d
 import { AppError } from '../../shared/errors/AppError';
 
 export class UserMapper {
-   static toApplicantSnapshot(user: User): ApplicantSnapshot {
+  static toApplicantSnapshot(user: User): ApplicantSnapshot {
     if (!user) {
       throw new AppError('Cannot map null User entity to ApplicantSnapshot', 500);
     }
