@@ -59,10 +59,6 @@ export class MongoInstructorApplicationRepository
     );
   }
 
-  /**
-   * Translates a typed application-layer filter into a MongoDB query object.
-   * This translation is intentionally isolated to the infrastructure adapter.
-   */
   private toMongoFilter(
     filter: InstructorApplicationFilter
   ): Record<string, unknown> {
