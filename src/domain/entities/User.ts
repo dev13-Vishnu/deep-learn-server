@@ -1,31 +1,54 @@
-import { DomainError } from "../errors/DomainError";
-import { Email } from "../value-objects/Email";
-import { InstructorState } from "./InstructorState";
-import { UserRole } from "./UserRole";
+import { DomainError } from '../errors/DomainError';
+import { Email } from '../value-objects/Email';
+import { InstructorState } from './InstructorState';
+import { UserRole } from './UserRole';
+
+const VALID_TRANSITIONS: Record<InstructorState, InstructorState[]> = {
+  not_applied: ['pending'],
+  pending: ['approved', 'rejected'],
+  approved: [],
+  rejected: ['pending'],
+};
 
 export class User {
+  private _instructorState: InstructorState;
+
   constructor(
     public readonly email: Email,
     public readonly role: UserRole,
-    public  passwordHash: string | null,
+    public passwordHash: string | null,
     public readonly isActive: boolean = true,
     public readonly emailVerified: boolean = false,
-    public readonly id?: string, // assigned by repository
+    public readonly id?: string,
 
-    public firstName?:string | null,
+    public firstName?: string | null,
     public lastName?: string | null,
     public bio?: string | null,
     public avatar?: string | null,
-    
-    public instructorState?: InstructorState | null,
-  ) {}
 
-   // Business behavior: Can apply as instructor?
+    instructorState?: InstructorState | null
+  ) {
+    this._instructorState = instructorState ?? 'not_applied';
+  }
+
+  get instructorState(): InstructorState {
+    return this._instructorState;
+  }
+
+  public setInstructorState(newState: InstructorState): void {
+    const allowed = VALID_TRANSITIONS[this._instructorState];
+    if (!allowed.includes(newState)) {
+      throw new DomainError(
+        `Cannot transition instructorState from '${this._instructorState}' to '${newState}'`
+      );
+    }
+    this._instructorState = newState;
+  }
+
   public canApplyAsInstructor(): boolean {
     return this.role === UserRole.STUDENT && this.isActive && this.emailVerified;
   }
 
-  // Business behavior: Upgrade to instructor
   public upgradeToInstructor(): void {
     if (this.role !== UserRole.STUDENT) {
       throw new DomainError('Only students can be upgraded to instructors');
@@ -36,11 +59,8 @@ export class User {
     if (!this.emailVerified) {
       throw new DomainError('Email must be verified to become an instructor');
     }
-    // Note: Role is readonly, so we need a different approach
-    // We'll handle this in the use case with repository.updateRole()
   }
 
-  // Business behavior: Change password
   public changePassword(hashedPassword: string): void {
     if (!hashedPassword || hashedPassword.trim().length === 0) {
       throw new DomainError('Hashed password cannot be empty');
@@ -48,15 +68,15 @@ export class User {
     this.passwordHash = hashedPassword;
   }
 
-  public getPassword(): string | null{
+  public getPassword(): string | null {
     return this.passwordHash;
   }
 
-  public updateProfile (
-    firstName?:string,
-    lastName?:string,
-    bio?:string,
-  ):void {
+  public updateProfile(
+    firstName?: string,
+    lastName?: string,
+    bio?: string
+  ): void {
     if (firstName !== undefined) {
       this.validateName(firstName);
       this.firstName = firstName;
@@ -70,7 +90,7 @@ export class User {
       this.bio = bio;
     }
   }
-  
+
   private validateName(name: string): void {
     if (name.trim().length === 0) {
       throw new DomainError('Name cannot be empty');
@@ -86,7 +106,6 @@ export class User {
     }
   }
 
-  // Business validation: Avatar
   public updateAvatar(avatarUrl: string | null): void {
     if (avatarUrl !== null && !this.isValidUrl(avatarUrl)) {
       throw new DomainError('Invalid avatar URL');

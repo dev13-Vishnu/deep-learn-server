@@ -5,6 +5,12 @@ import { AppError } from '../../shared/errors/AppError';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { instructorConfig } from '../../shared/config/instructor.config';
 import { logger } from '../../shared/utils/logger';
+import { DomainError } from '../../domain/errors/DomainError';
+import {
+  RejectInstructorApplicationRequestDTO,
+  RejectInstructorApplicationResponseDTO,
+} from '../dto/instructor/RejectInstructorApplication.dto';
+import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
 
 @injectable()
 export class RejectInstructorApplicationUseCase {
@@ -16,54 +22,61 @@ export class RejectInstructorApplicationUseCase {
     private readonly userRepository: UserRepositoryPort
   ) {}
 
-  async execute(applicationId: string, reason?: string) {
-  const application = await this.applicationRepository.findById(applicationId);
+  async execute(
+    request: RejectInstructorApplicationRequestDTO
+  ): Promise<RejectInstructorApplicationResponseDTO> {
+    const application = await this.applicationRepository.findById(
+      request.applicationId
+    );
 
-  if (!application) {
-    throw new AppError('Application not found', 404);
-  }
+    if (!application) {
+      throw new AppError('Application not found', 404);
+    }
 
-  if (!reason || reason.trim().length === 0) {
-    throw new AppError('Rejection reason is required', 400);
-  }
+    if (!request.reason || request.reason.trim().length === 0) {
+      throw new AppError('Rejection reason is required', 400);
+    }
 
-  // ── COMPUTE COOLDOWN ────────────────────────────────────────────────────
     const cooldownExpiresAt = new Date(
       Date.now() + instructorConfig.cooldown.durationMs
     );
 
-  // Use entity's business logic
-  try {
-    application.reject(reason, cooldownExpiresAt);  // Throws DomainError if invalid
-  } catch (error: any) {
-    if (error.name === 'DomainError') {
-      throw new AppError(error.message, 400);
+    try {
+      application.reject(request.reason, cooldownExpiresAt);
+    } catch (error: unknown) {
+      if (error instanceof DomainError) {
+        throw new AppError(error.message, 400);
+      }
+      throw error;
     }
-    throw error;
-  }
 
-  await this.applicationRepository.update(application);
+    await this.applicationRepository.update(application);
 
-  // Update users's instructor state to rejected
-  const user = await this.userRepository.findById(application.userId);
+    const user = await this.userRepository.findById(application.userId);
 
-  if(user) {
-    user.instructorState = 'rejected';
-    await this.userRepository.update(user);
-  }
+    if (user) {
+      try {
+        user.setInstructorState('rejected');
+      } catch (error: unknown) {
+        if (error instanceof DomainError) {
+          throw new AppError(error.message, 400);
+        }
+        throw error;
+      }
+      await this.userRepository.update(user);
+    }
 
-  // ── AUDIT LOG ───────────────────────────────────────────────────────────
     logger.info(
-      `[AUDIT] Application rejected | applicationId=${applicationId} userId=${application.userId} reason="${reason}" cooldownUntil=${cooldownExpiresAt.toISOString()} at=${new Date().toISOString()}`
+      `[AUDIT] Application rejected | applicationId=${request.applicationId} userId=${application.userId} reason="${request.reason}" cooldownUntil=${cooldownExpiresAt.toISOString()} at=${new Date().toISOString()}`
     );
 
-  return {
-    message: 'Application rejected',
-    application,
-    cooldown: {
-      expiresAt: cooldownExpiresAt.toISOString(),
-      durationDays: instructorConfig.cooldown.durationDays,
-    }
-  };
-}
+    return {
+      message: 'Application rejected',
+      application: InstructorApplicationMapper.toDTO(application),
+      cooldown: {
+        expiresAt: cooldownExpiresAt.toISOString(),
+        durationDays: instructorConfig.cooldown.durationDays,
+      },
+    };
+  }
 }
