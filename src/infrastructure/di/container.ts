@@ -16,7 +16,6 @@ import { S3StorageService } from '../storage/s3.storage';
 
 // Use cases — Auth
 import { LoginUserUseCase } from '../../application/auth/LoginUserUseCase';
-import { RegisterUserUseCase } from '../../application/auth/RegisterUserUseCase';
 import { ResetPasswordUseCase } from '../../application/auth/ResetPasswordUseCase';
 import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
 import { RequestSignupOtpUseCase } from '../../application/auth/RequestSignupOtpUseCase';
@@ -76,7 +75,6 @@ container.bind(TYPES.StorageServicePort).to(S3StorageService);
 //  Use Cases — Auth 
 
 container.bind(TYPES.LoginUserUseCase).to(LoginUserUseCase);
-container.bind(TYPES.RegisterUserUseCase).to(RegisterUserUseCase);
 container.bind(TYPES.ResetPasswordUseCase).to(ResetPasswordUseCase);
 container.bind(TYPES.GetCurrentUserUseCase).to(GetCurrentUserUseCase);
 container.bind(TYPES.RequestSignupOtpUseCase).to(RequestSignupOtpUseCase);

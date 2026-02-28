@@ -5,5 +5,4 @@ export interface RefreshTokenRepositoryPort {
   findByHash(tokenHash: string): Promise<RefreshToken | null>;
   revoke(tokenHash: string): Promise<void>;
   revokeAllForUser(userId: string): Promise<void>;
-  // deleteByTokenHash(tokenHash: string): Promise<void>;
 } 
