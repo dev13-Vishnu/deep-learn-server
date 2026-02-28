@@ -3,6 +3,8 @@ import { TYPES } from '../../shared/di/types';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
 import crypto from 'crypto';
+import { TokenServicePort } from '../ports/TokenServicePort';
+import { authConfig } from '../../shared/config/auth.config';
 
 interface CreateRefreshTokenOutput {
   token: string;
@@ -13,15 +15,19 @@ interface CreateRefreshTokenOutput {
 export class CreateRefreshTokenUseCase {
   constructor(
     @inject(TYPES.RefreshTokenRepositoryPort)
-    private readonly refreshTokenRepository: RefreshTokenRepositoryPort
+    private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
+
+    @inject(TYPES.TokenServicePort)
+    private readonly tokenService: TokenServicePort,
   ) {}
 
   async execute(userId: string): Promise<CreateRefreshTokenOutput> {
     // Generate token
-    const token = this.generateToken();
-    const tokenHash = this.hashToken(token);
-    const expiresAt = this.calculateExpiration();
-
+    const token = this.tokenService.generateRefreshToken();
+    const tokenHash = this.tokenService.hashToken(token);
+    const expiresAt = new Date(
+      Date.now() + authConfig.refreshToken.expiresInMs
+    );
     // Create domain entity
     const refreshToken = new RefreshToken(
       undefined,  // ID assigned by repository
@@ -35,18 +41,5 @@ export class CreateRefreshTokenUseCase {
     await this.refreshTokenRepository.create(refreshToken);
 
     return { token, expiresAt };
-  }
-
-  private generateToken(): string {
-    return crypto.randomBytes(40).toString('hex');
-  }
-
-  private hashToken(token: string): string {
-    return crypto.createHash('sha256').update(token).digest('hex');
-  }
-
-  private calculateExpiration(): Date {
-    const expiresIn = 7 * 24 * 60 * 60 * 1000; // 7 days
-    return new Date(Date.now() + expiresIn);
   }
 }

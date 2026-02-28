@@ -54,10 +54,8 @@ export class ApproveInstructorApplicationUseCase {
       throw new AppError('User ID not found', 500);
     }
 
-    await this.userRepository.updateRole(user.id, UserRole.TUTOR);
-
     try {
-      user.setInstructorState('approved');
+      user.upgradeToInstructor();
     } catch (error: unknown) {
       if (error instanceof DomainError) {
         throw new AppError(error.message, 400);
