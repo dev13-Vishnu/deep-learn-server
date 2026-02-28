@@ -1,4 +1,6 @@
+import { UploadableFile } from '../dto/shared/UploadableFile.dto';
+
 export interface StorageServicePort {
-  uploadFile(file: Express.Multer.File, folder: string): Promise<string>;
+  uploadFile(file: UploadableFile, folder: string): Promise<string>;
   deleteFile(fileUrl: string): Promise<void>;
 }

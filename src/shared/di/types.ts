@@ -1,25 +1,19 @@
-import { SignupUseCase } from "../../application/auth/SignupUseCase";
+// No application-class imports. Symbol constants only.
 
 export const TYPES = {
-  // ======================
   // Repositories (Ports)
-  // ======================
   UserRepositoryPort: Symbol.for('UserRepositoryPort'),
   RefreshTokenRepositoryPort: Symbol.for('RefreshTokenRepositoryPort'),
   InstructorApplicationRepositoryPort: Symbol.for(
-  'InstructorApplicationRepositoryPort'
-),
+    'InstructorApplicationRepositoryPort'
+  ),
 
-  // ======================
   // Services (Ports)
-  // ======================
   OtpServicePort: Symbol.for('OtpServicePort'),
   PasswordHasherPort: Symbol.for('PasswordHasherPort'),
   TokenServicePort: Symbol.for('TokenServicePort'),
 
-  // ======================
   // Use Cases
-  // ======================
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
   RegisterUserUseCase: Symbol.for('RegisterUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
@@ -33,40 +27,39 @@ export const TYPES = {
   RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
   LogoutUserUseCase: Symbol.for('LogoutUserUseCase'),
 
-  // Instructor-related (add more later as needed)
+  // Instructor
   ApplyForInstructorUseCase: Symbol.for('ApplyForInstructorUseCase'),
-  GetInstructorStatusUseCase: Symbol.for('GetInstructorStatusUseCase'),ListInstructorApplicationsUseCase: Symbol.for('ListInstructorApplicationsUseCase'),  // ← ADD
-  ApproveInstructorApplicationUseCase: Symbol.for('ApproveInstructorApplicationUseCase'),  // ← ADD
-  RejectInstructorApplicationUseCase: Symbol.for('RejectInstructorApplicationUseCase'),  // ← ADD
+  GetInstructorStatusUseCase: Symbol.for('GetInstructorStatusUseCase'),
+  ListInstructorApplicationsUseCase: Symbol.for(
+    'ListInstructorApplicationsUseCase'
+  ),
+  ApproveInstructorApplicationUseCase: Symbol.for(
+    'ApproveInstructorApplicationUseCase'
+  ),
+  RejectInstructorApplicationUseCase: Symbol.for(
+    'RejectInstructorApplicationUseCase'
+  ),
 
-  // JwtAuthMiddleware: Symbol.for('JwtAuthMiddleware'),
-  
-
-  // ======================
   // Controllers
-  // ======================
   AuthController: Symbol.for('AuthController'),
-
-  // Profile
-  GetProfileUseCase: Symbol.for('GetProfileUseCase'),
-  UpdateProfileUseCase: Symbol.for('UpdateProfileUseCase'),
-  UploadAvatarUseCase: Symbol.for('UploadAvatarUseCase'),
-  DeleteAvatarUseCase: Symbol.for('DeleteAvatarUseCase'),
-  
-  // Storage
-  StorageServicePort: Symbol.for('StorageServicePort'),
-  
-  // Controllers (updated)
   LoginController: Symbol.for('LoginController'),
   SignupController: Symbol.for('SignupController'),
   PasswordResetController: Symbol.for('PasswordResetController'),
   InstructorController: Symbol.for('InstructorController'),
   ProfileController: Symbol.for('ProfileController'),
 
+  // Profile
+  GetProfileUseCase: Symbol.for('GetProfileUseCase'),
+  UpdateProfileUseCase: Symbol.for('UpdateProfileUseCase'),
+  UploadAvatarUseCase: Symbol.for('UploadAvatarUseCase'),
+  DeleteAvatarUseCase: Symbol.for('DeleteAvatarUseCase'),
+
+  // Storage
+  StorageServicePort: Symbol.for('StorageServicePort'),
+
   UserReaderPort: Symbol.for('UserReaderPort'),
   UserWriterPort: Symbol.for('UserWriterPort'),
   SignupUseCase: Symbol.for('SignupUseCase'),
-
 
   OAuthConnectionRepositoryPort: Symbol.for('OAuthConnectionRepositoryPort'),
   OAuthStateStorePort: Symbol.for('OAuthStateStorePort'),
@@ -77,5 +70,4 @@ export const TYPES = {
   GoogleOAuthAdapter: Symbol.for('GoogleOAuthAdapter'),
   FacebookOAuthAdapter: Symbol.for('FacebookOAuthAdapter'),
   MicrosoftOAuthAdapter: Symbol.for('MicrosoftOAuthAdapter'),
-
 };

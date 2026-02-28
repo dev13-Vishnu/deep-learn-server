@@ -1,10 +1,16 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { injectable } from 'inversify';
 import { storageConfig } from '../../shared/config/storage.config';
+import { StorageServicePort } from '../../application/ports/StorageServicePort';
+import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
 
 @injectable()
-export class S3StorageService {
+export class S3StorageService implements StorageServicePort {
   private readonly s3Client: S3Client;
   private readonly bucketName: string;
 
@@ -19,10 +25,7 @@ export class S3StorageService {
     this.bucketName = storageConfig.aws.bucketName;
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    folder: string
-  ): Promise<string> {
+  async uploadFile(file: UploadableFile, folder: string): Promise<string> {
     const fileName = `${folder}/${Date.now()}-${file.originalname}`;
 
     const command = new PutObjectCommand({
@@ -30,7 +33,6 @@ export class S3StorageService {
       Key: fileName,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: 'public-read',
     });
 
     await this.s3Client.send(command);

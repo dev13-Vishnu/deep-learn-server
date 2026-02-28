@@ -1,12 +1,9 @@
-import { Request,Response } from 'express';
+import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
-
 import { TYPES } from '../../shared/di/types';
-
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
 import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
-
 import { ListInstructorApplicationsUseCase } from '../../application/instructor/ListInstructorApplicationsUseCase';
 import { ApproveInstructorApplicationUseCase } from '../../application/instructor/ApproveInstructorApplicationUseCase';
 import { RejectInstructorApplicationUseCase } from '../../application/instructor/RejectInstructorApplicationUseCase';
@@ -20,7 +17,7 @@ export class InstructorController {
     @inject(TYPES.GetInstructorStatusUseCase)
     private readonly getInstructorStatusUseCase: GetInstructorStatusUseCase,
 
-     @inject(TYPES.ListInstructorApplicationsUseCase)
+    @inject(TYPES.ListInstructorApplicationsUseCase)
     private readonly listApplicationsUseCase: ListInstructorApplicationsUseCase,
 
     @inject(TYPES.ApproveInstructorApplicationUseCase)
@@ -30,72 +27,63 @@ export class InstructorController {
     private readonly rejectApplicationUseCase: RejectInstructorApplicationUseCase
   ) {}
 
-    /* ================= APPLY ================= */
-
-  async apply (req: Request, res: Response): Promise<Response> {
+  async apply(req: Request, res: Response): Promise<Response> {
     const authReq = req as AuthenticatedRequest;
 
-    const application = await this.applyForInstructorUseCase.execute({
+    const result = await this.applyForInstructorUseCase.execute({
       userId: authReq.user!.userId,
-      ...req.body,
+      bio: req.body.bio,
+      experienceYears: req.body.experienceYears,
+      teachingExperience: req.body.teachingExperience,
+      courseIntent: req.body.courseIntent,
+      level: req.body.level,
+      language: req.body.language,
     });
 
-    return res.status(201).json({
-      message: 'Instructor application submitted',
-      application,
-    });
+    return res.status(201).json(result);
   }
 
-    /* ================= STATUS ================= */
-    
+  async getStatus(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
 
-  async getStatus(req: Request, res: Response) : Promise <Response>{
-  const authReq = req as AuthenticatedRequest;
-
-  const status = await this.getInstructorStatusUseCase.execute(
-    authReq.user!.userId
-  );
-
-  return res.status(200).json({
-    status: status
-  });
-}
-
-async listApplications(req: Request, res: Response): Promise<Response> {
-    const { page, limit, status } = req.query;
-
-    const result = await this.listApplicationsUseCase.execute({
-      page: page ? parseInt(page as string) : undefined,
-      limit: limit ? parseInt(limit as string) : undefined,
-      status: status as any,
-    });
-
-    return res.status(200).json(result);
-  }
-
-  /* ================= ADMIN: APPROVE APPLICATION ================= */
-
-  async approveApplication(req: Request, res: Response): Promise<Response> {
-    const { applicationId } = req.params;
-
-    const result = await this.approveApplicationUseCase.execute(applicationId);
-
-    return res.status(200).json(result);
-  }
-
-  /* ================= ADMIN: REJECT APPLICATION ================= */
-
-  async rejectApplication(req: Request, res: Response): Promise<Response> {
-    const { applicationId } = req.params;
-    const { reason } = req.body;
-
-    const result = await this.rejectApplicationUseCase.execute(
-      applicationId,
-      reason
+    const result = await this.getInstructorStatusUseCase.execute(
+      authReq.user!.userId
     );
 
     return res.status(200).json(result);
   }
 
+  async listApplications(req: Request, res: Response): Promise<Response> {
+    const { page, limit, status } = req.query;
 
+    const result = await this.listApplicationsUseCase.execute({
+      page: page ? parseInt(page as string, 10) : undefined,
+      limit: limit ? parseInt(limit as string, 10) : undefined,
+      status: status as 'pending' | 'approved' | 'rejected' | undefined,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async approveApplication(req: Request, res: Response): Promise<Response> {
+    const { applicationId } = req.params;
+
+    const result = await this.approveApplicationUseCase.execute({
+      applicationId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async rejectApplication(req: Request, res: Response): Promise<Response> {
+    const { applicationId } = req.params;
+    const { reason } = req.body;
+
+    const result = await this.rejectApplicationUseCase.execute({
+      applicationId,
+      reason,
+    });
+
+    return res.status(200).json(result);
+  }
 }

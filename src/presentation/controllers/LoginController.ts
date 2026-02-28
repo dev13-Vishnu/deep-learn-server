@@ -30,16 +30,14 @@ export class LoginController {
 
     const result = await this.loginUserUseCase.execute({ email, password });
 
-    // Set refresh token cookie
-      const isCrossSite = env.isProduction || env.isTunnel;
+    const isCrossSite = env.isProduction || env.isTunnel;
 
-    res.cookie('refreshToken', result.refreshToken,{
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: isCrossSite,
       sameSite: isCrossSite ? 'none' : 'lax',
       maxAge: authConfig.refreshToken.expiresInMs,
     });
-
 
     return res.status(200).json({
       message: 'Login successful',
@@ -50,7 +48,10 @@ export class LoginController {
 
   async getCurrentUser(req: Request, res: Response): Promise<Response> {
     const authReq = req as AuthenticatedRequest;
-    const user = await this.getCurrentUserUseCase.execute(authReq.user!.userId);
+
+    const user = await this.getCurrentUserUseCase.execute({
+      userId: authReq.user!.userId,
+    });
 
     return res.status(200).json({ user });
   }
@@ -64,12 +65,11 @@ export class LoginController {
 
     const result = await this.refreshAccessTokenUseCase.execute(refreshToken);
 
-    // Set new refresh token cookie
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: env.isProduction || env.isTunnel,
+      sameSite: (env.isProduction || env.isTunnel) ? 'none' : 'lax',
+      maxAge: authConfig.refreshToken.expiresInMs,
     });
 
     return res.status(200).json({

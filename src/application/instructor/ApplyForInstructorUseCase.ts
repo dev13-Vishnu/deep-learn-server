@@ -5,16 +5,12 @@ import { InstructorApplication } from '../../domain/entities/InstructorApplicati
 import { AppError } from '../../shared/errors/AppError';
 import { generateId } from '../../shared/utils/idGenerator';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
-
-interface ApplyForInstructorDTO {
-  userId: string;
-  bio: string;
-  experienceYears: string;
-  teachingExperience: 'yes' | 'no';
-  courseIntent: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
-  language: string;
-}
+import { DomainError } from '../../domain/errors/DomainError';
+import {
+  ApplyForInstructorRequestDTO,
+  ApplyForInstructorResponseDTO,
+} from '../dto/instructor/ApplyForInstructor.dto';
+import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
 
 @injectable()
 export class ApplyForInstructorUseCase {
@@ -26,19 +22,20 @@ export class ApplyForInstructorUseCase {
     private readonly userRepository: UserRepositoryPort
   ) {}
 
-  async execute(dto: ApplyForInstructorDTO) {
-    // Check for existing application
+  async execute(
+    dto: ApplyForInstructorRequestDTO
+  ): Promise<ApplyForInstructorResponseDTO> {
     const existing = await this.applicationRepository.findByUserId(dto.userId);
 
     if (existing) {
-      if(existing.status === 'rejected' && existing. isCooldownActive()){
+      if (existing.status === 'rejected' && existing.isCooldownActive()) {
         throw new AppError(
-          `You cannot reapply until ${existing.cooldownExpiresAt!.toISOString()}.` + `Cooldown expires on ${existing.cooldownExpiresAt!.toLocaleDateString()}.`,
+          `You cannot reapply until ${existing.cooldownExpiresAt!.toISOString()}. ` +
+            `Cooldown expires on ${existing.cooldownExpiresAt!.toLocaleDateString()}.`,
           403
         );
       }
-
-       if (existing.status === 'pending') {
+      if (existing.status === 'pending') {
         throw new AppError('You already have a pending application', 400);
       }
       if (existing.status === 'approved') {
@@ -46,11 +43,10 @@ export class ApplyForInstructorUseCase {
       }
     }
 
-    // Use entity's create factory method (validates business rules)
     let application: InstructorApplication;
     try {
       application = InstructorApplication.create(
-        generateId(),  // Generate ID
+        generateId(),
         dto.userId,
         dto.bio,
         dto.experienceYears,
@@ -59,8 +55,8 @@ export class ApplyForInstructorUseCase {
         dto.level,
         dto.language
       );
-    } catch (error: any) {
-      if (error.name === 'DomainError') {
+    } catch (error: unknown) {
+      if (error instanceof DomainError) {
         throw new AppError(error.message, 400);
       }
       throw error;
@@ -68,16 +64,26 @@ export class ApplyForInstructorUseCase {
 
     await this.applicationRepository.create(application);
 
-    // UPDATE USER'S INSTRUCTOR STATE TO PENDING
     const user = await this.userRepository.findById(dto.userId);
-    
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
 
-    user.instructorState = 'pending';
+    try {
+      user.setInstructorState('pending');
+    } catch (error: unknown) {
+      if (error instanceof DomainError) {
+        throw new AppError(error.message, 400);
+      }
+      throw error;
+    }
+
     await this.userRepository.update(user);
 
-    return { application };
+    return {
+      message: 'Instructor application submitted',
+      application: InstructorApplicationMapper.toDTO(application),
+    };
   }
 }

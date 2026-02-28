@@ -4,7 +4,13 @@ import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicat
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
 import { UserRole } from '../../domain/entities/UserRole';
+import { DomainError } from '../../domain/errors/DomainError';
 import { logger } from '../../shared/utils/logger';
+import {
+  ApproveInstructorApplicationRequestDTO,
+  ApproveInstructorApplicationResponseDTO,
+} from '../dto/instructor/ApproveInstructorApplication.dto';
+import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
 
 @injectable()
 export class ApproveInstructorApplicationUseCase {
@@ -16,27 +22,28 @@ export class ApproveInstructorApplicationUseCase {
     private readonly userRepository: UserRepositoryPort
   ) {}
 
-  async execute(applicationId: string) {
-    const application = await this.applicationRepository.findById(applicationId);
+  async execute(
+    request: ApproveInstructorApplicationRequestDTO
+  ): Promise<ApproveInstructorApplicationResponseDTO> {
+    const application = await this.applicationRepository.findById(
+      request.applicationId
+    );
 
     if (!application) {
       throw new AppError('Application not found', 404);
     }
 
-    // Use entity's business logic
     try {
-      application.approve();  // Throws DomainError if invalid
-    } catch (error: any) {
-      if (error.name === 'DomainError') {
+      application.approve();
+    } catch (error: unknown) {
+      if (error instanceof DomainError) {
         throw new AppError(error.message, 400);
       }
       throw error;
     }
 
-    // Save updated application
     await this.applicationRepository.update(application);
 
-    // Upgrade user role
     const user = await this.userRepository.findById(application.userId);
 
     if (!user) {
@@ -49,16 +56,24 @@ export class ApproveInstructorApplicationUseCase {
 
     await this.userRepository.updateRole(user.id, UserRole.TUTOR);
 
-    user.instructorState = 'approved';
+    try {
+      user.setInstructorState('approved');
+    } catch (error: unknown) {
+      if (error instanceof DomainError) {
+        throw new AppError(error.message, 400);
+      }
+      throw error;
+    }
+
     await this.userRepository.update(user);
 
     logger.info(
-      `[AUDIT] Application approved | applicationId=${applicationId} userId=${application.userId} at=${new Date().toISOString()}`
-    )
+      `[AUDIT] Application approved | applicationId=${request.applicationId} userId=${application.userId} at=${new Date().toISOString()}`
+    );
 
     return {
       message: 'Application approved successfully',
-      application,
+      application: InstructorApplicationMapper.toDTO(application),
     };
   }
 }

@@ -1,4 +1,4 @@
-import { DomainError } from "../errors/DomainError";
+import { DomainError } from '../errors/DomainError';
 
 export class InstructorApplication {
   private constructor(
@@ -20,7 +20,6 @@ export class InstructorApplication {
     this.validateCourseIntent(courseIntent);
   }
 
-  //  Factory method for creation
   public static create(
     id: string,
     userId: string,
@@ -40,7 +39,7 @@ export class InstructorApplication {
       courseIntent,
       level,
       language,
-      'pending',  // Always starts as pending
+      'pending',
       null,
       null,
       new Date(),
@@ -48,7 +47,6 @@ export class InstructorApplication {
     );
   }
 
-  // Factory method for reconstruction (from DB)
   public static reconstruct(
     id: string,
     userId: string,
@@ -81,7 +79,6 @@ export class InstructorApplication {
     );
   }
 
-  // Business validation
   private validateBio(bio: string): void {
     if (bio.length < 50) {
       throw new DomainError('Bio must be at least 50 characters');
@@ -100,7 +97,6 @@ export class InstructorApplication {
     }
   }
 
-  // Business behavior: Approve
   public approve(): void {
     if (this._status === 'approved') {
       throw new DomainError('Application is already approved');
@@ -113,7 +109,6 @@ export class InstructorApplication {
     this._cooldownExpiresAt = null;
   }
 
-  // Business behavior: Reject
   public reject(reason: string, cooldownExpiresAt: Date): void {
     if (!reason || reason.trim().length === 0) {
       throw new DomainError('Rejection reason is required');
@@ -129,17 +124,14 @@ export class InstructorApplication {
     this._cooldownExpiresAt = cooldownExpiresAt;
   }
 
-  // Business query: Can be approved?
   public canBeApproved(): boolean {
     return this._status === 'pending';
   }
 
-  // Business query: Is approved?
   public isApproved(): boolean {
     return this._status === 'approved';
   }
 
-  // Business query: Is pending?
   public isPending(): boolean {
     return this._status === 'pending';
   }
@@ -148,26 +140,15 @@ export class InstructorApplication {
     return this._cooldownExpiresAt !== null && this._cooldownExpiresAt > new Date();
   }
 
-  // Getters (encapsulation)
-  public get status(): string { return this._status; }
-  public get rejectionReason(): string | null { return this._rejectionReason; }
-public get cooldownExpiresAt() : Date | null { return this._cooldownExpiresAt;}
-// Called automatically by JSON.stringify — maps private fields to public names
-public toJSON() {
-  return {
-    id: this.id,
-    userId: this.userId,
-    bio: this.bio,
-    experienceYears: this.experienceYears,
-    teachingExperience: this.teachingExperience,
-    courseIntent: this.courseIntent,
-    level: this.level,
-    language: this.language,
-    status: this._status,              // ← exposes as "status"
-    rejectionReason: this._rejectionReason,
-    cooldownExpiresAt: this._cooldownExpiresAt,
-    createdAt: this.createdAt,
-    updatedAt: this.updatedAt,
-  };
-}
+  public get status(): 'pending' | 'approved' | 'rejected' {
+    return this._status;
+  }
+
+  public get rejectionReason(): string | null {
+    return this._rejectionReason;
+  }
+
+  public get cooldownExpiresAt(): Date | null {
+    return this._cooldownExpiresAt;
+  }
 }
