@@ -25,7 +25,6 @@ import { VerifyPasswordResetOtpUseCase } from '../../application/auth/VerifyPass
 import { CreateRefreshTokenUseCase } from '../../application/auth/CreateRefreshTokenUseCase';
 import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
-import { LogoutUserUseCase } from '../../application/auth/LogoutUserUseCase';
 import { SignupUseCase } from '../../application/auth/SignupUseCase';
 
 // Use cases — Instructor
@@ -88,7 +87,6 @@ container
 container.bind(TYPES.CreateRefreshTokenUseCase).to(CreateRefreshTokenUseCase);
 container.bind(TYPES.RefreshAccessTokenUseCase).to(RefreshAccessTokenUseCase);
 container.bind(TYPES.RevokeRefreshTokenUseCase).to(RevokeRefreshTokenUseCase);
-container.bind(TYPES.LogoutUserUseCase).to(LogoutUserUseCase);
 container.bind(TYPES.SignupUseCase).to(SignupUseCase);
 
 //  Use Cases — Instructor 

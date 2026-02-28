@@ -3,11 +3,11 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { LoginUserUseCase } from '../../application/auth/LoginUserUseCase';
 import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
-import { LogoutUserUseCase } from '../../application/auth/LogoutUserUseCase';
 import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
 import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 import { env } from '../../shared/config/env';
 import { authConfig } from '../../shared/config/auth.config';
+import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
 
 @injectable()
 export class LoginController {
@@ -21,8 +21,8 @@ export class LoginController {
     @inject(TYPES.RefreshAccessTokenUseCase)
     private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
 
-    @inject(TYPES.LogoutUserUseCase)
-    private readonly logoutUserUseCase: LogoutUserUseCase
+    @inject(TYPES.RevokeRefreshTokenUseCase)
+    private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase,
   ) {}
 
   async login(req: Request, res: Response): Promise<Response> {
@@ -81,7 +81,7 @@ export class LoginController {
     const refreshToken = req.cookies.refreshToken;
 
     if (refreshToken) {
-      await this.logoutUserUseCase.execute(refreshToken);
+      await this.revokeRefreshTokenUseCase.execute(refreshToken);
     }
 
     res.clearCookie('refreshToken');
