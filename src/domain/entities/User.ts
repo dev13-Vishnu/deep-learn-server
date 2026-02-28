@@ -15,7 +15,7 @@ export class User {
 
   constructor(
     public readonly email: Email,
-    public readonly role: UserRole,
+    public  role: UserRole,
     public passwordHash: string | null,
     public readonly isActive: boolean = true,
     public readonly emailVerified: boolean = false,
@@ -50,16 +50,19 @@ export class User {
   }
 
   public upgradeToInstructor(): void {
-    if (this.role !== UserRole.STUDENT) {
-      throw new DomainError('Only students can be upgraded to instructors');
-    }
-    if (!this.isActive) {
-      throw new DomainError('Inactive users cannot become instructors');
-    }
-    if (!this.emailVerified) {
-      throw new DomainError('Email must be verified to become an instructor');
-    }
+  if (this.role !== UserRole.STUDENT) {
+    throw new DomainError('Only students can be upgraded to instructors');
   }
+  if (!this.isActive) {
+    throw new DomainError('Inactive users cannot become instructors');
+  }
+  if (!this.emailVerified) {
+    throw new DomainError('Email must be verified to become an instructor');
+  }
+
+  this.role = UserRole.TUTOR;
+  this.setInstructorState('approved');
+}
 
   public changePassword(hashedPassword: string): void {
     if (!hashedPassword || hashedPassword.trim().length === 0) {
