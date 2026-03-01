@@ -5,7 +5,7 @@ import { CourseController } from '../controllers/CourseController';
 import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { tutorAuthMiddleware } from '../../infrastructure/security/tutor-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
-import { createCourseSchema } from '../validators/course.validators';
+import { createCourseSchema, updateCourseSchema } from '../validators/course.validators';
 
 const router = Router();
 
@@ -18,6 +18,14 @@ router.post(
   tutorAuthMiddleware,
   validateRequest(createCourseSchema),
   courseController.createCourse.bind(courseController)
+);
+
+router.put(
+  '/my/:courseId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(updateCourseSchema),
+  courseController.updateCourse.bind(courseController)
 );
 
 export default router;
