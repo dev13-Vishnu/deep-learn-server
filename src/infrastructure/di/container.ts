@@ -7,6 +7,7 @@ import { TYPES } from '../../shared/di/types';
 import { MongoUserRepository } from '../database/repositories/MongoUserRepository';
 import { MongoRefreshTokenRepository } from '../database/repositories/MongoRefreshTokenRepository';
 import { MongoInstructorApplicationRepository } from '../database/repositories/MongoInstructorApplicationRepository';
+import { MongoCourseRepository } from '../database/repositories/MongoCourseRepository';
 
 // Services
 import { BcryptPasswordHasher } from '../security/BcryptPasswordHasher';
@@ -40,86 +41,82 @@ import { UpdateProfileUseCase } from '../../application/profile/UpdateProfileUse
 import { UploadAvatarUseCase } from '../../application/profile/UploadAvatarUseCase';
 import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCase';
 
+// Use cases — Course
+import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
+
 // Controllers
 import { LoginController } from '../../presentation/controllers/LoginController';
 import { SignupController } from '../../presentation/controllers/SignupController';
 import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
 import { InstructorController } from '../../presentation/controllers/InstructorController';
 import { ProfileController } from '../../presentation/controllers/ProfileController';
+import { CourseController } from '../../presentation/controllers/CourseController';
 
 // OAuth
 import { bindOAuthDependencies } from './oauthBindings';
 
 export const container = new Container();
 
-//  Repositories 
+// ─── Repositories ─────────────────────────────────────────────────────────────
 
 container.bind(TYPES.UserRepositoryPort).to(MongoUserRepository);
 container.bind(TYPES.RefreshTokenRepositoryPort).to(MongoRefreshTokenRepository);
-container
-  .bind(TYPES.InstructorApplicationRepositoryPort)
-  .to(MongoInstructorApplicationRepository);
+container.bind(TYPES.InstructorApplicationRepositoryPort).to(MongoInstructorApplicationRepository);
+container.bind(TYPES.CourseRepositoryPort).to(MongoCourseRepository);
 
 // Split interfaces bound to same implementation
 container.bind(TYPES.UserReaderPort).to(MongoUserRepository);
 container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
 
-//  Services 
+// ─── Services ─────────────────────────────────────────────────────────────────
 
 container.bind(TYPES.PasswordHasherPort).to(BcryptPasswordHasher);
 container.bind(TYPES.TokenServicePort).to(JwtTokenService);
 container.bind(TYPES.OtpServicePort).to(RedisOtpService);
 container.bind(TYPES.StorageServicePort).to(S3StorageService);
 
-//  Use Cases — Auth 
+// ─── Use Cases — Auth ─────────────────────────────────────────────────────────
 
 container.bind(TYPES.LoginUserUseCase).to(LoginUserUseCase);
 container.bind(TYPES.ResetPasswordUseCase).to(ResetPasswordUseCase);
 container.bind(TYPES.GetCurrentUserUseCase).to(GetCurrentUserUseCase);
 container.bind(TYPES.RequestSignupOtpUseCase).to(RequestSignupOtpUseCase);
 container.bind(TYPES.VerifySignupOtpUseCase).to(VerifySignupOtpUseCase);
-container
-  .bind(TYPES.RequestPasswordResetOtpUseCase)
-  .to(RequestPasswordResetOtpUseCase);
-container
-  .bind(TYPES.VerifyPasswordResetOtpUseCase)
-  .to(VerifyPasswordResetOtpUseCase);
+container.bind(TYPES.RequestPasswordResetOtpUseCase).to(RequestPasswordResetOtpUseCase);
+container.bind(TYPES.VerifyPasswordResetOtpUseCase).to(VerifyPasswordResetOtpUseCase);
 container.bind(TYPES.CreateRefreshTokenUseCase).to(CreateRefreshTokenUseCase);
 container.bind(TYPES.RefreshAccessTokenUseCase).to(RefreshAccessTokenUseCase);
 container.bind(TYPES.RevokeRefreshTokenUseCase).to(RevokeRefreshTokenUseCase);
 container.bind(TYPES.SignupUseCase).to(SignupUseCase);
 
-//  Use Cases — Instructor 
+// ─── Use Cases — Instructor ───────────────────────────────────────────────────
 
 container.bind(TYPES.ApplyForInstructorUseCase).to(ApplyForInstructorUseCase);
-container
-  .bind(TYPES.GetInstructorStatusUseCase)
-  .to(GetInstructorStatusUseCase);
-container
-  .bind(TYPES.ListInstructorApplicationsUseCase)
-  .to(ListInstructorApplicationsUseCase);
-container
-  .bind(TYPES.ApproveInstructorApplicationUseCase)
-  .to(ApproveInstructorApplicationUseCase);
-container
-  .bind(TYPES.RejectInstructorApplicationUseCase)
-  .to(RejectInstructorApplicationUseCase);
+container.bind(TYPES.GetInstructorStatusUseCase).to(GetInstructorStatusUseCase);
+container.bind(TYPES.ListInstructorApplicationsUseCase).to(ListInstructorApplicationsUseCase);
+container.bind(TYPES.ApproveInstructorApplicationUseCase).to(ApproveInstructorApplicationUseCase);
+container.bind(TYPES.RejectInstructorApplicationUseCase).to(RejectInstructorApplicationUseCase);
 
-//  Use Cases — Profile 
+// ─── Use Cases — Profile ──────────────────────────────────────────────────────
 
 container.bind(TYPES.GetProfileUseCase).to(GetProfileUseCase);
 container.bind(TYPES.UpdateProfileUseCase).to(UpdateProfileUseCase);
 container.bind(TYPES.UploadAvatarUseCase).to(UploadAvatarUseCase);
 container.bind(TYPES.DeleteAvatarUseCase).to(DeleteAvatarUseCase);
 
-//  Controllers 
+// ─── Use Cases — Course ───────────────────────────────────────────────────────
+
+container.bind(TYPES.CreateCourseUseCase).to(CreateCourseUseCase);
+
+// ─── Controllers ──────────────────────────────────────────────────────────────
 
 container.bind(TYPES.LoginController).to(LoginController);
 container.bind(TYPES.SignupController).to(SignupController);
 container.bind(TYPES.PasswordResetController).to(PasswordResetController);
 container.bind(TYPES.InstructorController).to(InstructorController);
 container.bind(TYPES.ProfileController).to(ProfileController);
+container.bind(TYPES.CourseController).to(CourseController);
 
-//  OAuth 
+// ─── OAuth ────────────────────────────────────────────────────────────────────
 
 bindOAuthDependencies(container);
