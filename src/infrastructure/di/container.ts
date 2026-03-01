@@ -43,6 +43,7 @@ import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCa
 
 // Use cases — Course
 import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
+import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
 
 // Controllers
 import { LoginController } from '../../presentation/controllers/LoginController';
@@ -107,6 +108,7 @@ container.bind(TYPES.DeleteAvatarUseCase).to(DeleteAvatarUseCase);
 // ─── Use Cases — Course ───────────────────────────────────────────────────────
 
 container.bind(TYPES.CreateCourseUseCase).to(CreateCourseUseCase);
+container.bind(TYPES.UpdateCourseUseCase).to(UpdateCourseUseCase);
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 

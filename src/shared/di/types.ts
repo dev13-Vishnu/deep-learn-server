@@ -15,7 +15,6 @@ export const TYPES = {
 
   // Use Cases — Auth
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
-  RegisterUserUseCase: Symbol.for('RegisterUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
   GetCurrentUserUseCase: Symbol.for('GetCurrentUserUseCase'),
   RequestSignupOtpUseCase: Symbol.for('RequestSignupOtpUseCase'),
@@ -25,7 +24,6 @@ export const TYPES = {
   CreateRefreshTokenUseCase: Symbol.for('CreateRefreshTokenUseCase'),
   RefreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
   RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
-  LogoutUserUseCase: Symbol.for('LogoutUserUseCase'),
   SignupUseCase: Symbol.for('SignupUseCase'),
 
   // Use Cases — Instructor
@@ -49,6 +47,7 @@ export const TYPES = {
 
   // Use Cases — Course
   CreateCourseUseCase: Symbol.for('CreateCourseUseCase'),
+  UpdateCourseUseCase: Symbol.for('UpdateCourseUseCase'),
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
