@@ -58,4 +58,11 @@ router.post(
   courseController.uploadThumbnail.bind(courseController)
 );
 
+router.post(
+  '/my/:courseId/publish',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.publishCourse.bind(courseController)
+);
+
 export default router;
