@@ -7,6 +7,7 @@ import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCas
 import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCoursesUseCase';
 import { CourseStatus } from '../../domain/entities/Course';
 import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUseCase';
+import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCase';
 
 @injectable()
 export class CourseController {
@@ -22,6 +23,9 @@ export class CourseController {
 
     @inject(TYPES.GetTutorCourseUseCase)
     private readonly getTutorCourseUseCase: GetTutorCourseUseCase,
+
+    @inject(TYPES.DeleteCourseUseCase)
+    private readonly deleteCourseUseCase: DeleteCourseUseCase
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -81,6 +85,17 @@ export class CourseController {
     const authReq = req as AuthenticatedRequest;
 
     const result = await this.getTutorCourseUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async deleteCourse(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.deleteCourseUseCase.execute({
       courseId: req.params.courseId,
       tutorId:  authReq.user!.userId,
     });
