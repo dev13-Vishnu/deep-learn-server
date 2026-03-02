@@ -66,6 +66,10 @@ import { ReorderModulesUseCase } from '../../application/course/ReorderModulesUs
 import { RemoveModuleUseCase } from '../../application/course/RemoveModuleUseCase';
 import { UpdateModuleUseCase } from '../../application/course/UpdateModuleUseCase';
 import { AddModuleUseCase } from '../../application/course/AddModuleUseCase';
+import { AddLessonUseCase } from '../../application/course/AddLessonUseCase';
+import { UpdateLessonUseCase } from '../../application/course/UpdateLessonUseCase';
+import { RemoveLessonUseCase } from '../../application/course/RemoveLessonUseCase';
+import { ReorderLessonsUseCase } from '../../application/course/ReorderLessonsUseCase';
 
 export const container = new Container();
 
@@ -131,6 +135,10 @@ container.bind(TYPES.AddModuleUseCase).to(AddModuleUseCase);
 container.bind(TYPES.UpdateModuleUseCase).to(UpdateModuleUseCase);
 container.bind(TYPES.RemoveModuleUseCase).to(RemoveModuleUseCase);
 container.bind(TYPES.ReorderModulesUseCase).to(ReorderModulesUseCase);
+container.bind(TYPES.AddLessonUseCase).to(AddLessonUseCase);
+container.bind(TYPES.UpdateLessonUseCase).to(UpdateLessonUseCase);
+container.bind(TYPES.RemoveLessonUseCase).to(RemoveLessonUseCase);
+container.bind(TYPES.ReorderLessonsUseCase).to(ReorderLessonsUseCase);
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
