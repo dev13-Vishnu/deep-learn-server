@@ -62,6 +62,10 @@ import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnail
 import { PublishCourseUseCase } from '../../application/course/PublishCourseUseCase';
 import { UnpublishCourseUseCase } from '../../application/course/UnpublishCourseUseCase';
 import { ArchiveCourseUseCase } from '../../application/course/ArchiveCourseUseCase';
+import { ReorderModulesUseCase } from '../../application/course/ReorderModulesUseCase';
+import { RemoveModuleUseCase } from '../../application/course/RemoveModuleUseCase';
+import { UpdateModuleUseCase } from '../../application/course/UpdateModuleUseCase';
+import { AddModuleUseCase } from '../../application/course/AddModuleUseCase';
 
 export const container = new Container();
 
@@ -123,6 +127,10 @@ container.bind(TYPES.UploadThumbnailUseCase).to(UploadThumbnailUseCase);
 container.bind(TYPES.PublishCourseUseCase).to(PublishCourseUseCase);
 container.bind(TYPES.UnpublishCourseUseCase).to(UnpublishCourseUseCase);
 container.bind(TYPES.ArchiveCourseUseCase).to(ArchiveCourseUseCase);
+container.bind(TYPES.AddModuleUseCase).to(AddModuleUseCase);
+container.bind(TYPES.UpdateModuleUseCase).to(UpdateModuleUseCase);
+container.bind(TYPES.RemoveModuleUseCase).to(RemoveModuleUseCase);
+container.bind(TYPES.ReorderModulesUseCase).to(ReorderModulesUseCase);
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
