@@ -12,6 +12,10 @@ import {
   updateModuleSchema,
   reorderSchema,
 } from '../validators/course.validators';
+import {
+  addLessonSchema,
+  updateLessonSchema,
+} from '../validators/course.validators';
 
 const router = Router();
 
@@ -84,7 +88,7 @@ router.post(
   courseController.archiveCourse.bind(courseController)
 );
 
-// ─── Module Management ────────────────────────────────────────────────────────
+// ─── Module Management 
 
 router.post(
   '/my/:courseId/modules',
@@ -115,6 +119,39 @@ router.delete(
   jwtAuthMiddleware,
   tutorAuthMiddleware,
   courseController.removeModule.bind(courseController)
+);
+
+// ─── Lesson Management
+
+router.post(
+  '/my/:courseId/modules/:moduleId/lessons',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(addLessonSchema),
+  courseController.addLesson.bind(courseController)
+);
+
+router.put(
+  '/my/:courseId/modules/:moduleId/lessons/reorder',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(reorderSchema),
+  courseController.reorderLessons.bind(courseController)
+);
+
+router.put(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(updateLessonSchema),
+  courseController.updateLesson.bind(courseController)
+);
+
+router.delete(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.removeLesson.bind(courseController)
 );
 
 
