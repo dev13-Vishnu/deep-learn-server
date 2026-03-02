@@ -70,10 +70,14 @@ import { AddLessonUseCase } from '../../application/course/AddLessonUseCase';
 import { UpdateLessonUseCase } from '../../application/course/UpdateLessonUseCase';
 import { RemoveLessonUseCase } from '../../application/course/RemoveLessonUseCase';
 import { ReorderLessonsUseCase } from '../../application/course/ReorderLessonsUseCase';
+import { AddChapterUseCase } from '../../application/course/AddChapterUseCase';
+import { UpdateChapterUseCase } from '../../application/course/UpdateChapterUseCase';
+import { RemoveChapterUseCase } from '../../application/course/RemoveChapterUseCase';
+import { ReorderChaptersUseCase } from '../../application/course/ReorderChaptersUseCase';
 
 export const container = new Container();
 
-// ─── Repositories ─────────────────────────────────────────────────────────────
+//  Repositories
 
 container.bind(TYPES.UserRepositoryPort).to(MongoUserRepository);
 container.bind(TYPES.RefreshTokenRepositoryPort).to(MongoRefreshTokenRepository);
@@ -84,14 +88,14 @@ container.bind(TYPES.CourseRepositoryPort).to(MongoCourseRepository);
 container.bind(TYPES.UserReaderPort).to(MongoUserRepository);
 container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
 
-// ─── Services ─────────────────────────────────────────────────────────────────
+//  Services
 
 container.bind(TYPES.PasswordHasherPort).to(BcryptPasswordHasher);
 container.bind(TYPES.TokenServicePort).to(JwtTokenService);
 container.bind(TYPES.OtpServicePort).to(RedisOtpService);
 container.bind(TYPES.StorageServicePort).to(S3StorageService);
 
-// ─── Use Cases — Auth ─────────────────────────────────────────────────────────
+//  Use Cases — Auth 
 
 container.bind(TYPES.LoginUserUseCase).to(LoginUserUseCase);
 container.bind(TYPES.ResetPasswordUseCase).to(ResetPasswordUseCase);
@@ -105,7 +109,7 @@ container.bind(TYPES.RefreshAccessTokenUseCase).to(RefreshAccessTokenUseCase);
 container.bind(TYPES.RevokeRefreshTokenUseCase).to(RevokeRefreshTokenUseCase);
 container.bind(TYPES.SignupUseCase).to(SignupUseCase);
 
-// ─── Use Cases — Instructor ───────────────────────────────────────────────────
+//  Use Cases — Instructor 
 
 container.bind(TYPES.ApplyForInstructorUseCase).to(ApplyForInstructorUseCase);
 container.bind(TYPES.GetInstructorStatusUseCase).to(GetInstructorStatusUseCase);
@@ -113,14 +117,14 @@ container.bind(TYPES.ListInstructorApplicationsUseCase).to(ListInstructorApplica
 container.bind(TYPES.ApproveInstructorApplicationUseCase).to(ApproveInstructorApplicationUseCase);
 container.bind(TYPES.RejectInstructorApplicationUseCase).to(RejectInstructorApplicationUseCase);
 
-// ─── Use Cases — Profile ──────────────────────────────────────────────────────
+//  Use Cases — Profile 
 
 container.bind(TYPES.GetProfileUseCase).to(GetProfileUseCase);
 container.bind(TYPES.UpdateProfileUseCase).to(UpdateProfileUseCase);
 container.bind(TYPES.UploadAvatarUseCase).to(UploadAvatarUseCase);
 container.bind(TYPES.DeleteAvatarUseCase).to(DeleteAvatarUseCase);
 
-// ─── Use Cases — Course ───────────────────────────────────────────────────────
+//  Use Cases — Course
 
 container.bind(TYPES.CreateCourseUseCase).to(CreateCourseUseCase);
 container.bind(TYPES.UpdateCourseUseCase).to(UpdateCourseUseCase);
@@ -140,7 +144,13 @@ container.bind(TYPES.UpdateLessonUseCase).to(UpdateLessonUseCase);
 container.bind(TYPES.RemoveLessonUseCase).to(RemoveLessonUseCase);
 container.bind(TYPES.ReorderLessonsUseCase).to(ReorderLessonsUseCase);
 
-// ─── Controllers ──────────────────────────────────────────────────────────────
+// Chapter Management 
+container.bind(TYPES.AddChapterUseCase).to(AddChapterUseCase);
+container.bind(TYPES.UpdateChapterUseCase).to(UpdateChapterUseCase);
+container.bind(TYPES.RemoveChapterUseCase).to(RemoveChapterUseCase);
+container.bind(TYPES.ReorderChaptersUseCase).to(ReorderChaptersUseCase);
+
+//  Controllers
 
 container.bind(TYPES.LoginController).to(LoginController);
 container.bind(TYPES.SignupController).to(SignupController);
@@ -149,6 +159,6 @@ container.bind(TYPES.InstructorController).to(InstructorController);
 container.bind(TYPES.ProfileController).to(ProfileController);
 container.bind(TYPES.CourseController).to(CourseController);
 
-// ─── OAuth ────────────────────────────────────────────────────────────────────
+//  OAuth
 
 bindOAuthDependencies(container);
