@@ -65,4 +65,18 @@ router.post(
   courseController.publishCourse.bind(courseController)
 );
 
+router.post(
+  '/my/:courseId/unpublish',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.unpublishCourse.bind(courseController)
+);
+
+router.post(
+  '/my/:courseId/archive',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.archiveCourse.bind(courseController)
+);
+
 export default router;
