@@ -4,6 +4,8 @@ import { TYPES } from '../../shared/di/types';
 import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
 import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
+import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCoursesUseCase';
+import { CourseStatus } from '../../domain/entities/Course';
 
 @injectable()
 export class CourseController {
@@ -12,7 +14,11 @@ export class CourseController {
     private readonly createCourseUseCase: CreateCourseUseCase,
 
     @inject(TYPES.UpdateCourseUseCase)
-    private readonly updateCourseUseCase: UpdateCourseUseCase
+    private readonly updateCourseUseCase: UpdateCourseUseCase,
+
+    @inject(TYPES.ListTutorCoursesUseCase)
+    private readonly listTutorCoursesUseCase: ListTutorCoursesUseCase,
+    
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -49,6 +55,20 @@ export class CourseController {
       price:       req.body.price,
       currency:    req.body.currency,
       tags:        req.body.tags,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async getMyCourses(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+    const { page, limit, status } = req.query;
+
+    const result = await this.listTutorCoursesUseCase.execute({
+      tutorId: authReq.user!.userId,
+      page:    page  ? parseInt(page  as string, 10) : undefined,
+      limit:   limit ? parseInt(limit as string, 10) : undefined,
+      status:  status as CourseStatus | undefined,
     });
 
     return res.status(200).json(result);
