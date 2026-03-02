@@ -292,3 +292,29 @@ export const updateChapterSchema = z
       data.duration !== undefined,
     { message: 'At least one field must be provided for update' }
   );
+
+  // Video Upload Validators
+
+export const getVideoUploadUrlSchema = z.object({
+  filename: z
+    .string()
+    .min(1, 'Filename is required')
+    .max(255, 'Filename cannot exceed 255 characters'),
+
+  mimeType: z.enum(
+    ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/mpeg'],
+    { message: 'Unsupported video mime type' }
+  ),
+
+  size: z
+    .number()
+    .int()
+    .positive('File size must be positive')
+    .max(2 * 1024 * 1024 * 1024, 'File size cannot exceed 2 GB'),
+});
+
+export const confirmVideoUploadSchema = z.object({
+  duration: z
+    .number()
+    .positive('Duration must be greater than 0'),
+});

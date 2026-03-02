@@ -16,6 +16,8 @@ import {
   // Feature 11
   addChapterSchema,
   updateChapterSchema,
+  getVideoUploadUrlSchema,
+  confirmVideoUploadSchema,
 } from '../validators/course.validators';
 import { upload } from '../../infrastructure/middlewares/upload.middleware';
 
@@ -190,5 +192,22 @@ router.delete(
   courseController.removeChapter.bind(courseController)
 );
 
+// Video Upload
+
+router.post(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId/chapters/:chapterId/video-upload-url',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(getVideoUploadUrlSchema),
+  courseController.getVideoUploadUrl.bind(courseController)
+);
+
+router.post(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId/chapters/:chapterId/confirm-upload',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(confirmVideoUploadSchema),
+  courseController.confirmVideoUpload.bind(courseController)
+);
 
 export default router;
