@@ -20,6 +20,13 @@ router.post(
   courseController.createCourse.bind(courseController)
 );
 
+router.get(
+  '/my',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.getMyCourses.bind(courseController)
+);
+
 router.put(
   '/my/:courseId',
   jwtAuthMiddleware,
