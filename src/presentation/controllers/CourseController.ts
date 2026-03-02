@@ -17,6 +17,10 @@ import { AddModuleUseCase } from '../../application/course/AddModuleUseCase';
 import { UpdateModuleUseCase } from '../../application/course/UpdateModuleUseCase';
 import { RemoveModuleUseCase } from '../../application/course/RemoveModuleUseCase';
 import { ReorderModulesUseCase } from '../../application/course/ReorderModulesUseCase';
+import { AddLessonUseCase } from '../../application/course/AddLessonUseCase';
+import { UpdateLessonUseCase } from '../../application/course/UpdateLessonUseCase';
+import { RemoveLessonUseCase } from '../../application/course/RemoveLessonUseCase';
+import { ReorderLessonsUseCase } from '../../application/course/ReorderLessonsUseCase';
 
 @injectable()
 export class CourseController {
@@ -59,6 +63,18 @@ export class CourseController {
 
     @inject(TYPES.ReorderModulesUseCase)
     private readonly reorderModulesUseCase: ReorderModulesUseCase,
+
+    @inject(TYPES.AddLessonUseCase)
+    private readonly addLessonUseCase: AddLessonUseCase,
+
+    @inject(TYPES.UpdateLessonUseCase)
+    private readonly updateLessonUseCase: UpdateLessonUseCase,
+
+    @inject(TYPES.RemoveLessonUseCase)
+    private readonly removeLessonUseCase: RemoveLessonUseCase,
+
+    @inject(TYPES.ReorderLessonsUseCase)
+    private readonly reorderLessonsUseCase: ReorderLessonsUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -239,6 +255,65 @@ export class CourseController {
     const result = await this.reorderModulesUseCase.execute({
       courseId:   req.params.courseId,
       tutorId:    authReq.user!.userId,
+      orderedIds: req.body.orderedIds,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  // ─── Lesson Management ────────────
+
+  async addLesson(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.addLessonUseCase.execute({
+      courseId:    req.params.courseId,
+      tutorId:     authReq.user!.userId,
+      moduleId:    req.params.moduleId,
+      title:       req.body.title,
+      description: req.body.description ?? null,
+      isPreview:   req.body.isPreview,
+    });
+
+    return res.status(201).json(result);
+  }
+
+  async updateLesson(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.updateLessonUseCase.execute({
+      courseId:    req.params.courseId,
+      tutorId:     authReq.user!.userId,
+      moduleId:    req.params.moduleId,
+      lessonId:    req.params.lessonId,
+      title:       req.body.title,
+      description: req.body.description,
+      isPreview:   req.body.isPreview,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async removeLesson(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.removeLessonUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
+      moduleId: req.params.moduleId,
+      lessonId: req.params.lessonId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async reorderLessons(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.reorderLessonsUseCase.execute({
+      courseId:   req.params.courseId,
+      tutorId:    authReq.user!.userId,
+      moduleId:   req.params.moduleId,
       orderedIds: req.body.orderedIds,
     });
 
