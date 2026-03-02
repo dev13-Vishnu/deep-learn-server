@@ -60,6 +60,8 @@ import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUs
 import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCase';
 import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnailUseCase';
 import { PublishCourseUseCase } from '../../application/course/PublishCourseUseCase';
+import { UnpublishCourseUseCase } from '../../application/course/UnpublishCourseUseCase';
+import { ArchiveCourseUseCase } from '../../application/course/ArchiveCourseUseCase';
 
 export const container = new Container();
 
@@ -119,6 +121,8 @@ container.bind(TYPES.GetTutorCourseUseCase).to(GetTutorCourseUseCase);
 container.bind(TYPES.DeleteCourseUseCase).to(DeleteCourseUseCase);
 container.bind(TYPES.UploadThumbnailUseCase).to(UploadThumbnailUseCase);
 container.bind(TYPES.PublishCourseUseCase).to(PublishCourseUseCase);
+container.bind(TYPES.UnpublishCourseUseCase).to(UnpublishCourseUseCase);
+container.bind(TYPES.ArchiveCourseUseCase).to(ArchiveCourseUseCase);
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
