@@ -8,6 +8,8 @@ import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCours
 import { CourseStatus } from '../../domain/entities/Course';
 import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUseCase';
 import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCase';
+import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
+import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnailUseCase';
 
 @injectable()
 export class CourseController {
@@ -25,7 +27,10 @@ export class CourseController {
     private readonly getTutorCourseUseCase: GetTutorCourseUseCase,
 
     @inject(TYPES.DeleteCourseUseCase)
-    private readonly deleteCourseUseCase: DeleteCourseUseCase
+    private readonly deleteCourseUseCase: DeleteCourseUseCase,
+
+    @inject(TYPES.UploadThumbnailUseCase)
+    private readonly uploadThumbnailUseCase: UploadThumbnailUseCase
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -98,6 +103,30 @@ export class CourseController {
     const result = await this.deleteCourseUseCase.execute({
       courseId: req.params.courseId,
       tutorId:  authReq.user!.userId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async uploadThumbnail(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Framework boundary — strip Multer type down to UploadableFile
+    const uploadableFile: UploadableFile = {
+      buffer:       req.file.buffer,
+      originalname: req.file.originalname,
+      mimetype:     req.file.mimetype,
+      size:         req.file.size,
+    };
+
+    const result = await this.uploadThumbnailUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
+      file:     uploadableFile,
     });
 
     return res.status(200).json(result);
