@@ -13,6 +13,10 @@ import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnail
 import { PublishCourseUseCase } from '../../application/course/PublishCourseUseCase';
 import { UnpublishCourseUseCase } from '../../application/course/UnpublishCourseUseCase';
 import { ArchiveCourseUseCase } from '../../application/course/ArchiveCourseUseCase';
+import { AddModuleUseCase } from '../../application/course/AddModuleUseCase';
+import { UpdateModuleUseCase } from '../../application/course/UpdateModuleUseCase';
+import { RemoveModuleUseCase } from '../../application/course/RemoveModuleUseCase';
+import { ReorderModulesUseCase } from '../../application/course/ReorderModulesUseCase';
 
 @injectable()
 export class CourseController {
@@ -42,7 +46,19 @@ export class CourseController {
     private readonly unpublishCourseUseCase: UnpublishCourseUseCase,
 
     @inject(TYPES.ArchiveCourseUseCase)
-    private readonly archiveCourseUseCase: ArchiveCourseUseCase
+    private readonly archiveCourseUseCase: ArchiveCourseUseCase,
+
+    @inject(TYPES.AddModuleUseCase)
+    private readonly addModuleUseCase: AddModuleUseCase,
+
+    @inject(TYPES.UpdateModuleUseCase)
+    private readonly updateModuleUseCase: UpdateModuleUseCase,
+
+    @inject(TYPES.RemoveModuleUseCase)
+    private readonly removeModuleUseCase: RemoveModuleUseCase,
+
+    @inject(TYPES.ReorderModulesUseCase)
+    private readonly reorderModulesUseCase: ReorderModulesUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -171,6 +187,59 @@ export class CourseController {
     const result = await this.archiveCourseUseCase.execute({
       courseId: req.params.courseId,
       tutorId:  authReq.user!.userId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  // ─── Module Management ─────────────
+
+  async addModule(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.addModuleUseCase.execute({
+      courseId:    req.params.courseId,
+      tutorId:     authReq.user!.userId,
+      title:       req.body.title,
+      description: req.body.description ?? null,
+    });
+
+    return res.status(201).json(result);
+  }
+
+  async updateModule(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.updateModuleUseCase.execute({
+      courseId:    req.params.courseId,
+      tutorId:     authReq.user!.userId,
+      moduleId:    req.params.moduleId,
+      title:       req.body.title,
+      description: req.body.description,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async removeModule(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.removeModuleUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
+      moduleId: req.params.moduleId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async reorderModules(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.reorderModulesUseCase.execute({
+      courseId:   req.params.courseId,
+      tutorId:    authReq.user!.userId,
+      orderedIds: req.body.orderedIds,
     });
 
     return res.status(200).json(result);
