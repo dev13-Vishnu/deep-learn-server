@@ -54,7 +54,8 @@ export const TYPES = {
   UploadThumbnailUseCase:   Symbol.for('UploadThumbnailUseCase'),
   PublishCourseUseCase:    Symbol.for('PublishCourseUseCase'),
   UnpublishCourseUseCase:  Symbol.for('UnpublishCourseUseCase'),
-  ArchiveCourseUseCase:    Symbol.for('ArchiveCourseUseCase'),  
+  ArchiveCourseUseCase:    Symbol.for('ArchiveCourseUseCase'),
+  AddModuleUseCase:        Symbol.for('AddModuleUseCase'),
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
