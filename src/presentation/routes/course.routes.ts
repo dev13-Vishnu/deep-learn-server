@@ -6,6 +6,7 @@ import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middle
 import { tutorAuthMiddleware } from '../../infrastructure/security/tutor-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
 import { createCourseSchema, updateCourseSchema } from '../validators/course.validators';
+import { upload } from '../../infrastructure/middlewares/upload.middleware';
 
 const router = Router();
 
@@ -47,6 +48,14 @@ router.delete(
   jwtAuthMiddleware,
   tutorAuthMiddleware,
   courseController.deleteCourse.bind(courseController)
+);
+
+router.post(
+  '/my/:courseId/thumbnail',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  upload.single('thumbnail'),
+  courseController.uploadThumbnail.bind(courseController)
 );
 
 export default router;
