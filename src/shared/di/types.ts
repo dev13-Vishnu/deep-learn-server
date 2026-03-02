@@ -56,6 +56,7 @@ export const TYPES = {
   UnpublishCourseUseCase:  Symbol.for('UnpublishCourseUseCase'),
   ArchiveCourseUseCase:    Symbol.for('ArchiveCourseUseCase'),
   AddModuleUseCase:        Symbol.for('AddModuleUseCase'),
+  UpdateModuleUseCase:     Symbol.for('UpdateModuleUseCase'),
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
