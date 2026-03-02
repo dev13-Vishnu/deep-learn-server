@@ -11,6 +11,8 @@ import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCas
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
 import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnailUseCase';
 import { PublishCourseUseCase } from '../../application/course/PublishCourseUseCase';
+import { UnpublishCourseUseCase } from '../../application/course/UnpublishCourseUseCase';
+import { ArchiveCourseUseCase } from '../../application/course/ArchiveCourseUseCase';
 
 @injectable()
 export class CourseController {
@@ -34,7 +36,13 @@ export class CourseController {
     private readonly uploadThumbnailUseCase: UploadThumbnailUseCase,
 
     @inject(TYPES.PublishCourseUseCase)
-    private readonly publishCourseUseCase: PublishCourseUseCase
+    private readonly publishCourseUseCase: PublishCourseUseCase,
+
+    @inject(TYPES.UnpublishCourseUseCase)
+    private readonly unpublishCourseUseCase: UnpublishCourseUseCase,
+
+    @inject(TYPES.ArchiveCourseUseCase)
+    private readonly archiveCourseUseCase: ArchiveCourseUseCase
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -139,6 +147,28 @@ export class CourseController {
     const authReq = req as AuthenticatedRequest;
 
     const result = await this.publishCourseUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async unpublishCourse(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.unpublishCourseUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async archiveCourse(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.archiveCourseUseCase.execute({
       courseId: req.params.courseId,
       tutorId:  authReq.user!.userId,
     });
