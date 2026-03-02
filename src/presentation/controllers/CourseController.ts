@@ -6,6 +6,7 @@ import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCas
 import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
 import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCoursesUseCase';
 import { CourseStatus } from '../../domain/entities/Course';
+import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUseCase';
 
 @injectable()
 export class CourseController {
@@ -18,7 +19,9 @@ export class CourseController {
 
     @inject(TYPES.ListTutorCoursesUseCase)
     private readonly listTutorCoursesUseCase: ListTutorCoursesUseCase,
-    
+
+    @inject(TYPES.GetTutorCourseUseCase)
+    private readonly getTutorCourseUseCase: GetTutorCourseUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -69,6 +72,17 @@ export class CourseController {
       page:    page  ? parseInt(page  as string, 10) : undefined,
       limit:   limit ? parseInt(limit as string, 10) : undefined,
       status:  status as CourseStatus | undefined,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async getMyCourse(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.getTutorCourseUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
     });
 
     return res.status(200).json(result);
