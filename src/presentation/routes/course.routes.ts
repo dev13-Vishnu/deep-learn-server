@@ -27,6 +27,13 @@ router.get(
   courseController.getMyCourses.bind(courseController)
 );
 
+router.get(
+  '/my/:courseId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.getMyCourse.bind(courseController)
+);
+
 router.put(
   '/my/:courseId',
   jwtAuthMiddleware,
