@@ -49,6 +49,8 @@ export const TYPES = {
   CreateCourseUseCase: Symbol.for('CreateCourseUseCase'),
   UpdateCourseUseCase: Symbol.for('UpdateCourseUseCase'),
   ListTutorCoursesUseCase: Symbol.for('ListTutorCoursesUseCase'),
+  GetTutorCourseUseCase:   Symbol.for('GetTutorCourseUseCase'),
+
 
 
   // Controllers
