@@ -53,6 +53,7 @@ export const TYPES = {
   DeleteCourseUseCase:     Symbol.for('DeleteCourseUseCase'),
   UploadThumbnailUseCase:   Symbol.for('UploadThumbnailUseCase'),
   PublishCourseUseCase:    Symbol.for('PublishCourseUseCase'),
+  UnpublishCourseUseCase:  Symbol.for('UnpublishCourseUseCase'),
 
 
 
