@@ -50,6 +50,7 @@ export const TYPES = {
   UpdateCourseUseCase: Symbol.for('UpdateCourseUseCase'),
   ListTutorCoursesUseCase: Symbol.for('ListTutorCoursesUseCase'),
   GetTutorCourseUseCase:   Symbol.for('GetTutorCourseUseCase'),
+  DeleteCourseUseCase:     Symbol.for('DeleteCourseUseCase'),
 
 
 
