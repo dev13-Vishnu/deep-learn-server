@@ -66,6 +66,8 @@ export const TYPES = {
   AddChapterUseCase:       Symbol.for('AddChapterUseCase'),
   UpdateChapterUseCase:    Symbol.for('UpdateChapterUseCase'),
   RemoveChapterUseCase:    Symbol.for('RemoveChapterUseCase'),
+  ReorderChaptersUseCase:  Symbol.for('ReorderChaptersUseCase'),
+
 
 
   // Controllers
