@@ -25,6 +25,8 @@ import { AddChapterUseCase } from '../../application/course/AddChapterUseCase';
 import { UpdateChapterUseCase } from '../../application/course/UpdateChapterUseCase';
 import { RemoveChapterUseCase } from '../../application/course/RemoveChapterUseCase';
 import { ReorderChaptersUseCase } from '../../application/course/ReorderChaptersUseCase';
+import { GetVideoUploadUrlUseCase } from '../../application/course/GetVideoUploadUrlUseCase';
+import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideoUploadUseCase';
 
 @injectable()
 export class CourseController {
@@ -92,6 +94,12 @@ export class CourseController {
 
     @inject(TYPES.ReorderChaptersUseCase)
     private readonly reorderChaptersUseCase: ReorderChaptersUseCase,
+
+    @inject(TYPES.GetVideoUploadUrlUseCase)
+    private readonly getVideoUploadUrlUseCase: GetVideoUploadUrlUseCase,
+
+    @inject(TYPES.ConfirmVideoUploadUseCase)
+    private readonly confirmVideoUploadUseCase: ConfirmVideoUploadUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -398,6 +406,40 @@ export class CourseController {
       moduleId:   req.params.moduleId,
       lessonId:   req.params.lessonId,
       orderedIds: req.body.orderedIds,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  // Video Upload
+
+  async getVideoUploadUrl(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.getVideoUploadUrlUseCase.execute({
+      courseId:  req.params.courseId,
+      tutorId:   authReq.user!.userId,
+      moduleId:  req.params.moduleId,
+      lessonId:  req.params.lessonId,
+      chapterId: req.params.chapterId,
+      filename:  req.body.filename,
+      mimeType:  req.body.mimeType,
+      size:      req.body.size,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async confirmVideoUpload(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.confirmVideoUploadUseCase.execute({
+      courseId:  req.params.courseId,
+      tutorId:   authReq.user!.userId,
+      moduleId:  req.params.moduleId,
+      lessonId:  req.params.lessonId,
+      chapterId: req.params.chapterId,
+      duration:  req.body.duration,
     });
 
     return res.status(200).json(result);
