@@ -61,6 +61,7 @@ export const TYPES = {
   ReorderModulesUseCase:   Symbol.for('ReorderModulesUseCase'),
   AddLessonUseCase:        Symbol.for('AddLessonUseCase'),
   UpdateLessonUseCase:     Symbol.for('UpdateLessonUseCase'),
+  RemoveLessonUseCase:     Symbol.for('RemoveLessonUseCase'),
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
