@@ -21,6 +21,10 @@ import { AddLessonUseCase } from '../../application/course/AddLessonUseCase';
 import { UpdateLessonUseCase } from '../../application/course/UpdateLessonUseCase';
 import { RemoveLessonUseCase } from '../../application/course/RemoveLessonUseCase';
 import { ReorderLessonsUseCase } from '../../application/course/ReorderLessonsUseCase';
+import { AddChapterUseCase } from '../../application/course/AddChapterUseCase';
+import { UpdateChapterUseCase } from '../../application/course/UpdateChapterUseCase';
+import { RemoveChapterUseCase } from '../../application/course/RemoveChapterUseCase';
+import { ReorderChaptersUseCase } from '../../application/course/ReorderChaptersUseCase';
 
 @injectable()
 export class CourseController {
@@ -75,6 +79,19 @@ export class CourseController {
 
     @inject(TYPES.ReorderLessonsUseCase)
     private readonly reorderLessonsUseCase: ReorderLessonsUseCase,
+
+    //  Feature 11
+    @inject(TYPES.AddChapterUseCase)
+    private readonly addChapterUseCase: AddChapterUseCase,
+
+    @inject(TYPES.UpdateChapterUseCase)
+    private readonly updateChapterUseCase: UpdateChapterUseCase,
+
+    @inject(TYPES.RemoveChapterUseCase)
+    private readonly removeChapterUseCase: RemoveChapterUseCase,
+
+    @inject(TYPES.ReorderChaptersUseCase)
+    private readonly reorderChaptersUseCase: ReorderChaptersUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -208,7 +225,7 @@ export class CourseController {
     return res.status(200).json(result);
   }
 
-  // ─── Module Management ─────────────
+  //  Module Management 
 
   async addModule(req: Request, res: Response): Promise<Response> {
     const authReq = req as AuthenticatedRequest;
@@ -261,7 +278,7 @@ export class CourseController {
     return res.status(200).json(result);
   }
 
-  // ─── Lesson Management ────────────
+  //  Lesson Management 
 
   async addLesson(req: Request, res: Response): Promise<Response> {
     const authReq = req as AuthenticatedRequest;
@@ -314,6 +331,72 @@ export class CourseController {
       courseId:   req.params.courseId,
       tutorId:    authReq.user!.userId,
       moduleId:   req.params.moduleId,
+      orderedIds: req.body.orderedIds,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  //  Chapter Management 
+
+  async addChapter(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.addChapterUseCase.execute({
+      courseId:  req.params.courseId,
+      tutorId:   authReq.user!.userId,
+      moduleId:  req.params.moduleId,
+      lessonId:  req.params.lessonId,
+      title:     req.body.title,
+      type:      req.body.type,
+      isFree:    req.body.isFree,
+      content:   req.body.content  ?? null,
+      duration:  req.body.duration,
+    });
+
+    return res.status(201).json(result);
+  }
+
+  async updateChapter(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.updateChapterUseCase.execute({
+      courseId:  req.params.courseId,
+      tutorId:   authReq.user!.userId,
+      moduleId:  req.params.moduleId,
+      lessonId:  req.params.lessonId,
+      chapterId: req.params.chapterId,
+      title:     req.body.title,
+      isFree:    req.body.isFree,
+      content:   req.body.content,
+      duration:  req.body.duration,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async removeChapter(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.removeChapterUseCase.execute({
+      courseId:  req.params.courseId,
+      tutorId:   authReq.user!.userId,
+      moduleId:  req.params.moduleId,
+      lessonId:  req.params.lessonId,
+      chapterId: req.params.chapterId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async reorderChapters(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.reorderChaptersUseCase.execute({
+      courseId:   req.params.courseId,
+      tutorId:    authReq.user!.userId,
+      moduleId:   req.params.moduleId,
+      lessonId:   req.params.lessonId,
       orderedIds: req.body.orderedIds,
     });
 
