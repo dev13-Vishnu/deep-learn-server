@@ -218,3 +218,77 @@ export const updateLessonSchema = z
     data.isPreview !== undefined,
   { message: 'At least one field must be provided for update' }
 )
+
+//  Chapter Validators
+
+export const addChapterSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, 'Title is required')
+      .min(3, 'Chapter title must be at least 3 characters')
+      .max(150, 'Chapter title cannot exceed 150 characters'),
+
+    type: z.enum(['video', 'text'], {
+      message: "Chapter type must be 'video' or 'text'",
+    }),
+
+    isFree: z
+      .boolean()
+      .optional()
+      .default(false),
+
+    // Only relevant for text chapters — validated at domain level too
+    content: z
+      .string()
+      .max(50000, 'Content cannot exceed 50,000 characters')
+      .nullable()
+      .optional(),
+
+    duration: z
+      .number()
+      .min(0, 'Duration cannot be negative')
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      // text chapters must have content
+      if (data.type === 'text' && !data.content) {
+        return false;
+      }
+      return true;
+    },
+    { message: 'Text chapters must include content', path: ['content'] }
+  );
+
+export const updateChapterSchema = z
+  .object({
+    title: z
+      .string()
+      .min(3, 'Chapter title must be at least 3 characters')
+      .max(150, 'Chapter title cannot exceed 150 characters')
+      .optional(),
+
+    isFree: z
+      .boolean()
+      .optional(),
+
+    content: z
+      .string()
+      .max(50000, 'Content cannot exceed 50,000 characters')
+      .nullable()
+      .optional(),
+
+    duration: z
+      .number()
+      .min(0, 'Duration cannot be negative')
+      .optional(),
+  })
+  .refine(
+    (data) =>
+      data.title    !== undefined ||
+      data.isFree   !== undefined ||
+      data.content  !== undefined ||
+      data.duration !== undefined,
+    { message: 'At least one field must be provided for update' }
+  );

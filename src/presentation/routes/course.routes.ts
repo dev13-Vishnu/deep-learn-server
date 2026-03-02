@@ -5,17 +5,19 @@ import { CourseController } from '../controllers/CourseController';
 import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { tutorAuthMiddleware } from '../../infrastructure/security/tutor-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
-import { createCourseSchema, updateCourseSchema } from '../validators/course.validators';
-import { upload } from '../../infrastructure/middlewares/upload.middleware';
 import {
+  createCourseSchema,
+  updateCourseSchema,
   addModuleSchema,
   updateModuleSchema,
   reorderSchema,
-} from '../validators/course.validators';
-import {
   addLessonSchema,
   updateLessonSchema,
+  // Feature 11
+  addChapterSchema,
+  updateChapterSchema,
 } from '../validators/course.validators';
+import { upload } from '../../infrastructure/middlewares/upload.middleware';
 
 const router = Router();
 
@@ -88,7 +90,7 @@ router.post(
   courseController.archiveCourse.bind(courseController)
 );
 
-// ─── Module Management 
+// Module Management 
 
 router.post(
   '/my/:courseId/modules',
@@ -121,7 +123,7 @@ router.delete(
   courseController.removeModule.bind(courseController)
 );
 
-// ─── Lesson Management
+// Lesson Management
 
 router.post(
   '/my/:courseId/modules/:moduleId/lessons',
@@ -154,6 +156,39 @@ router.delete(
   courseController.removeLesson.bind(courseController)
 );
 
+//Chapter Management
+
+router.post(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId/chapters',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(addChapterSchema),
+  courseController.addChapter.bind(courseController)
+);
+
+// NOTE: reorder must be declared before /:chapterId to avoid route collision
+router.put(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId/chapters/reorder',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(reorderSchema),
+  courseController.reorderChapters.bind(courseController)
+);
+
+router.put(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId/chapters/:chapterId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(updateChapterSchema),
+  courseController.updateChapter.bind(courseController)
+);
+
+router.delete(
+  '/my/:courseId/modules/:moduleId/lessons/:lessonId/chapters/:chapterId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.removeChapter.bind(courseController)
+);
 
 
 export default router;
