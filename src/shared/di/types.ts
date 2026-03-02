@@ -48,6 +48,8 @@ export const TYPES = {
   // Use Cases — Course
   CreateCourseUseCase: Symbol.for('CreateCourseUseCase'),
   UpdateCourseUseCase: Symbol.for('UpdateCourseUseCase'),
+  ListTutorCoursesUseCase: Symbol.for('ListTutorCoursesUseCase'),
+
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
