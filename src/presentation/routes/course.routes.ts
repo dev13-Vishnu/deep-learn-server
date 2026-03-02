@@ -42,4 +42,11 @@ router.put(
   courseController.updateCourse.bind(courseController)
 );
 
+router.delete(
+  '/my/:courseId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.deleteCourse.bind(courseController)
+);
+
 export default router;
