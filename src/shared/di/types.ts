@@ -67,6 +67,9 @@ export const TYPES = {
   UpdateChapterUseCase:    Symbol.for('UpdateChapterUseCase'),
   RemoveChapterUseCase:    Symbol.for('RemoveChapterUseCase'),
   ReorderChaptersUseCase:  Symbol.for('ReorderChaptersUseCase'),
+  // Video Upload
+  GetVideoUploadUrlUseCase:   Symbol.for('GetVideoUploadUrlUseCase'),
+  ConfirmVideoUploadUseCase:  Symbol.for('ConfirmVideoUploadUseCase'),
 
 
 

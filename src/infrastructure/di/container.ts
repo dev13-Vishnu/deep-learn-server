@@ -74,6 +74,8 @@ import { AddChapterUseCase } from '../../application/course/AddChapterUseCase';
 import { UpdateChapterUseCase } from '../../application/course/UpdateChapterUseCase';
 import { RemoveChapterUseCase } from '../../application/course/RemoveChapterUseCase';
 import { ReorderChaptersUseCase } from '../../application/course/ReorderChaptersUseCase';
+import { GetVideoUploadUrlUseCase } from '../../application/course/GetVideoUploadUrlUseCase';
+import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideoUploadUseCase';
 
 export const container = new Container();
 
@@ -149,6 +151,9 @@ container.bind(TYPES.AddChapterUseCase).to(AddChapterUseCase);
 container.bind(TYPES.UpdateChapterUseCase).to(UpdateChapterUseCase);
 container.bind(TYPES.RemoveChapterUseCase).to(RemoveChapterUseCase);
 container.bind(TYPES.ReorderChaptersUseCase).to(ReorderChaptersUseCase);
+// Video Upload
+container.bind(TYPES.GetVideoUploadUrlUseCase).to(GetVideoUploadUrlUseCase);
+container.bind(TYPES.ConfirmVideoUploadUseCase).to(ConfirmVideoUploadUseCase);
 
 //  Controllers
 
