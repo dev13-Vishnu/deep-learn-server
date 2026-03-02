@@ -10,6 +10,7 @@ import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUs
 import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCase';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
 import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnailUseCase';
+import { PublishCourseUseCase } from '../../application/course/PublishCourseUseCase';
 
 @injectable()
 export class CourseController {
@@ -30,7 +31,10 @@ export class CourseController {
     private readonly deleteCourseUseCase: DeleteCourseUseCase,
 
     @inject(TYPES.UploadThumbnailUseCase)
-    private readonly uploadThumbnailUseCase: UploadThumbnailUseCase
+    private readonly uploadThumbnailUseCase: UploadThumbnailUseCase,
+
+    @inject(TYPES.PublishCourseUseCase)
+    private readonly publishCourseUseCase: PublishCourseUseCase
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -115,7 +119,6 @@ export class CourseController {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    // Framework boundary — strip Multer type down to UploadableFile
     const uploadableFile: UploadableFile = {
       buffer:       req.file.buffer,
       originalname: req.file.originalname,
@@ -127,6 +130,17 @@ export class CourseController {
       courseId: req.params.courseId,
       tutorId:  authReq.user!.userId,
       file:     uploadableFile,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async publishCourse(req: Request, res: Response): Promise<Response> {
+    const authReq = req as AuthenticatedRequest;
+
+    const result = await this.publishCourseUseCase.execute({
+      courseId: req.params.courseId,
+      tutorId:  authReq.user!.userId,
     });
 
     return res.status(200).json(result);
