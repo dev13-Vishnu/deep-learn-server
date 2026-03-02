@@ -57,6 +57,7 @@ import { CourseController } from '../../presentation/controllers/CourseControlle
 import { bindOAuthDependencies } from './oauthBindings';
 import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCoursesUseCase';
 import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUseCase';
+import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCase';
 
 export const container = new Container();
 
@@ -113,6 +114,7 @@ container.bind(TYPES.CreateCourseUseCase).to(CreateCourseUseCase);
 container.bind(TYPES.UpdateCourseUseCase).to(UpdateCourseUseCase);
 container.bind(TYPES.ListTutorCoursesUseCase).to(ListTutorCoursesUseCase);
 container.bind(TYPES.GetTutorCourseUseCase).to(GetTutorCourseUseCase);
+container.bind(TYPES.DeleteCourseUseCase).to(DeleteCourseUseCase);
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
