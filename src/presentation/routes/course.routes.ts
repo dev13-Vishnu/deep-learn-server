@@ -7,6 +7,11 @@ import { tutorAuthMiddleware } from '../../infrastructure/security/tutor-auth.mi
 import { validateRequest } from '../middlewares/validationRequest';
 import { createCourseSchema, updateCourseSchema } from '../validators/course.validators';
 import { upload } from '../../infrastructure/middlewares/upload.middleware';
+import {
+  addModuleSchema,
+  updateModuleSchema,
+  reorderSchema,
+} from '../validators/course.validators';
 
 const router = Router();
 
@@ -78,5 +83,40 @@ router.post(
   tutorAuthMiddleware,
   courseController.archiveCourse.bind(courseController)
 );
+
+// ─── Module Management ────────────────────────────────────────────────────────
+
+router.post(
+  '/my/:courseId/modules',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(addModuleSchema),
+  courseController.addModule.bind(courseController)
+);
+
+router.put(
+  '/my/:courseId/modules/reorder',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(reorderSchema),
+  courseController.reorderModules.bind(courseController)
+);
+
+router.put(
+  '/my/:courseId/modules/:moduleId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  validateRequest(updateModuleSchema),
+  courseController.updateModule.bind(courseController)
+);
+
+router.delete(
+  '/my/:courseId/modules/:moduleId',
+  jwtAuthMiddleware,
+  tutorAuthMiddleware,
+  courseController.removeModule.bind(courseController)
+);
+
+
 
 export default router;

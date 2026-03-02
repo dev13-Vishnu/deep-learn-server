@@ -124,3 +124,50 @@ export const updateCourseSchema = z.object({
   (data) => Object.keys(data).length > 0,
   { message: 'At least one field must be provided for update' }
 );
+
+// add after updateCourseSchema
+
+export const addModuleSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .min(3, 'Module title must be at least 3 characters')
+    .max(150, 'Module title cannot exceed 150 characters'),
+
+  description: z
+    .string()
+    .max(500, 'Description cannot exceed 500 characters')
+    .nullable()
+    .optional(),
+});
+
+// add after updateCourseSchema
+
+export const updateModuleSchema = z
+  .object({
+    title: z
+      .string()
+      .min(3, 'Module title must be at least 3 characters')
+      .max(150, 'Module title cannot exceed 150 characters')
+      .optional(),
+
+    description: z
+      .string()
+      .max(500, 'Description cannot exceed 500 characters')
+      .nullable()
+      .optional(),
+  })
+  .refine(
+  (data) =>
+    data.title !== undefined ||
+    data.description !== undefined,
+  { message: 'At least one field must be provided for update' }
+);
+
+// add after updateCourseSchema
+
+export const reorderSchema = z.object({
+  orderedIds: z
+    .array(z.string())
+    .min(1, 'orderedIds must contain at least one id'),
+});
