@@ -29,6 +29,7 @@ import { GetVideoUploadUrlUseCase } from '../../application/course/GetVideoUploa
 import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideoUploadUseCase';
 import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
 import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
+import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
 
 @injectable()
 export class CourseController {
@@ -105,6 +106,9 @@ export class CourseController {
 
     @inject(TYPES.ListPublicCoursesUseCase)
     private readonly listPublicCoursesUseCase: ListPublicCoursesUseCase,
+
+    @inject(TYPES.GetPublicCourseUseCase)
+    private readonly getPublicCourseUseCase: GetPublicCourseUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -193,6 +197,13 @@ export class CourseController {
       },
     });
 
+    return res.status(200).json(result);
+  }
+
+  async getPublicCourse(req: Request, res: Response): Promise<Response> {
+    const result = await this.getPublicCourseUseCase.execute({
+      courseId: req.params.courseId,
+    });
     return res.status(200).json(result);
   }
 
