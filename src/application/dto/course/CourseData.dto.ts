@@ -75,3 +75,20 @@ export interface TutorCourseListItemDTO {
   updatedAt:       string;
   publishedAt:     string | null;
 }
+
+export interface PublicCourseListItemDTO {
+  id:              string;
+  tutorId:         string;
+  title:           string;
+  subtitle:        string | null;
+  thumbnail:       string | null;
+  category:        string;
+  level:           string;
+  language:        string;
+  price:           number;
+  currency:        string;
+  tags:            string[];
+  totalDuration:   number;
+  enrollmentCount: number;
+  publishedAt:     string | null;
+}
