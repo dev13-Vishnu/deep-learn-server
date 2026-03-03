@@ -14,6 +14,10 @@ import {
   ChapterDTO,
   VideoMetadataDTO,
   PublicCourseListItemDTO,
+  PublicCourseDetailDTO,
+  PublicModuleDTO,
+  PublicLessonDTO,
+  PublicChapterDTO,
 } from '../dto/course/CourseData.dto';
 
 export class CourseMapper {
@@ -73,6 +77,55 @@ export class CourseMapper {
       totalDuration:   course.totalDuration,
       enrollmentCount: course.enrollmentCount,
       publishedAt:     course.publishedAt?.toISOString() ?? null,
+    };
+  }
+
+  static toPublicDetail(course: Course): PublicCourseDetailDTO {
+    return {
+      ...CourseMapper.toPublicListItem(course),
+      description: course.description,
+      language:    course.language,
+      tags:        course.tags,
+      modules:     course.modules.map(m => CourseMapper.toPublicModuleDTO(m)),
+    };
+  }
+
+  static toPublicModuleDTO(module: Module): PublicModuleDTO {
+    return {
+      id:          module.id,
+      title:       module.title,
+      description: module.description,
+      order:       module.order,
+      duration:    module.duration,
+      lessons:     module.lessons.map(l => CourseMapper.toPublicLessonDTO(l)),
+    };
+  }
+
+  static toPublicLessonDTO(lesson: Lesson): PublicLessonDTO {
+    return {
+      id:          lesson.id,
+      title:       lesson.title,
+      description: lesson.description,
+      order:       lesson.order,
+      isPreview:   lesson.isPreview,
+      duration:    lesson.duration,
+      chapters:    lesson.chapters.map(c => CourseMapper.toPublicChapterDTO(c)),
+    };
+  }
+
+  static toPublicChapterDTO(chapter: Chapter): PublicChapterDTO {
+    // Non-free chapters: content and video are hidden from public/non-enrolled users
+    return {
+      id:       chapter.id,
+      title:    chapter.title,
+      order:    chapter.order,
+      type:     chapter.type,
+      duration: chapter.duration,
+      isFree:   chapter.isFree,
+      content:  chapter.isFree ? chapter.content : null,
+      video:    chapter.isFree && chapter.video
+                  ? CourseMapper.toVideoMetadataDTO(chapter.video)
+                  : null,
     };
   }
 
