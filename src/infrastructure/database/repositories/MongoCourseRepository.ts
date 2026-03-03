@@ -9,6 +9,7 @@ import {
 } from '../models/CourseModel';
 import {
   CourseRepositoryPort,
+  PublicCourseFilter,
   TutorCourseFilter,
 } from '../../../application/ports/CourseRepositoryPort';
 import {
@@ -78,6 +79,24 @@ export class MongoCourseRepository implements CourseRepositoryPort {
     return CourseModel.countDocuments(query);
   }
 
+  async findPublished(
+    filter: PublicCourseFilter,
+    skip: number,
+    limit: number
+  ): Promise<Course[]> {
+    const { query, sort } = this.buildPublicQuery(filter);
+    const docs = await CourseModel.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+    return docs.map(doc => this.toDomain(doc));
+  }
+
+  async countPublished(filter: PublicCourseFilter): Promise<number> {
+    const { query } = this.buildPublicQuery(filter);
+    return CourseModel.countDocuments(query);
+  }
+
   // ─── Query builders ──────────────────────────────────────────────────────────
 
   private buildTutorQuery(
@@ -91,6 +110,39 @@ export class MongoCourseRepository implements CourseRepositoryPort {
       query.status = filter.status;
     }
     return query;
+  }
+
+  private buildPublicQuery(filter: PublicCourseFilter): {
+    query: Record<string, unknown>;
+    sort:  Record<string, unknown>;
+  } {
+    const query: Record<string, unknown> = { status: 'published' };
+
+    if (filter.category) query.category = filter.category;
+    if (filter.language) query.language  = filter.language;
+    if (filter.level)    query.level     = filter.level;
+
+    if (filter.minPrice !== undefined || filter.maxPrice !== undefined) {
+      const priceFilter: Record<string, number> = {};
+      if (filter.minPrice !== undefined) priceFilter.$gte = filter.minPrice;
+      if (filter.maxPrice !== undefined) priceFilter.$lte = filter.maxPrice;
+      query.price = priceFilter;
+    }
+
+    if (filter.search) {
+      query.$text = { $search: filter.search };
+    }
+
+    const sortMap: Record<string, Record<string, unknown>> = {
+      newest:    { createdAt: -1 },
+      oldest:    { createdAt:  1 },
+      price_asc: { price:      1 },
+      price_desc:{ price:     -1 },
+      popular:   { enrollmentCount: -1 },
+    };
+    const sort = sortMap[filter.sort ?? 'newest'];
+
+    return { query, sort };
   }
 
   // ─── toDomain ────────────────────────────────────────────────────────────────
