@@ -25,6 +25,10 @@ const router = Router();
 
 const courseController = container.get<CourseController>(TYPES.CourseController);
 
+router.get(
+  '/',
+  courseController.getPublicCourses.bind(courseController)
+);
 
 router.post(
   '/',
