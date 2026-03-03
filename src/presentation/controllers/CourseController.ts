@@ -27,6 +27,8 @@ import { RemoveChapterUseCase } from '../../application/course/RemoveChapterUseC
 import { ReorderChaptersUseCase } from '../../application/course/ReorderChaptersUseCase';
 import { GetVideoUploadUrlUseCase } from '../../application/course/GetVideoUploadUrlUseCase';
 import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideoUploadUseCase';
+import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
+import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
 
 @injectable()
 export class CourseController {
@@ -100,6 +102,9 @@ export class CourseController {
 
     @inject(TYPES.ConfirmVideoUploadUseCase)
     private readonly confirmVideoUploadUseCase: ConfirmVideoUploadUseCase,
+
+    @inject(TYPES.ListPublicCoursesUseCase)
+    private readonly listPublicCoursesUseCase: ListPublicCoursesUseCase,
   ) {}
 
   async createCourse(req: Request, res: Response): Promise<Response> {
@@ -161,6 +166,31 @@ export class CourseController {
     const result = await this.getTutorCourseUseCase.execute({
       courseId: req.params.courseId,
       tutorId:  authReq.user!.userId,
+    });
+
+    return res.status(200).json(result);
+  }
+
+  async getPublicCourses(req: Request, res: Response): Promise<Response> {
+    const {
+      page, limit,
+      category, level, language,
+      minPrice, maxPrice,
+      search, sort,
+    } = req.query;
+
+    const result = await this.listPublicCoursesUseCase.execute({
+      page:  page  ? parseInt(page  as string, 10) : undefined,
+      limit: limit ? parseInt(limit as string, 10) : undefined,
+      filter: {
+        category: category as string | undefined,
+        level:    level    as string | undefined,
+        language: language as string | undefined,
+        minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
+        maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
+        search:   search   as string | undefined,
+        sort:     sort     as PublicCourseSort | undefined,
+      },
     });
 
     return res.status(200).json(result);
