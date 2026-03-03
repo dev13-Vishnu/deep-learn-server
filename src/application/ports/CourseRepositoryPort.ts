@@ -31,5 +31,6 @@ export interface CourseRepositoryPort {
   countByTutor(tutorId: string, filter: TutorCourseFilter): Promise<number>;
   findPublished(filter: PublicCourseFilter, skip: number, limit: number): Promise<Course[]>;
   countPublished(filter: PublicCourseFilter): Promise<number>;
+  findPublishedById(id: string): Promise<Course | null>;
 
 }
