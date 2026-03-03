@@ -4,6 +4,23 @@ export interface TutorCourseFilter {
   status?: CourseStatus;
 }
 
+export type PublicCourseSort =
+  | 'newest'
+  | 'oldest'
+  | 'price_asc'
+  | 'price_desc'
+  | 'popular';
+
+export interface PublicCourseFilter {
+  category?:  string;
+  level?:     string;
+  language?:  string;
+  minPrice?:  number;
+  maxPrice?:  number;
+  search?:    string;
+  sort?:      PublicCourseSort;
+}
+
 export interface CourseRepositoryPort {
   create(course: Course): Promise<void>;
   findById(id: string): Promise<Course | null>;
@@ -12,4 +29,7 @@ export interface CourseRepositoryPort {
   delete(id: string): Promise<void>;
   findByTutor(tutorId: string, filter: TutorCourseFilter, skip: number, limit: number): Promise<Course[]>;
   countByTutor(tutorId: string, filter: TutorCourseFilter): Promise<number>;
+  findPublished(filter: PublicCourseFilter, skip: number, limit: number): Promise<Course[]>;
+  countPublished(filter: PublicCourseFilter): Promise<number>;
+
 }
