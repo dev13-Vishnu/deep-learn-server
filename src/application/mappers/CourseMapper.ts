@@ -13,6 +13,7 @@ import {
   LessonDTO,
   ChapterDTO,
   VideoMetadataDTO,
+  PublicCourseListItemDTO,
 } from '../dto/course/CourseData.dto';
 
 export class CourseMapper {
@@ -52,6 +53,25 @@ export class CourseMapper {
       totalDuration:   course.totalDuration,
       enrollmentCount: course.enrollmentCount,
       updatedAt:       course.updatedAt.toISOString(),
+      publishedAt:     course.publishedAt?.toISOString() ?? null,
+    };
+  }
+
+  static toPublicListItem(course: Course): PublicCourseListItemDTO {
+    return {
+      id:              course.id,
+      tutorId:         course.tutorId,
+      title:           course.title,
+      subtitle:        course.subtitle,
+      thumbnail:       course.thumbnail,
+      category:        course.category,
+      level:           course.level,
+      language:        course.language,
+      price:           course.price,
+      currency:        course.currency,
+      tags:            course.tags,
+      totalDuration:   course.totalDuration,
+      enrollmentCount: course.enrollmentCount,
       publishedAt:     course.publishedAt?.toISOString() ?? null,
     };
   }
