@@ -70,7 +70,7 @@ export const TYPES = {
   // Video Upload
   GetVideoUploadUrlUseCase:   Symbol.for('GetVideoUploadUrlUseCase'),
   ConfirmVideoUploadUseCase:  Symbol.for('ConfirmVideoUploadUseCase'),
-
+  ListPublicCoursesUseCase:  Symbol.for('ListPublicCoursesUseCase'),
 
 
   // Controllers
