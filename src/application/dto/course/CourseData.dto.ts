@@ -92,3 +92,41 @@ export interface PublicCourseListItemDTO {
   enrollmentCount: number;
   publishedAt:     string | null;
 }
+
+export interface PublicChapterDTO {
+  id:       string;
+  title:    string;
+  order:    number;
+  type:     'video' | 'text';
+  duration: number;
+  isFree:   boolean;
+  // content and video are only populated for isFree chapters
+  content:  string | null;
+  video:    VideoMetadataDTO | null;
+}
+
+export interface PublicLessonDTO {
+  id:          string;
+  title:       string;
+  description: string | null;
+  order:       number;
+  isPreview:   boolean;
+  duration:    number;
+  chapters:    PublicChapterDTO[];
+}
+
+export interface PublicModuleDTO {
+  id:          string;
+  title:       string;
+  description: string | null;
+  order:       number;
+  duration:    number;
+  lessons:     PublicLessonDTO[];
+}
+
+export interface PublicCourseDetailDTO extends PublicCourseListItemDTO {
+  description: string;
+  language:    string;
+  tags:        string[];
+  modules:     PublicModuleDTO[];
+}
