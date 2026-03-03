@@ -77,6 +77,7 @@ import { ReorderChaptersUseCase } from '../../application/course/ReorderChapters
 import { GetVideoUploadUrlUseCase } from '../../application/course/GetVideoUploadUrlUseCase';
 import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideoUploadUseCase';
 import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
+import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
 
 export const container = new Container();
 
@@ -156,6 +157,7 @@ container.bind(TYPES.ReorderChaptersUseCase).to(ReorderChaptersUseCase);
 container.bind(TYPES.GetVideoUploadUrlUseCase).to(GetVideoUploadUrlUseCase);
 container.bind(TYPES.ConfirmVideoUploadUseCase).to(ConfirmVideoUploadUseCase);
 container.bind(TYPES.ListPublicCoursesUseCase).to(ListPublicCoursesUseCase);
+container.bind(TYPES.GetPublicCourseUseCase).to(GetPublicCourseUseCase);
 
 //  Controllers
 
