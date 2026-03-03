@@ -30,10 +30,6 @@ router.get(
   courseController.getPublicCourses.bind(courseController)
 );
 
-router.get(
-  '/:courseId',
-  courseController.getPublicCourse.bind(courseController)
-);
 
 router.post(
   '/',
@@ -55,6 +51,11 @@ router.get(
   jwtAuthMiddleware,
   tutorAuthMiddleware,
   courseController.getMyCourse.bind(courseController)
+);
+
+router.get(
+  '/:courseId',
+  courseController.getPublicCourse.bind(courseController)
 );
 
 router.put(
