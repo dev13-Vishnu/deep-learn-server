@@ -25,6 +25,8 @@ import {
   VideoStatus,
 } from '../../../domain/entities/Course';
 
+import { SortOrder } from 'mongoose';
+
 @injectable()
 export class MongoCourseRepository implements CourseRepositoryPort {
 
@@ -114,7 +116,7 @@ export class MongoCourseRepository implements CourseRepositoryPort {
 
   private buildPublicQuery(filter: PublicCourseFilter): {
     query: Record<string, unknown>;
-    sort:  Record<string, unknown>;
+    sort:  Record<string, SortOrder>;
   } {
     const query: Record<string, unknown> = { status: 'published' };
 
@@ -133,7 +135,7 @@ export class MongoCourseRepository implements CourseRepositoryPort {
       query.$text = { $search: filter.search };
     }
 
-    const sortMap: Record<string, Record<string, unknown>> = {
+    const sortMap: Record<string, Record<string, SortOrder>> = {
       newest:    { createdAt: -1 },
       oldest:    { createdAt:  1 },
       price_asc: { price:      1 },
