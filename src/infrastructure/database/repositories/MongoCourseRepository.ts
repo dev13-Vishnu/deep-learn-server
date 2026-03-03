@@ -99,6 +99,15 @@ export class MongoCourseRepository implements CourseRepositoryPort {
     return CourseModel.countDocuments(query);
   }
 
+  async findPublishedById(id: string): Promise<Course | null> {
+    const doc = await CourseModel.findOne({
+      _id:    new Types.ObjectId(id),
+      status: 'published',
+    });
+    if (!doc) return null;
+    return this.toDomain(doc);
+  }
+
   // ─── Query builders ──────────────────────────────────────────────────────────
 
   private buildTutorQuery(
@@ -142,7 +151,7 @@ export class MongoCourseRepository implements CourseRepositoryPort {
       price_desc:{ price:     -1 },
       popular:   { enrollmentCount: -1 },
     };
-    const sort = sortMap[filter.sort ?? 'newest'];
+    const sort = sortMap[filter.sort ?? 'newest'] ?? sortMap['newest'];
 
     return { query, sort };
   }
