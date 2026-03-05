@@ -13,9 +13,8 @@ export const TYPES = {
   PasswordHasherPort: Symbol.for('PasswordHasherPort'),
   TokenServicePort: Symbol.for('TokenServicePort'),
 
-  // Use Cases
+  // Use Cases — Auth
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
-  RegisterUserUseCase: Symbol.for('RegisterUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
   GetCurrentUserUseCase: Symbol.for('GetCurrentUserUseCase'),
   RequestSignupOtpUseCase: Symbol.for('RequestSignupOtpUseCase'),
@@ -25,9 +24,9 @@ export const TYPES = {
   CreateRefreshTokenUseCase: Symbol.for('CreateRefreshTokenUseCase'),
   RefreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
   RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
-  LogoutUserUseCase: Symbol.for('LogoutUserUseCase'),
+  SignupUseCase: Symbol.for('SignupUseCase'),
 
-  // Instructor
+  // Use Cases — Instructor
   ApplyForInstructorUseCase: Symbol.for('ApplyForInstructorUseCase'),
   GetInstructorStatusUseCase: Symbol.for('GetInstructorStatusUseCase'),
   ListInstructorApplicationsUseCase: Symbol.for(
@@ -40,6 +39,41 @@ export const TYPES = {
     'RejectInstructorApplicationUseCase'
   ),
 
+  // Use Cases — Profile
+  GetProfileUseCase: Symbol.for('GetProfileUseCase'),
+  UpdateProfileUseCase: Symbol.for('UpdateProfileUseCase'),
+  UploadAvatarUseCase: Symbol.for('UploadAvatarUseCase'),
+  DeleteAvatarUseCase: Symbol.for('DeleteAvatarUseCase'),
+
+  // Use Cases — Course
+  CreateCourseUseCase: Symbol.for('CreateCourseUseCase'),
+  UpdateCourseUseCase: Symbol.for('UpdateCourseUseCase'),
+  ListTutorCoursesUseCase: Symbol.for('ListTutorCoursesUseCase'),
+  GetTutorCourseUseCase:   Symbol.for('GetTutorCourseUseCase'),
+  DeleteCourseUseCase:     Symbol.for('DeleteCourseUseCase'),
+  UploadThumbnailUseCase:   Symbol.for('UploadThumbnailUseCase'),
+  PublishCourseUseCase:    Symbol.for('PublishCourseUseCase'),
+  UnpublishCourseUseCase:  Symbol.for('UnpublishCourseUseCase'),
+  ArchiveCourseUseCase:    Symbol.for('ArchiveCourseUseCase'),
+  AddModuleUseCase:        Symbol.for('AddModuleUseCase'),
+  UpdateModuleUseCase:     Symbol.for('UpdateModuleUseCase'),
+  RemoveModuleUseCase:     Symbol.for('RemoveModuleUseCase'),
+  ReorderModulesUseCase:   Symbol.for('ReorderModulesUseCase'),
+  AddLessonUseCase:        Symbol.for('AddLessonUseCase'),
+  UpdateLessonUseCase:     Symbol.for('UpdateLessonUseCase'),
+  RemoveLessonUseCase:     Symbol.for('RemoveLessonUseCase'),
+  ReorderLessonsUseCase:   Symbol.for('ReorderLessonsUseCase'),
+  AddChapterUseCase:       Symbol.for('AddChapterUseCase'),
+  UpdateChapterUseCase:    Symbol.for('UpdateChapterUseCase'),
+  RemoveChapterUseCase:    Symbol.for('RemoveChapterUseCase'),
+  ReorderChaptersUseCase:  Symbol.for('ReorderChaptersUseCase'),
+  // Video Upload
+  GetVideoUploadUrlUseCase:   Symbol.for('GetVideoUploadUrlUseCase'),
+  ConfirmVideoUploadUseCase:  Symbol.for('ConfirmVideoUploadUseCase'),
+  ListPublicCoursesUseCase:  Symbol.for('ListPublicCoursesUseCase'),
+  GetPublicCourseUseCase:    Symbol.for('GetPublicCourseUseCase'),
+
+
   // Controllers
   AuthController: Symbol.for('AuthController'),
   LoginController: Symbol.for('LoginController'),
@@ -47,20 +81,19 @@ export const TYPES = {
   PasswordResetController: Symbol.for('PasswordResetController'),
   InstructorController: Symbol.for('InstructorController'),
   ProfileController: Symbol.for('ProfileController'),
-
-  // Profile
-  GetProfileUseCase: Symbol.for('GetProfileUseCase'),
-  UpdateProfileUseCase: Symbol.for('UpdateProfileUseCase'),
-  UploadAvatarUseCase: Symbol.for('UploadAvatarUseCase'),
-  DeleteAvatarUseCase: Symbol.for('DeleteAvatarUseCase'),
+  CourseController: Symbol.for('CourseController'),
 
   // Storage
   StorageServicePort: Symbol.for('StorageServicePort'),
 
+  // Ports — split interfaces
   UserReaderPort: Symbol.for('UserReaderPort'),
   UserWriterPort: Symbol.for('UserWriterPort'),
-  SignupUseCase: Symbol.for('SignupUseCase'),
 
+  // Ports — Course
+  CourseRepositoryPort: Symbol.for('CourseRepositoryPort'),
+
+  // OAuth
   OAuthConnectionRepositoryPort: Symbol.for('OAuthConnectionRepositoryPort'),
   OAuthStateStorePort: Symbol.for('OAuthStateStorePort'),
   OAuthProviderRegistry: Symbol.for('OAuthProviderRegistry'),

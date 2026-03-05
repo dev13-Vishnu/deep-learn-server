@@ -8,6 +8,7 @@ import oauthRoutes from '../../presentation/routes/oauth.routes'
 import instructorRoutes  from '../../presentation/routes/instructor.routes';
 import apiRoutes from '../../presentation/routes';
 import profileRoutes from "../../presentation/routes/profile.routes"
+import courseRoutes from '../../presentation/routes/course.routes';
 
 import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
 import { env } from '../../shared/config/env';
@@ -36,6 +37,8 @@ export function createExpressApp() {
 );
 app.use('/profile', profileRoutes)
 app.use('/auth/oauth', oauthRoutes)
+app.use('/courses',     courseRoutes);
+
 
 
   // 404 handler

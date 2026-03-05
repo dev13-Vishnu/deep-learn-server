@@ -11,10 +11,12 @@ import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto'
 
 @injectable()
 export class S3StorageService implements StorageServicePort {
+  private readonly region: string;
   private readonly s3Client: S3Client;
   private readonly bucketName: string;
 
   constructor() {
+    this.region     = storageConfig.aws.region;
     this.s3Client = new S3Client({
       region: storageConfig.aws.region,
       credentials: {
@@ -37,7 +39,7 @@ export class S3StorageService implements StorageServicePort {
 
     await this.s3Client.send(command);
 
-    return `https://${this.bucketName}.s3.${storageConfig.aws.region}.amazonaws.com/${fileName}`;
+    return this.getPublicUrl(fileName);
   }
 
   async deleteFile(fileUrl: string): Promise<void> {
@@ -59,4 +61,21 @@ export class S3StorageService implements StorageServicePort {
 
     return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
   }
+
+  async getPresignedUploadUrl(
+  s3Key: string,
+  mimeType: string,
+  expiresIn: number = 3600
+): Promise<string> {
+  const command = new PutObjectCommand({
+    Bucket:      this.bucketName,
+    Key:         s3Key,
+    ContentType: mimeType,
+  });
+  return getSignedUrl(this.s3Client, command, { expiresIn });
+}
+
+getPublicUrl(s3Key: string): string {
+  return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${s3Key}`;
+}
 }
