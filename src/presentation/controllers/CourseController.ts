@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
 import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
 import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCoursesUseCase';
@@ -30,6 +29,7 @@ import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideo
 import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
 import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
 import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
+import { AuthenticatedRequest } from '../http/AuthenticatedRequest';
 
 @injectable()
 export class CourseController {

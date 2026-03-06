@@ -3,10 +3,10 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { ApplyForInstructorUseCase } from '../../application/instructor/ApplyForInstructorUseCase';
 import { GetInstructorStatusUseCase } from '../../application/instructor/GetInstructorStatusUseCase';
-import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 import { ListInstructorApplicationsUseCase } from '../../application/instructor/ListInstructorApplicationsUseCase';
 import { ApproveInstructorApplicationUseCase } from '../../application/instructor/ApproveInstructorApplicationUseCase';
 import { RejectInstructorApplicationUseCase } from '../../application/instructor/RejectInstructorApplicationUseCase';
+import { AuthenticatedRequest } from '../http/AuthenticatedRequest';
 
 @injectable()
 export class InstructorController {

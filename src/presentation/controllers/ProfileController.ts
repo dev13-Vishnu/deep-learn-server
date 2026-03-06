@@ -5,8 +5,8 @@ import { GetProfileUseCase } from '../../application/profile/GetProfileUseCase';
 import { UpdateProfileUseCase } from '../../application/profile/UpdateProfileUseCase';
 import { UploadAvatarUseCase } from '../../application/profile/UploadAvatarUseCase';
 import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCase';
-import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
+import { AuthenticatedRequest } from '../http/AuthenticatedRequest';
 
 @injectable()
 export class ProfileController {

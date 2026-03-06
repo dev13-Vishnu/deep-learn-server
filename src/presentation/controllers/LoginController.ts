@@ -4,10 +4,10 @@ import { TYPES } from '../../shared/di/types';
 import { LoginUserUseCase } from '../../application/auth/LoginUserUseCase';
 import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
 import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
-import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
 import { env } from '../../shared/config/env';
 import { authConfig } from '../../shared/config/auth.config';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
+import { AuthenticatedRequest } from '../http/AuthenticatedRequest';
 
 @injectable()
 export class LoginController {
