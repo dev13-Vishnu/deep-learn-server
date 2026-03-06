@@ -4,7 +4,6 @@ import { TYPES } from '../../shared/di/types';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
-import { authConfig } from '../../shared/config/auth.config';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
 import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';

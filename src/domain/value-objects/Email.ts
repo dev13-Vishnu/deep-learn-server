@@ -1,9 +1,11 @@
+import { DomainError } from "../errors/DomainError";
+
 export class Email {
     private readonly value: string;
     
     constructor (email: string) {
         if(!Email.isValid(email)) {
-            throw new Error('Invalid email address');
+            throw new DomainError('Invalid email address');
         }
         this.value = email.toLowerCase();
     }

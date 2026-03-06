@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './jwt-auth.middleware';
 import { AppError } from '../../shared/errors/AppError';
+import { UserRole } from '../../domain/entities/UserRole';
 
 export function adminAuthMiddleware(
   req: Request,
@@ -13,8 +14,7 @@ export function adminAuthMiddleware(
     throw new AppError('Authentication required', 401);
   }
 
-  // Check if user has admin role (assuming 2 = admin)
-  if (authReq.user.role !== 2) {
+  if (authReq.user.role !== UserRole.ADMIN) {
     throw new AppError('Admin access required', 403);
   }
 

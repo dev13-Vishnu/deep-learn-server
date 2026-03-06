@@ -1,8 +1,10 @@
+import { DomainError } from "../errors/DomainError";
+
 export class Password {
     private readonly value: string;
     constructor (password: string) {
         if(!Password.isValid(password)) {
-            throw new Error('Password must be at leas 8 characters long');
+            throw new DomainError('Password must be at least 8 characters long');
         }
         this.value = password;
     }
