@@ -4,6 +4,7 @@ import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
 import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
+import { LoggerPort } from '../ports/LoggerPort';
 import {
   UploadThumbnailRequestDTO,
   UploadThumbnailResponseDTO,
@@ -16,7 +17,10 @@ export class UploadThumbnailUseCase {
     private readonly courseRepository: CourseRepositoryPort,
 
     @inject(TYPES.StorageServicePort)
-    private readonly storageService: StorageServicePort
+    private readonly storageService: StorageServicePort,
+
+    @inject(TYPES.LoggerPort)
+    private readonly logger: LoggerPort,
   ) {}
 
   async execute(dto: UploadThumbnailRequestDTO): Promise<UploadThumbnailResponseDTO> {
@@ -37,7 +41,7 @@ export class UploadThumbnailUseCase {
         await this.storageService.deleteFile(course.thumbnail);
       } catch (error) {
         // Best-effort — log but don't block the upload
-        console.error('[UploadThumbnailUseCase] Failed to delete old thumbnail:', error);
+        this.logger.error('[UploadThumbnailUseCase] Failed to delete old thumbnail', error);
       }
     }
 

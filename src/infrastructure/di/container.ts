@@ -80,6 +80,7 @@ import { NodemailerEmailService }     from '../services/NodemailerEmailService';
 import { RedisClientPort }            from '../../application/ports/RedisClientPort';
 import { EmailServicePort }           from '../../application/ports/EmailServicePort';
 import { CryptoIdGenerator } from '../utils/CryptoIdGenerator';
+import { AppLoggerAdapter } from '../logging/AppLoggerAdapter';
 
 
 export const container = new Container();
@@ -103,6 +104,8 @@ container.bind(TYPES.OtpServicePort).to(RedisOtpService);
 container.bind(TYPES.StorageServicePort).to(S3StorageService);
 container.bind<RedisClientPort>(TYPES.RedisClientPort).to(RedisClientAdapter).inSingletonScope();
 container.bind<EmailServicePort>(TYPES.EmailServicePort).to(NodemailerEmailService);
+
+container.bind(TYPES.LoggerPort).to(AppLoggerAdapter).inSingletonScope();
 
 //  Use Cases — Auth 
 

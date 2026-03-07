@@ -3,6 +3,7 @@ import { TYPES } from '../../shared/di/types';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
 import { AppError } from '../../shared/errors/AppError';
+import { LoggerPort } from '../ports/LoggerPort';
 import {
   UploadAvatarRequestDTO,
   UploadAvatarResponseDTO,
@@ -15,7 +16,10 @@ export class UploadAvatarUseCase {
     private readonly userRepository: UserRepositoryPort,
 
     @inject(TYPES.StorageServicePort)
-    private readonly storageService: StorageServicePort
+    private readonly storageService: StorageServicePort,
+
+    @inject(TYPES.LoggerPort)
+    private readonly logger: LoggerPort,
   ) {}
 
   async execute(request: UploadAvatarRequestDTO): Promise<UploadAvatarResponseDTO> {
@@ -29,7 +33,7 @@ export class UploadAvatarUseCase {
       try {
         await this.storageService.deleteFile(user.avatar);
       } catch (err) {
-        console.error('Failed to delete old avatar:', err);
+        this.logger.error('[UploadAvatarUseCase] Failed to delete old avatar', err);
       }
     }
 

@@ -18,6 +18,8 @@ export const TYPES = {
 
   CreateRefreshTokenPort: Symbol.for('CreateRefreshTokenPort'),
 
+    LoggerPort: Symbol.for('LoggerPort'),
+
   // Use Cases — Auth
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
