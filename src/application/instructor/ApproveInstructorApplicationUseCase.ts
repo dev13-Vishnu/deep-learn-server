@@ -3,9 +3,8 @@ import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
-import { UserRole } from '../../domain/entities/UserRole';
 import { DomainError } from '../../domain/errors/DomainError';
-import { logger } from '../../shared/utils/logger';
+import { LoggerPort } from '../ports/LoggerPort';
 import {
   ApproveInstructorApplicationRequestDTO,
   ApproveInstructorApplicationResponseDTO,
@@ -19,7 +18,10 @@ export class ApproveInstructorApplicationUseCase {
     private readonly applicationRepository: InstructorApplicationRepositoryPort,
 
     @inject(TYPES.UserRepositoryPort)
-    private readonly userRepository: UserRepositoryPort
+    private readonly userRepository: UserRepositoryPort,
+
+    @inject(TYPES.LoggerPort)
+    private readonly logger: LoggerPort,
   ) {}
 
   async execute(
@@ -65,7 +67,7 @@ export class ApproveInstructorApplicationUseCase {
 
     await this.userRepository.update(user);
 
-    logger.info(
+    this.logger.info(
       `[AUDIT] Application approved | applicationId=${request.applicationId} userId=${application.userId} at=${new Date().toISOString()}`
     );
 

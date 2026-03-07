@@ -4,7 +4,7 @@ import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicat
 import { AppError } from '../../shared/errors/AppError';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { instructorConfig } from '../../shared/config/instructor.config';
-import { logger } from '../../shared/utils/logger';
+import { LoggerPort } from '../ports/LoggerPort';
 import { DomainError } from '../../domain/errors/DomainError';
 import {
   RejectInstructorApplicationRequestDTO,
@@ -19,7 +19,10 @@ export class RejectInstructorApplicationUseCase {
     private readonly applicationRepository: InstructorApplicationRepositoryPort,
 
     @inject(TYPES.UserReaderPort)
-    private readonly userRepository: UserRepositoryPort
+    private readonly userRepository: UserRepositoryPort,
+
+    @inject(TYPES.LoggerPort)
+    private readonly logger: LoggerPort,
   ) {}
 
   async execute(
@@ -66,7 +69,7 @@ export class RejectInstructorApplicationUseCase {
       await this.userRepository.update(user);
     }
 
-    logger.info(
+    this.logger.info(
       `[AUDIT] Application rejected | applicationId=${request.applicationId} userId=${application.userId} reason="${request.reason}" cooldownUntil=${cooldownExpiresAt.toISOString()} at=${new Date().toISOString()}`
     );
 
