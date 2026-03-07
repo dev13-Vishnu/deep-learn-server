@@ -3,8 +3,8 @@ import { container } from '../../infrastructure/di/container';
 import { TYPES } from '../../shared/di/types';
 import { ProfileHttpAdapter } from '../http/ProfileHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { upload } from '../../infrastructure/middlewares/upload.middleware';
+import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
 
 const router = Router();
 

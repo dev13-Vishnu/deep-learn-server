@@ -3,7 +3,6 @@ import { container } from '../../infrastructure/di/container';
 import { TYPES } from '../../shared/di/types';
 import { CourseHttpAdapter } from '../http/CourseHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { tutorAuthMiddleware } from '../../infrastructure/security/tutor-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
 import {
@@ -14,6 +13,7 @@ import {
   getVideoUploadUrlSchema, confirmVideoUploadSchema,
 } from '../validators/course.validators';
 import { upload } from '../../infrastructure/middlewares/upload.middleware';
+import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
 
 const router = Router();
 

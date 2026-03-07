@@ -4,11 +4,11 @@ import { TYPES } from '../../shared/di/types';
 import { AuthHttpAdapter } from '../http/AuthHttpAdapter';
 import { SignupHttpAdapter } from '../http/SignupHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
 import {
   loginSchema, requestOtpSchema, resetPasswordSchema, signupSchema, verifyOtpSchema,
 } from '../validators/auth.validators';
+import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
 
 const router = Router();
 

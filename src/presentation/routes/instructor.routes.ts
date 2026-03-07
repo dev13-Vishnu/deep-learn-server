@@ -3,10 +3,10 @@ import { container } from '../../infrastructure/di/container';
 import { TYPES } from '../../shared/di/types';
 import { InstructorHttpAdapter } from '../http/InstructorHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { adminAuthMiddleware } from '../../infrastructure/security/admin-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
 import { applyForInstructorSchema, rejectApplicationSchema } from '../validators/instructor.validators';
+import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
 
 const router = Router();
 

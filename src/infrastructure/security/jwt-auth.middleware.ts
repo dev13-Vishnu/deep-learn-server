@@ -1,40 +1,38 @@
-import { NextFunction, Request, Response } from "express";
-import { container } from '../di/container';
-import { TYPES } from '../../shared/di/types';
+import { NextFunction, Response } from "express";
 import { TokenServicePort } from '../../application/ports/TokenServicePort';
-import { UserRole } from "../../domain/entities/UserRole";
-import { AuthenticatedRequest } from "../../presentation/http/AuthenticatedRequest";
+export { AuthenticatedRequest } from '../../presentation/http/AuthenticatedRequest';
+import { AuthenticatedRequest } from '../../presentation/http/AuthenticatedRequest';
 
-// Keep as function - resolve from container when needed
-export function jwtAuthMiddleware(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-) {
-    const authHeader = req.headers.authorization;
+export function createJwtAuthMiddleware(tokenService: TokenServicePort) {
+    return function jwtAuthMiddleware(
+        req: AuthenticatedRequest,
+        res: Response,
+        next: NextFunction
+    ): void {
+        const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({
-            message: 'Authorization token missing or invalid',
-        });
-    }
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({
+                message: 'Authorization token missing or invalid',
+            });
+            return;
+        }
 
-    const token = authHeader.split(' ')[1];
+        const token = authHeader.split(' ')[1];
 
-    try {
-        // Get token service from container
-        const tokenService = container.get<TokenServicePort>(TYPES.TokenServicePort);
-        const payload = tokenService.verifyAccessToken(token);
+        try {
+            const payload = tokenService.verifyAccessToken(token);
 
-        req.user = {
-            userId: payload.userId,
-            role: payload.role,
-        };
+            req.user = {
+                userId: payload.userId,
+                role: payload.role,
+            };
 
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            message: 'Invalid or expired token',
-        });
-    }
+            next();
+        } catch (error) {
+            res.status(401).json({
+                message: 'Invalid or expired token',
+            });
+        }
+    };
 }
