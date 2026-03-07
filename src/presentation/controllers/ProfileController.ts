@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { GetProfileUseCase } from '../../application/profile/GetProfileUseCase';
@@ -6,7 +5,6 @@ import { UpdateProfileUseCase } from '../../application/profile/UpdateProfileUse
 import { UploadAvatarUseCase } from '../../application/profile/UploadAvatarUseCase';
 import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCase';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
-import { AuthenticatedRequest } from '../http/AuthenticatedRequest';
 
 @injectable()
 export class ProfileController {
@@ -21,56 +19,27 @@ export class ProfileController {
     private readonly uploadAvatarUseCase: UploadAvatarUseCase,
 
     @inject(TYPES.DeleteAvatarUseCase)
-    private readonly deleteAvatarUseCase: DeleteAvatarUseCase
+    private readonly deleteAvatarUseCase: DeleteAvatarUseCase,
   ) {}
 
-  async getProfile(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-    const profile = await this.getProfileUseCase.execute({
-      userId: authReq.user!.userId,
-    });
-    return res.status(200).json(profile);
+  async getProfile(userId: string) {
+    return this.getProfileUseCase.execute({ userId });
   }
 
-  async updateProfile(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-    const profile = await this.updateProfileUseCase.execute({
-      userId: authReq.user!.userId,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      bio: req.body.bio,
-    });
-    return res.status(200).json(profile);
+  async updateProfile(data: {
+    userId: string;
+    firstName?: string;
+    lastName?: string;
+    bio?: string;
+  }) {
+    return this.updateProfileUseCase.execute(data);
   }
 
-  async uploadAvatar(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    // Map Express.Multer.File → UploadableFile (framework boundary)
-    const uploadableFile: UploadableFile = {
-      buffer: req.file.buffer,
-      originalname: req.file.originalname,
-      mimetype: req.file.mimetype,
-      size: req.file.size,
-    };
-
-    const result = await this.uploadAvatarUseCase.execute({
-      userId: authReq.user!.userId,
-      file: uploadableFile,
-    });
-
-    return res.status(200).json(result);
+  async uploadAvatar(userId: string, file: UploadableFile) {
+    return this.uploadAvatarUseCase.execute({ userId, file });
   }
 
-  async deleteAvatar(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-    const result = await this.deleteAvatarUseCase.execute({
-      userId: authReq.user!.userId,
-    });
-    return res.status(200).json(result);
+  async deleteAvatar(userId: string) {
+    return this.deleteAvatarUseCase.execute({ userId });
   }
 }

@@ -83,6 +83,14 @@ export const TYPES = {
   ProfileController: Symbol.for('ProfileController'),
   CourseController: Symbol.for('CourseController'),
 
+  // Http Adapters
+  AuthHttpAdapter: Symbol.for('AuthHttpAdapter'),
+  SignupHttpAdapter: Symbol.for('SignupHttpAdapter'),
+  OAuthHttpAdapter: Symbol.for('OAuthHttpAdapter'),
+  ProfileHttpAdapter: Symbol.for('ProfileHttpAdapter'),
+  CourseHttpAdapter: Symbol.for('CourseHttpAdapter'),
+  InstructorHttpAdapter: Symbol.for('InstructorHttpAdapter'),
+
   // Storage
   StorageServicePort: Symbol.for('StorageServicePort'),
 

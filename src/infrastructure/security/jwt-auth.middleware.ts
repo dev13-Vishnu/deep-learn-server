@@ -3,8 +3,7 @@ import { container } from '../di/container';
 import { TYPES } from '../../shared/di/types';
 import { TokenServicePort } from '../../application/ports/TokenServicePort';
 import { UserRole } from "../../domain/entities/UserRole";
-import { AuthenticatedRequest } from "../http/AuthenticatedRequest";
-
+import { AuthenticatedRequest } from "../../presentation/http/AuthenticatedRequest";
 
 // Keep as function - resolve from container when needed
 export function jwtAuthMiddleware(

@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { RequestPasswordResetOtpUseCase } from '../../application/auth/RequestPasswordResetOtpUseCase';
@@ -15,36 +14,21 @@ export class PasswordResetController {
     private readonly verifyPasswordResetOtpUseCase: VerifyPasswordResetOtpUseCase,
 
     @inject(TYPES.ResetPasswordUseCase)
-    private readonly resetPasswordUseCase: ResetPasswordUseCase
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
-  async requestOtp(req: Request, res: Response): Promise<Response> {
-    const { email } = req.body;
-
+  async requestOtp(email: string) {
     await this.requestPasswordResetOtpUseCase.execute(email);
-
-    return res.status(200).json({
-      message: 'If the email exists, a verification code has been sent',
-    });
+    return { message: 'If the email exists, a verification code has been sent' };
   }
 
-  async verifyOtp(req: Request, res: Response): Promise<Response> {
-    const { email, otp } = req.body;
-
+  async verifyOtp(email: string, otp: string) {
     await this.verifyPasswordResetOtpUseCase.execute(email, otp);
-
-    return res.status(200).json({
-      message: 'OTP verified successfully',
-    });
+    return { message: 'OTP verified successfully' };
   }
 
-  async resetPassword(req: Request, res: Response): Promise<Response> {
-    const { email, password } = req.body;
-
+  async resetPassword(email: string, password: string) {
     await this.resetPasswordUseCase.execute(email, password);
-
-    return res.status(200).json({
-      message: 'Password reset successfully',
-    });
+    return { message: 'Password reset successfully' };
   }
 }

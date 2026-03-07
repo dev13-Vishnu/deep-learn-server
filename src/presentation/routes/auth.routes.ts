@@ -1,85 +1,34 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { container } from '../../infrastructure/di/container';
 import { TYPES } from '../../shared/di/types';
-import { LoginController } from '../controllers/LoginController';
-import { SignupController } from '../controllers/SignupController';
-import { PasswordResetController } from '../controllers/PasswordResetController';
+import { AuthHttpAdapter } from '../http/AuthHttpAdapter';
+import { SignupHttpAdapter } from '../http/SignupHttpAdapter';
+import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
 import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
 import { validateRequest } from '../middlewares/validationRequest';
 import {
-  loginSchema,
-  requestOtpSchema,
-  resetPasswordSchema,
-  signupSchema,
-  verifyOtpSchema 
+  loginSchema, requestOtpSchema, resetPasswordSchema, signupSchema, verifyOtpSchema,
 } from '../validators/auth.validators';
 
 const router = Router();
 
-// Get controllers
-const loginController = container.get<LoginController>(TYPES.LoginController);
-const signupController = container.get<SignupController>(TYPES.SignupController);
-const passwordResetController = container.get<PasswordResetController>(
-  TYPES.PasswordResetController
-);
+const authAdapter   = container.get<AuthHttpAdapter>(TYPES.AuthHttpAdapter);
+const signupAdapter = container.get<SignupHttpAdapter>(TYPES.SignupHttpAdapter);
 
-// ==================== LOGIN ====================
-router.post(
-  '/login',
-  validateRequest(loginSchema),
-  loginController.login.bind(loginController)
-);
+const bind = (fn: (req: any, res: any) => Promise<void>) =>
+  (req: Request, res: Response) => fn(toHttpRequest(req), toHttpResponse(res));
 
-router.get(
-  '/me',
-  jwtAuthMiddleware,
-  loginController.getCurrentUser.bind(loginController)
-);
+router.post('/login',   validateRequest(loginSchema),   bind(authAdapter.login.bind(authAdapter)));
+router.get( '/me',      jwtAuthMiddleware,               bind(authAdapter.getCurrentUser.bind(authAdapter)));
+router.post('/refresh',                                  bind(authAdapter.refreshToken.bind(authAdapter)));
+router.post('/logout',  jwtAuthMiddleware,               bind(authAdapter.logout.bind(authAdapter)));
 
-router.post('/refresh', loginController.refreshToken.bind(loginController));
+router.post('/request-otp', validateRequest(requestOtpSchema), bind(signupAdapter.requestOtp.bind(signupAdapter)));
+router.post('/verify-otp',  validateRequest(verifyOtpSchema),  bind(signupAdapter.verifyOtp.bind(signupAdapter)));
+router.post('/signup',      validateRequest(signupSchema),      bind(signupAdapter.signup.bind(signupAdapter)));
 
-router.post(
-  '/logout',
-  jwtAuthMiddleware,
-  loginController.logout.bind(loginController)
-);
-
-// ==================== SIGNUP ====================
-router.post(
-  '/request-otp',
-  validateRequest(requestOtpSchema),
-  signupController.requestOtp.bind(signupController)
-);
-
-router.post(
-  '/verify-otp',
-  validateRequest(verifyOtpSchema),
-  signupController.verifyOtp.bind(signupController)
-);
-
-router.post(
-  '/signup',
-  validateRequest(signupSchema),
-  signupController.signup.bind(signupController)
-);
-
-// ==================== PASSWORD RESET ====================
-router.post(
-  '/forgot-password/request-otp',
-  validateRequest(requestOtpSchema),
-  passwordResetController.requestOtp.bind(passwordResetController)
-);
-
-router.post(
-  '/forgot-password/verify-otp',
-  validateRequest(verifyOtpSchema),
-  passwordResetController.verifyOtp.bind(passwordResetController)
-);
-
-router.post(
-  '/forgot-password/reset',
-  validateRequest(resetPasswordSchema),
-  passwordResetController.resetPassword.bind(passwordResetController)
-);
+router.post('/forgot-password/request-otp', validateRequest(requestOtpSchema), bind(authAdapter.requestPasswordResetOtp.bind(authAdapter)));
+router.post('/forgot-password/verify-otp',  validateRequest(verifyOtpSchema),  bind(authAdapter.verifyPasswordResetOtp.bind(authAdapter)));
+router.post('/forgot-password/reset',       validateRequest(resetPasswordSchema), bind(authAdapter.resetPassword.bind(authAdapter)));
 
 export default router;

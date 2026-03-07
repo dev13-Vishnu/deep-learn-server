@@ -1,13 +1,9 @@
-import { Request, Response } from 'express';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { LoginUserUseCase } from '../../application/auth/LoginUserUseCase';
 import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
 import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
-import { env } from '../../shared/config/env';
-import { authConfig } from '../../shared/config/auth.config';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
-import { AuthenticatedRequest } from '../http/AuthenticatedRequest';
 
 @injectable()
 export class LoginController {
@@ -25,69 +21,23 @@ export class LoginController {
     private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase,
   ) {}
 
-  async login(req: Request, res: Response): Promise<Response> {
-    const { email, password } = req.body;
-
-    const result = await this.loginUserUseCase.execute({ email, password });
-
-    const isCrossSite = env.isProduction || env.isTunnel;
-
-    res.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: isCrossSite,
-      sameSite: isCrossSite ? 'none' : 'lax',
-      maxAge: authConfig.refreshToken.expiresInMs,
-    });
-
-    return res.status(200).json({
-      message: 'Login successful',
-      user: result.user,
-      accessToken: result.accessToken,
-    });
+  async login(email: string, password: string) {
+    return this.loginUserUseCase.execute({ email, password });
   }
 
-  async getCurrentUser(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const user = await this.getCurrentUserUseCase.execute({
-      userId: authReq.user!.userId,
-    });
-
-    return res.status(200).json({ user });
+  async getCurrentUser(userId: string) {
+    const user = await this.getCurrentUserUseCase.execute({ userId });
+    return { user };
   }
 
-  async refreshToken(req: Request, res: Response): Promise<Response> {
-    const refreshToken = req.cookies.refreshToken;
-
-    if (!refreshToken) {
-      return res.status(401).json({ message: 'Refresh token not found' });
-    }
-
-    const result = await this.refreshAccessTokenUseCase.execute(refreshToken);
-
-    res.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: env.isProduction || env.isTunnel,
-      sameSite: (env.isProduction || env.isTunnel) ? 'none' : 'lax',
-      maxAge: authConfig.refreshToken.expiresInMs,
-    });
-
-    return res.status(200).json({
-      accessToken: result.accessToken,
-    });
+  async refreshToken(plainToken: string) {
+    return this.refreshAccessTokenUseCase.execute(plainToken);
   }
 
-  async logout(req: Request, res: Response): Promise<Response> {
-    const refreshToken = req.cookies.refreshToken;
-
+  async logout(refreshToken: string | null): Promise<{ message: string }> {
     if (refreshToken) {
       await this.revokeRefreshTokenUseCase.execute(refreshToken);
     }
-
-    res.clearCookie('refreshToken');
-
-    return res.status(200).json({
-      message: 'Logged out successfully',
-    });
+    return { message: 'Logged out successfully' };
   }
 }

@@ -1,9 +1,9 @@
+import { Request } from 'express';
 import { UserRole } from '../../domain/entities/UserRole';
-export { Request } from 'express';
 
-export interface AuthenticatedRequest  extends Request {
-    user?: {
-        userId: string;
-        role: UserRole;
-    }
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    role: UserRole;
+  };
 }
