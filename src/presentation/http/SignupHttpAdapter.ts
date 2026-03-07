@@ -1,14 +1,14 @@
 import { injectable, inject } from 'inversify';
 import { HttpRequest, HttpResponse } from './HttpContext';
-import { TYPES } from '../../shared/di/types';
 import { SignupController } from '../controllers/SignupController';
 import { env } from '../../shared/config/env';
 import { authConfig } from '../../shared/config/auth.config';
+import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
 @injectable()
 export class SignupHttpAdapter {
   constructor(
-    @inject(TYPES.SignupController)
+    @inject(PRESENTATION_TYPES.SignupController)
     private readonly signupController: SignupController,
   ) {}
 

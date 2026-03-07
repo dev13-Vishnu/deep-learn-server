@@ -1,21 +1,12 @@
-import 'reflect-metadata';
-
-import { createExpressApp } from './infrastructure/http/express';
+import { Express } from 'express';
 import { env } from './shared/config/env';
 import { logger } from './shared/utils/logger';
-import {
-  connectDatabase,
-  disconnectDatabase,
-} from './infrastructure/database/mongoose.connection';
+import { connectDatabase, disconnectDatabase } from './infrastructure/database/mongoose.connection';
 import { initRedis } from './infrastructure/redis/redis.client';
-import './infrastructure/di/container';
 
-
-
-async function startServer() {
+export async function startServer(app: Express): Promise<void> {
   await connectDatabase();
   await initRedis();
-  const app = createExpressApp();
 
   const server = app.listen(env.port, () => {
     logger.info(`Server running on port ${env.port}`);
@@ -39,5 +30,3 @@ async function startServer() {
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 }
-
-startServer();

@@ -1,14 +1,14 @@
 import { injectable, inject } from 'inversify';
 import { HttpRequest, HttpResponse } from './HttpContext';
-import { TYPES } from '../../shared/di/types';
 import { OAuthController } from '../controllers/OAuthController';
 import { env } from '../../shared/config/env';
 import { authConfig } from '../../shared/config/auth.config';
+import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
 @injectable()
 export class OAuthHttpAdapter {
   constructor(
-    @inject(TYPES.OAuthController)
+    @inject(PRESENTATION_TYPES.OAuthController)
     private readonly oauthController: OAuthController,
   ) {}
 

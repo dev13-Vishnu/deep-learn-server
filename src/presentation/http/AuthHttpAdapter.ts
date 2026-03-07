@@ -1,18 +1,18 @@
 import { injectable, inject } from 'inversify';
 import { HttpRequest, HttpResponse } from './HttpContext';
-import { TYPES } from '../../shared/di/types';
 import { LoginController } from '../controllers/LoginController';
 import { PasswordResetController } from '../controllers/PasswordResetController';
 import { env } from '../../shared/config/env';
 import { authConfig } from '../../shared/config/auth.config';
+import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
 @injectable()
 export class AuthHttpAdapter {
   constructor(
-    @inject(TYPES.LoginController)
+    @inject(PRESENTATION_TYPES.LoginController)
     private readonly loginController: LoginController,
 
-    @inject(TYPES.PasswordResetController)
+    @inject(PRESENTATION_TYPES.PasswordResetController)
     private readonly passwordResetController: PasswordResetController,
   ) {}
 

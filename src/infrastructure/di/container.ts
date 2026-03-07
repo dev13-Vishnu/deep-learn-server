@@ -45,13 +45,7 @@ import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCa
 import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
 import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
 
-// Controllers
-import { LoginController } from '../../presentation/controllers/LoginController';
-import { SignupController } from '../../presentation/controllers/SignupController';
-import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
-import { InstructorController } from '../../presentation/controllers/InstructorController';
-import { ProfileController } from '../../presentation/controllers/ProfileController';
-import { CourseController } from '../../presentation/controllers/CourseController';
+
 
 // OAuth
 import { bindOAuthDependencies } from './oauthBindings';
@@ -79,13 +73,8 @@ import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideo
 import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
 import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
 
-// Http Adapters
-import { AuthHttpAdapter } from '../../presentation/http/AuthHttpAdapter';
-import { SignupHttpAdapter } from '../../presentation/http/SignupHttpAdapter';
-import { OAuthHttpAdapter } from '../../presentation/http/OAuthHttpAdapter';
-import { ProfileHttpAdapter } from '../../presentation/http/ProfileHttpAdapter';
-import { CourseHttpAdapter } from '../../presentation/http/CourseHttpAdapter';
-import { InstructorHttpAdapter } from '../../presentation/http/InstructorHttpAdapter';
+import { bindPresentationDependencies } from '../../presentation/di/presentationBindings';
+
 
 export const container = new Container();
 
@@ -167,24 +156,8 @@ container.bind(TYPES.ConfirmVideoUploadUseCase).to(ConfirmVideoUploadUseCase);
 container.bind(TYPES.ListPublicCoursesUseCase).to(ListPublicCoursesUseCase);
 container.bind(TYPES.GetPublicCourseUseCase).to(GetPublicCourseUseCase);
 
-//  Controllers
-
-container.bind(TYPES.LoginController).to(LoginController);
-container.bind(TYPES.SignupController).to(SignupController);
-container.bind(TYPES.PasswordResetController).to(PasswordResetController);
-container.bind(TYPES.InstructorController).to(InstructorController);
-container.bind(TYPES.ProfileController).to(ProfileController);
-container.bind(TYPES.CourseController).to(CourseController);
-
-//  Http Adapters
-
-container.bind(TYPES.AuthHttpAdapter).to(AuthHttpAdapter);
-container.bind(TYPES.SignupHttpAdapter).to(SignupHttpAdapter);
-container.bind(TYPES.OAuthHttpAdapter).to(OAuthHttpAdapter);
-container.bind(TYPES.ProfileHttpAdapter).to(ProfileHttpAdapter);
-container.bind(TYPES.CourseHttpAdapter).to(CourseHttpAdapter);
-container.bind(TYPES.InstructorHttpAdapter).to(InstructorHttpAdapter);
-
 //  OAuth
 
 bindOAuthDependencies(container);
+bindPresentationDependencies(container);
+

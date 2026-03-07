@@ -1,16 +1,16 @@
 import { injectable, inject } from 'inversify';
 import { HttpRequest, HttpResponse } from './HttpContext';
-import { TYPES } from '../../shared/di/types';
 import { CourseController } from '../controllers/CourseController';
 
 import { CourseCategory, CourseLevel, CourseStatus } from '../../domain/entities/Course';
 import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
+import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
 
 @injectable()
 export class CourseHttpAdapter {
   constructor(
-    @inject(TYPES.CourseController)
+    @inject(PRESENTATION_TYPES.CourseController)
     private readonly courseController: CourseController,
   ) {}
 

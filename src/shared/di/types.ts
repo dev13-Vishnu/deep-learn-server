@@ -76,20 +76,6 @@ export const TYPES = {
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
-  LoginController: Symbol.for('LoginController'),
-  SignupController: Symbol.for('SignupController'),
-  PasswordResetController: Symbol.for('PasswordResetController'),
-  InstructorController: Symbol.for('InstructorController'),
-  ProfileController: Symbol.for('ProfileController'),
-  CourseController: Symbol.for('CourseController'),
-
-  // Http Adapters
-  AuthHttpAdapter: Symbol.for('AuthHttpAdapter'),
-  SignupHttpAdapter: Symbol.for('SignupHttpAdapter'),
-  OAuthHttpAdapter: Symbol.for('OAuthHttpAdapter'),
-  ProfileHttpAdapter: Symbol.for('ProfileHttpAdapter'),
-  CourseHttpAdapter: Symbol.for('CourseHttpAdapter'),
-  InstructorHttpAdapter: Symbol.for('InstructorHttpAdapter'),
 
   // Storage
   StorageServicePort: Symbol.for('StorageServicePort'),
@@ -107,7 +93,6 @@ export const TYPES = {
   OAuthProviderRegistry: Symbol.for('OAuthProviderRegistry'),
   InitiateOAuthUseCase: Symbol.for('InitiateOAuthUseCase'),
   HandleOAuthCallbackUseCase: Symbol.for('HandleOAuthCallbackUseCase'),
-  OAuthController: Symbol.for('OAuthController'),
   GoogleOAuthAdapter: Symbol.for('GoogleOAuthAdapter'),
   FacebookOAuthAdapter: Symbol.for('FacebookOAuthAdapter'),
   MicrosoftOAuthAdapter: Symbol.for('MicrosoftOAuthAdapter'),

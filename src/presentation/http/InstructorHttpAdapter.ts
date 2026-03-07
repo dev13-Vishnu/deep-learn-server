@@ -1,12 +1,12 @@
 import { injectable, inject } from 'inversify';
 import { HttpRequest, HttpResponse } from './HttpContext';
-import { TYPES } from '../../shared/di/types';
 import { InstructorController } from '../controllers/InstructorController';
+import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
 @injectable()
 export class InstructorHttpAdapter {
   constructor(
-    @inject(TYPES.InstructorController)
+    @inject(PRESENTATION_TYPES.InstructorController)
     private readonly instructorController: InstructorController,
   ) {}
 
