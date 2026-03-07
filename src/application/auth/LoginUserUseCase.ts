@@ -8,9 +8,7 @@ import { TYPES } from '../../shared/di/types';
 
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
-// FIX #4: Depend on the port interface, not the concrete use case class.
 import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
-// FIX #6: Use the canonical DTO types from the dto file — no inline duplicates.
 import { LoginUserRequestDTO, LoginUserResponseDTO } from '../dto/auth/LoginUser.dto';
 
 @injectable()
@@ -25,7 +23,6 @@ export class LoginUserUseCase {
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
 
-    // FIX #4: Inject via the port symbol, typed as the port interface.
     @inject(TYPES.CreateRefreshTokenPort)
     private readonly createRefreshTokenPort: CreateRefreshTokenPort
   ) {}

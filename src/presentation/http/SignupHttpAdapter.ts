@@ -1,8 +1,7 @@
 import { injectable, inject } from 'inversify';
-import { HttpRequest, HttpResponse } from './HttpContext';
+import { HttpRequest, HttpResponse } from '../../shared/http/HttpContext';
 import { SignupController } from '../controllers/SignupController';
-import { env } from '../../shared/config/env';
-import { authConfig } from '../../shared/config/auth.config';
+import { refreshTokenCookieOptions, REFRESH_TOKEN_COOKIE_NAME } from '../../shared/config/cookie.config';
 import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
 @injectable()
@@ -29,13 +28,12 @@ export class SignupHttpAdapter {
       email: string; password: string; otp: string; firstName?: string; lastName?: string;
     };
     const result = await this.signupController.signup({ email, password, otp, firstName, lastName });
-    const isCrossSite = env.isProduction || env.isTunnel;
-    res.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure:   isCrossSite,
-      sameSite: isCrossSite ? 'none' : 'lax',
-      maxAge:   authConfig.refreshToken.expiresInMs,
+
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, result.refreshToken, refreshTokenCookieOptions);
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: result.user,
+      accessToken: result.accessToken,
     });
-    res.status(201).json({ message: 'User registered successfully', user: result.user, accessToken: result.accessToken });
   }
 }

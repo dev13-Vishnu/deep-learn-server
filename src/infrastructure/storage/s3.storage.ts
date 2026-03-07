@@ -17,10 +17,10 @@ export class S3StorageService implements StorageServicePort {
 
   constructor() {
     this.region     = storageConfig.aws.region;
-    this.s3Client = new S3Client({
+    this.s3Client   = new S3Client({
       region: storageConfig.aws.region,
       credentials: {
-        accessKeyId: storageConfig.aws.accessKeyId,
+        accessKeyId:     storageConfig.aws.accessKeyId,
         secretAccessKey: storageConfig.aws.secretAccessKey,
       },
     });
@@ -31,9 +31,9 @@ export class S3StorageService implements StorageServicePort {
     const fileName = `${folder}/${Date.now()}-${file.originalname}`;
 
     const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: fileName,
-      Body: file.buffer,
+      Bucket:      this.bucketName,
+      Key:         fileName,
+      Body:        file.buffer,
       ContentType: file.mimetype,
     });
 
@@ -47,35 +47,26 @@ export class S3StorageService implements StorageServicePort {
 
     const command = new DeleteObjectCommand({
       Bucket: this.bucketName,
-      Key: fileName,
+      Key:    fileName,
     });
 
     await this.s3Client.send(command);
   }
 
-  async getSignedUploadUrl(fileName: string): Promise<string> {
+  async getPresignedUploadUrl(
+    s3Key:    string,
+    mimeType: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
     const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: fileName,
+      Bucket:      this.bucketName,
+      Key:         s3Key,
+      ContentType: mimeType,
     });
-
-    return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+    return getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
-  async getPresignedUploadUrl(
-  s3Key: string,
-  mimeType: string,
-  expiresIn: number = 3600
-): Promise<string> {
-  const command = new PutObjectCommand({
-    Bucket:      this.bucketName,
-    Key:         s3Key,
-    ContentType: mimeType,
-  });
-  return getSignedUrl(this.s3Client, command, { expiresIn });
-}
-
-getPublicUrl(s3Key: string): string {
-  return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${s3Key}`;
-}
+  getPublicUrl(s3Key: string): string {
+    return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${s3Key}`;
+  }
 }
