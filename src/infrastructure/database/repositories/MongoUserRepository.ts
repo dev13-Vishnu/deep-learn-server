@@ -37,7 +37,7 @@ export class MongoUserRepository implements UserRepositoryPort {
     return this.toDomain(doc);  // Use helper
   }
 
-  async updateRole(userId: string, role: number): Promise<void> {
+  async updateRole(userId: string, role: UserRole): Promise<void> {
     const result = await UserModel.updateOne(
       { _id: userId },
       { $set: { role, updatedAt: new Date() } }
