@@ -12,8 +12,12 @@ export class InstructorHttpAdapter {
 
   async apply(req: HttpRequest, res: HttpResponse): Promise<void> {
     const body = req.body as {
-      bio: string; experienceYears: string; teachingExperience: string;
-      courseIntent: string; level: string; language: string;
+      bio: string;
+      experienceYears: string;
+      teachingExperience: 'yes' | 'no';
+      courseIntent: string;
+      level: 'beginner' | 'intermediate' | 'advanced';
+      language: string;
     };
     const result = await this.instructorController.apply({ userId: req.user!.userId, ...body });
     res.status(201).json(result);
@@ -29,10 +33,11 @@ export class InstructorHttpAdapter {
     const result = await this.instructorController.listApplications({
       page:   page  ? parseInt(page,  10) : undefined,
       limit:  limit ? parseInt(limit, 10) : undefined,
-      status: status as 'pending' | 'approved' | 'rejected' | undefined,
+      status: (status || undefined) as 'pending' | 'approved' | 'rejected' | undefined,
     });
     res.status(200).json(result);
   }
+
 
   async approveApplication(req: HttpRequest, res: HttpResponse): Promise<void> {
     const result = await this.instructorController.approveApplication(req.params.applicationId);

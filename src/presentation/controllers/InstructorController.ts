@@ -25,14 +25,7 @@ export class InstructorController {
     private readonly rejectApplicationUseCase: RejectInstructorApplicationUseCase,
   ) {}
 
-  async apply(data: {
-    userId: string;
-    bio: string;
-    experienceYears: string;
-    teachingExperience: string;
-    courseIntent: string;
-    level: string;
-    language: string;
+  async apply(data: { userId: string; bio: string; experienceYears: string; teachingExperience: 'yes' | 'no'; courseIntent: string; level: 'beginner' | 'intermediate' | 'advanced'; language: string;
   }) {
     return this.applyForInstructorUseCase.execute(data);
   }
@@ -41,10 +34,7 @@ export class InstructorController {
     return this.getInstructorStatusUseCase.execute(userId);
   }
 
-  async listApplications(params: {
-    page?: number;
-    limit?: number;
-    status?: 'pending' | 'approved' | 'rejected';
+  async listApplications(params: { page?: number; limit?: number; status?: 'pending' | 'approved' | 'rejected';
   }) {
     return this.listApplicationsUseCase.execute(params);
   }

@@ -3,6 +3,10 @@ import { HttpRequest, HttpResponse } from './HttpContext';
 import { TYPES } from '../../shared/di/types';
 import { CourseController } from '../controllers/CourseController';
 
+import { CourseCategory, CourseLevel, CourseStatus } from '../../domain/entities/Course';
+import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
+
+
 @injectable()
 export class CourseHttpAdapter {
   constructor(
@@ -11,14 +15,35 @@ export class CourseHttpAdapter {
   ) {}
 
   async createCourse(req: HttpRequest, res: HttpResponse): Promise<void> {
-    const body = req.body as any;
+    const body = req.body as {
+      title: string;
+      subtitle?: string | null;
+      description: string;
+      category: CourseCategory;
+      level: CourseLevel;
+      language: string;
+      price?: number;
+      currency?: string;
+      tags?: string[];
+    };
     const result = await this.courseController.createCourse(req.user!.userId, body);
     res.status(201).json(result);
   }
 
   async updateCourse(req: HttpRequest, res: HttpResponse): Promise<void> {
+    const body = req.body as {
+      title?: string;
+      subtitle?: string | null;
+      description?: string;
+      category?: CourseCategory;
+      level?: CourseLevel;
+      language?: string;
+      price?: number;
+      currency?: string;
+      tags?: string[];
+    };
     const result = await this.courseController.updateCourse(
-      req.params.courseId, req.user!.userId, req.body as any
+      req.params.courseId, req.user!.userId, body
     );
     res.status(200).json(result);
   }
@@ -28,7 +53,7 @@ export class CourseHttpAdapter {
     const result = await this.courseController.getMyCourses(req.user!.userId, {
       page:   page  ? parseInt(page,  10) : undefined,
       limit:  limit ? parseInt(limit, 10) : undefined,
-      status: status as string | undefined,
+      status: (status || undefined) as CourseStatus | undefined,
     });
     res.status(200).json(result);
   }
@@ -38,19 +63,20 @@ export class CourseHttpAdapter {
     res.status(200).json(result);
   }
 
+  // REPLACE getPublicCourses:
   async getPublicCourses(req: HttpRequest, res: HttpResponse): Promise<void> {
     const { page, limit, category, level, language, minPrice, maxPrice, search, sort } = req.query;
     const result = await this.courseController.getPublicCourses({
       page:  page  ? parseInt(page,  10) : undefined,
       limit: limit ? parseInt(limit, 10) : undefined,
       filter: {
-        category: category || undefined,
-        level:    level    || undefined,
+        category: (category || undefined) as CourseCategory | undefined,
+        level:    (level    || undefined) as CourseLevel    | undefined,
         language: language || undefined,
         minPrice: minPrice ? parseFloat(minPrice) : undefined,
         maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
         search:   search   || undefined,
-        sort:     sort     || undefined,
+        sort:     (sort    || undefined) as PublicCourseSort | undefined,
       },
     });
     res.status(200).json(result);

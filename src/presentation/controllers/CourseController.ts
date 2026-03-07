@@ -26,6 +26,8 @@ import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideo
 import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
 import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
+import { CourseCategory, CourseLevel, CourseStatus } from '../../domain/entities/Course';
+import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
 
 @injectable()
 export class CourseController {
@@ -57,15 +59,18 @@ export class CourseController {
     @inject(TYPES.GetPublicCourseUseCase)    private readonly getPublicCourseUseCase: GetPublicCourseUseCase,
   ) {}
 
-  async createCourse(tutorId: string, body: { title: string; subtitle?: string | null; description: string; category: string; level: string; language: string; price?: number; currency?: string; tags?: string[] }) {
+  async createCourse(tutorId: string, body: { title: string; subtitle?: string | null; description: string; category: CourseCategory; level: CourseLevel; language: string; price?: number; currency?: string; tags?: string[];
+  }) {
     return this.createCourseUseCase.execute({ tutorId, ...body });
   }
 
-  async updateCourse(courseId: string, tutorId: string, body: { title?: string; subtitle?: string | null; description?: string; category?: string; level?: string; language?: string; price?: number; currency?: string; tags?: string[] }) {
+  async updateCourse(courseId: string, tutorId: string, body: { title?: string; subtitle?: string | null; description?: string; category?: CourseCategory; level?: CourseLevel; language?: string; price?: number; currency?: string; tags?: string[];
+  }) {
     return this.updateCourseUseCase.execute({ courseId, tutorId, ...body });
   }
 
-  async getMyCourses(tutorId: string, query: { page?: number; limit?: number; status?: string }) {
+  async getMyCourses(tutorId: string, query: { page?: number; limit?: number; status?: CourseStatus;
+  }) {
     return this.listTutorCoursesUseCase.execute({ tutorId, ...query });
   }
 
@@ -73,7 +78,9 @@ export class CourseController {
     return this.getTutorCourseUseCase.execute({ courseId, tutorId });
   }
 
-  async getPublicCourses(params: { page?: number; limit?: number; filter: { category?: string; level?: string; language?: string; minPrice?: number; maxPrice?: number; search?: string; sort?: string } }) {
+  async getPublicCourses(params: { page?: number; limit?: number; filter: { category?: CourseCategory; level?: CourseLevel; language?: string; minPrice?: number; maxPrice?: number; search?: string; sort?: PublicCourseSort;
+    };
+  }) {
     return this.listPublicCoursesUseCase.execute(params);
   }
 
