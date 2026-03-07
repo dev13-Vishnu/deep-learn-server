@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../shared/errors/AppError';
 import { UserRole } from '../../domain/entities/UserRole';
-import { AuthenticatedRequest } from '../../shared/http/AuthenticatedRequest';
+import { AuthenticatedRequest } from './AuthenticatedRequest';
 
 export function tutorAuthMiddleware(
   req: Request,

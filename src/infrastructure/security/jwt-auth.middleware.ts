@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { TokenServicePort } from '../../application/ports/TokenServicePort';
-export { AuthenticatedRequest } from '../../shared/http/AuthenticatedRequest';
-import { AuthenticatedRequest } from '../../shared/http/AuthenticatedRequest';
+export { AuthenticatedRequest } from './AuthenticatedRequest';
+import { AuthenticatedRequest } from './AuthenticatedRequest';
 
 export function createJwtAuthMiddleware(tokenService: TokenServicePort) {
     return function jwtAuthMiddleware(

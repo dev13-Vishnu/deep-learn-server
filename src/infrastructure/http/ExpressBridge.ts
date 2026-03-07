@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthenticatedRequest } from '../../shared/http/AuthenticatedRequest';
+import { AuthenticatedRequest } from '../security/AuthenticatedRequest';
 import { HttpRequest, HttpResponse, CookieOptions } from '../../shared/http/HttpContext';
 
 export function toHttpRequest(req: Request): HttpRequest {
