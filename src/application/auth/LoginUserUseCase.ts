@@ -8,26 +8,10 @@ import { TYPES } from '../../shared/di/types';
 
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
-import { UserRole } from '../../domain/entities/UserRole';
-import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
-import { InstructorState } from '../../domain/entities/InstructorState';
-
-// ADD THIS MISSING INTERFACE
-interface LoginUserInput {
-  email: string;
-  password: string;
-}
-
-interface LoginUserOutput {
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
-    instructorState: InstructorState | null;
-  };
-  accessToken: string;
-  refreshToken: string;
-}
+// FIX #4: Depend on the port interface, not the concrete use case class.
+import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
+// FIX #6: Use the canonical DTO types from the dto file — no inline duplicates.
+import { LoginUserRequestDTO, LoginUserResponseDTO } from '../dto/auth/LoginUser.dto';
 
 @injectable()
 export class LoginUserUseCase {
@@ -41,11 +25,12 @@ export class LoginUserUseCase {
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
 
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
+    // FIX #4: Inject via the port symbol, typed as the port interface.
+    @inject(TYPES.CreateRefreshTokenPort)
+    private readonly createRefreshTokenPort: CreateRefreshTokenPort
   ) {}
 
-  async execute(input: LoginUserInput): Promise<LoginUserOutput> {
+  async execute(input: LoginUserRequestDTO): Promise<LoginUserResponseDTO> {
     const email = new Email(input.email);
     const password = new Password(input.password);
 
@@ -54,12 +39,13 @@ export class LoginUserUseCase {
     if (!user) {
       throw new AppError('Invalid email or password', 401);
     }
+
     if (!user.passwordHash) {
-  throw new AppError(
-    'This account uses social login. Please sign in with your provider.',
-    400
-  );
-}
+      throw new AppError(
+        'This account uses social login. Please sign in with your provider.',
+        400
+      );
+    }
 
     const passwordMatch = await this.passwordHasher.compare(
       password.getValue(),
@@ -80,9 +66,9 @@ export class LoginUserUseCase {
       role: user.role,
     });
 
-    // Create refresh token
+    // Create refresh token via port
     const { token: refreshToken } =
-      await this.createRefreshTokenUseCase.execute(user.id);
+      await this.createRefreshTokenPort.execute(user.id);
 
     return {
       user: {

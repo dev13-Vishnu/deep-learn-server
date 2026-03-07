@@ -118,6 +118,8 @@ container.bind(TYPES.RefreshAccessTokenUseCase).to(RefreshAccessTokenUseCase);
 container.bind(TYPES.RevokeRefreshTokenUseCase).to(RevokeRefreshTokenUseCase);
 container.bind(TYPES.SignupUseCase).to(SignupUseCase);
 
+container.bind(TYPES.CreateRefreshTokenPort).to(CreateRefreshTokenUseCase);
+
 //  Use Cases — Instructor 
 
 container.bind(TYPES.ApplyForInstructorUseCase).to(ApplyForInstructorUseCase);

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// USE CASE: HandleOAuthCallbackUseCase
-// Shared callback logic for ALL three providers.
-// Reuses your existing CreateRefreshTokenUseCase + TokenServicePort — no duplication.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../../shared/di/types';
 import { AppError } from '../../../shared/errors/AppError';
@@ -12,7 +6,7 @@ import { OAuthConnectionRepositoryPort } from '../../ports/OAuthConnectionReposi
 import { OAuthProviderPort } from '../../ports/OAuthProviderPort';
 import { UserRepositoryPort } from '../../ports/UserRepositoryPort';
 import { TokenServicePort } from '../../ports/TokenServicePort';
-import { CreateRefreshTokenUseCase } from '../CreateRefreshTokenUseCase';
+import { CreateRefreshTokenPort } from '../../ports/CreateRefreshTokenPort';
 import { OAuthConnection, OAuthProvider } from '../../../domain/entities/OAuthConnection';
 import { Email } from '../../../domain/value-objects/Email';
 import { UserRole } from '../../../domain/entities/UserRole';
@@ -52,8 +46,9 @@ export class HandleOAuthCallbackUseCase {
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
 
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
+    // FIX #4: Inject via port symbol, typed as the port interface.
+    @inject(TYPES.CreateRefreshTokenPort)
+    private readonly createRefreshTokenPort: CreateRefreshTokenPort
   ) {}
 
   async execute(input: HandleOAuthCallbackInput): Promise<HandleOAuthCallbackOutput> {
@@ -82,7 +77,7 @@ export class HandleOAuthCallbackUseCase {
       role: user.role,
     });
 
-    const { token: refreshToken } = await this.createRefreshTokenUseCase.execute(user.id);
+    const { token: refreshToken } = await this.createRefreshTokenPort.execute(user.id);
 
     return {
       user: {

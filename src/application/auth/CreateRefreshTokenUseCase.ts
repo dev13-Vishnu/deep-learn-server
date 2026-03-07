@@ -2,9 +2,9 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
 import { RefreshToken } from '../../domain/entities/RefreshToken';
-import crypto from 'crypto';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { authConfig } from '../../shared/config/auth.config';
+import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 
 interface CreateRefreshTokenOutput {
   token: string;
@@ -12,7 +12,7 @@ interface CreateRefreshTokenOutput {
 }
 
 @injectable()
-export class CreateRefreshTokenUseCase {
+export class CreateRefreshTokenUseCase implements CreateRefreshTokenPort {
   constructor(
     @inject(TYPES.RefreshTokenRepositoryPort)
     private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
@@ -37,7 +37,7 @@ export class CreateRefreshTokenUseCase {
       new Date()
     );
 
-    // SAVE TO DATABASE
+    // Persist
     await this.refreshTokenRepository.create(refreshToken);
 
     return { token, expiresAt };

@@ -16,6 +16,8 @@ export const TYPES = {
   RedisClientPort:  Symbol.for('RedisClientPort'),
   EmailServicePort: Symbol.for('EmailServicePort'),
 
+  CreateRefreshTokenPort: Symbol.for('CreateRefreshTokenPort'),
+
   // Use Cases — Auth
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
