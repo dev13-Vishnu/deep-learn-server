@@ -11,7 +11,7 @@ import {
   addChapterSchema, updateChapterSchema,
   getVideoUploadUrlSchema, confirmVideoUploadSchema,
 } from '../validators/course.validators';
-import { upload } from '../../infrastructure/middlewares/upload.middleware';
+import { upload } from '../middlewares/upload.middleware';
 
 export function createCourseRouter(courseAdapter: CourseHttpAdapter): Router {
   const router = Router();

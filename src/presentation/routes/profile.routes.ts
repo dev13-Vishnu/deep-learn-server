@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { ProfileHttpAdapter } from '../http/ProfileHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
 import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
-import { upload } from '../../infrastructure/middlewares/upload.middleware';
+import { upload } from '../middlewares/upload.middleware';
 
 export function createProfileRouter(profileAdapter: ProfileHttpAdapter): Router {
   const router = Router();
