@@ -1,17 +1,10 @@
-
-
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
-
-import { redisClient } from '../redis/redis.client';
+import { TYPES } from '../../shared/di/types';
+import { RedisClientPort } from '../../application/ports/RedisClientPort';
+import { EmailServicePort } from '../../application/ports/EmailServicePort';
 import { AppError } from '../../shared/errors/AppError';
 import { OtpServicePort } from '../../application/ports/OtpServicePort';
-import { env } from "../../shared/config/env";
-
-/* -----------------------------
-   Types
------------------------------ */
 
 type OtpPurpose = 'signup' | 'forgot-password';
 
@@ -20,19 +13,19 @@ interface CachedOtp {
   attempts: number;
 }
 
-/* -----------------------------
-   Constants
------------------------------ */
-
 const OTP_TTL_SECONDS = 120;
-const MAX_ATTEMPTS = 5;
-
-/* -----------------------------
-   Service
------------------------------ */
+const MAX_ATTEMPTS    = 5;
 
 @injectable()
 export class RedisOtpService implements OtpServicePort {
+  constructor(
+    @inject(TYPES.RedisClientPort)
+    private readonly redis: RedisClientPort,
+
+    @inject(TYPES.EmailServicePort)
+    private readonly emailService: EmailServicePort,
+  ) {}
+
   private generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
@@ -46,79 +39,37 @@ export class RedisOtpService implements OtpServicePort {
   }
 
   async requestOtp(email: string, purpose: OtpPurpose): Promise<Date> {
-    const otp = this.generateOtp();
-    
+    const otp   = this.generateOtp();
+    const hash  = this.hashOtp(otp);
+    const entry: CachedOtp = { hash, attempts: 0 };
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: env.deepLearnEmail,
-        pass: env.deepLearnPassword,
-      },
-    });
+    await this.redis.setEx(this.key(email, purpose), OTP_TTL_SECONDS, JSON.stringify(entry));
+    await this.emailService.sendOtp(email, otp, OTP_TTL_SECONDS);
 
-    try {
-      await transporter.sendMail({
-        from: env.deepLearnEmail,
-        to: email,
-        subject: 'Your OTP Code',
-        html: `
-          <p>Your OTP is:</p>
-          <h2>${otp}</h2>
-          <p>This OTP expires in 2 minutes.</p>
-        `,
-      });
-    } catch {
-      throw new AppError('Failed to send OTP email', 500);
-    }
-
-    try {
-      await redisClient.set(
-        this.key(email, purpose),
-        JSON.stringify({
-          hash: this.hashOtp(otp),
-          attempts: 0,
-        }),
-        { EX: OTP_TTL_SECONDS }
-      );
-    } catch {
-      throw new AppError('Failed to store OTP', 500);
-    }
-
-    return new Date(Date.now() + OTP_TTL_SECONDS * 1000);
+    const expiresAt = new Date(Date.now() + OTP_TTL_SECONDS * 1000);
+    return expiresAt;
   }
 
-  async verifyOtp(
-    email: string,
-    inputOtp: string,
-    purpose: OtpPurpose
-  ): Promise<void> {
-    const redisKey = this.key(email, purpose);
+  async verifyOtp(email: string, otp: string, purpose: OtpPurpose): Promise<void> {
+    const raw = await this.redis.get(this.key(email, purpose));
 
-    const raw = await redisClient.get(redisKey);
     if (!raw) {
-      throw new AppError('OTP expired or invalid', 400);
+      throw new AppError('OTP expired or not found', 400);
     }
 
-    const cached: CachedOtp = JSON.parse(raw);
+    const entry: CachedOtp = JSON.parse(raw);
 
-    if (cached.attempts >= MAX_ATTEMPTS) {
-      await redisClient.del(redisKey);
-      throw new AppError('Too many invalid OTP attempts', 429);
+    if (entry.attempts >= MAX_ATTEMPTS) {
+      await this.redis.del(this.key(email, purpose));
+      throw new AppError('Too many failed attempts. Please request a new OTP', 429);
     }
 
-    if (this.hashOtp(inputOtp) !== cached.hash) {
-      cached.attempts += 1;
-
-      await redisClient.set(
-        redisKey,
-        JSON.stringify(cached),
-        { EX: OTP_TTL_SECONDS }
-      );
-
+    if (entry.hash !== this.hashOtp(otp)) {
+      entry.attempts += 1;
+      await this.redis.setEx(this.key(email, purpose), OTP_TTL_SECONDS, JSON.stringify(entry));
       throw new AppError('Invalid OTP', 400);
     }
 
-    await redisClient.del(redisKey);
+    await this.redis.del(this.key(email, purpose));
   }
 }

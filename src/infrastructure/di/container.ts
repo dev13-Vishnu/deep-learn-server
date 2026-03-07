@@ -75,6 +75,11 @@ import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourse
 
 import { bindPresentationDependencies } from '../../presentation/di/presentationBindings';
 
+import { RedisClientAdapter }        from '../redis/RedisClientAdapter';
+import { NodemailerEmailService }     from '../services/NodemailerEmailService';
+import { RedisClientPort }            from '../../application/ports/RedisClientPort';
+import { EmailServicePort }           from '../../application/ports/EmailServicePort';
+
 
 export const container = new Container();
 
@@ -95,6 +100,8 @@ container.bind(TYPES.PasswordHasherPort).to(BcryptPasswordHasher);
 container.bind(TYPES.TokenServicePort).to(JwtTokenService);
 container.bind(TYPES.OtpServicePort).to(RedisOtpService);
 container.bind(TYPES.StorageServicePort).to(S3StorageService);
+container.bind<RedisClientPort>(TYPES.RedisClientPort).to(RedisClientAdapter).inSingletonScope();
+container.bind<EmailServicePort>(TYPES.EmailServicePort).to(NodemailerEmailService);
 
 //  Use Cases — Auth 
 
