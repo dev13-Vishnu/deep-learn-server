@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AuthenticatedRequest } from '../../presentation/http/AuthenticatedRequest';
-import { HttpRequest, HttpResponse, CookieOptions } from '../../presentation/http/HttpContext';
+import { AuthenticatedRequest } from '../../shared/http/AuthenticatedRequest';
+import { HttpRequest, HttpResponse, CookieOptions } from '../../shared/http/HttpContext';
 
 export function toHttpRequest(req: Request): HttpRequest {
   const authReq = req as AuthenticatedRequest;

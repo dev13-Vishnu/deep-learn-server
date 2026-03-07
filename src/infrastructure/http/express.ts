@@ -1,7 +1,6 @@
-import express, { Router } from 'express';
+import express, { Router, ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { globalErrorHandler } from '../../presentation/middlewares/error.middleware';
 import { env } from '../../shared/config/env';
 
 export interface AppRouters {
@@ -13,7 +12,10 @@ export interface AppRouters {
   apiRouter:        Router;
 }
 
-export function createExpressApp(routers: AppRouters) {
+export function createExpressApp(
+  routers: AppRouters,
+  errorHandler: ErrorRequestHandler,
+) {
   const app = express();
 
   app.use(cors({ origin: env.frontendOrigin, credentials: true }));
@@ -31,7 +33,7 @@ export function createExpressApp(routers: AppRouters) {
     res.status(404).json({ message: 'Route not found', path: req.originalUrl });
   });
 
-  app.use(globalErrorHandler);
+  app.use(errorHandler);
 
   return app;
 }

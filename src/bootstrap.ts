@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { logger } from './shared/utils/logger';
 
-// ── 1. Initialize the DI container (side-effectful imports) ───────────────────
+//  1. Initialize the DI container (side-effectful imports) 
 import { container } from './infrastructure/di/container';
 import { PRESENTATION_TYPES } from './presentation/di/presentationTypes';
 
-// ── 2. Resolve adapters ────────────────────────────────────────────────────────
+//  2. Resolve adapters
 import { AuthHttpAdapter }       from './presentation/http/AuthHttpAdapter';
 import { SignupHttpAdapter }      from './presentation/http/SignupHttpAdapter';
 import { OAuthHttpAdapter }       from './presentation/http/OAuthHttpAdapter';
@@ -13,7 +13,7 @@ import { ProfileHttpAdapter }     from './presentation/http/ProfileHttpAdapter';
 import { InstructorHttpAdapter }  from './presentation/http/InstructorHttpAdapter';
 import { CourseHttpAdapter }      from './presentation/http/CourseHttpAdapter';
 
-// ── 3. Route factories ─────────────────────────────────────────────────────────
+//  3. Route factories
 import { createAuthRouter }       from './presentation/routes/auth.routes';
 import { createOAuthRouter }      from './presentation/routes/oauth.routes';
 import { createProfileRouter }    from './presentation/routes/profile.routes';
@@ -21,7 +21,9 @@ import { createInstructorRouter } from './presentation/routes/instructor.routes'
 import { createCourseRouter }     from './presentation/routes/course.routes';
 import apiRouter                  from './presentation/routes/index';
 
-// ── 4. App + server ────────────────────────────────────────────────────────────
+import { globalErrorHandler } from './presentation/middlewares/error.middleware';
+
+//  5. App + server
 import { createExpressApp } from './infrastructure/http/express';
 import { startServer }      from './server';
 
@@ -39,13 +41,16 @@ const instructorAdapter = container.get<InstructorHttpAdapter>(PRESENTATION_TYPE
 const courseAdapter     = container.get<CourseHttpAdapter>(PRESENTATION_TYPES.CourseHttpAdapter);
 
 // Build routers — no container access inside route files
-const app = createExpressApp({
-  authRouter:       createAuthRouter(authAdapter, signupAdapter),
-  oauthRouter:      createOAuthRouter(oauthAdapter),
-  profileRouter:    createProfileRouter(profileAdapter),
-  instructorRouter: createInstructorRouter(instructorAdapter),
-  courseRouter:     createCourseRouter(courseAdapter),
-  apiRouter,
-});
+const app = createExpressApp(
+  {
+    authRouter:       createAuthRouter(authAdapter, signupAdapter),
+    oauthRouter:      createOAuthRouter(oauthAdapter),
+    profileRouter:    createProfileRouter(profileAdapter),
+    instructorRouter: createInstructorRouter(instructorAdapter),
+    courseRouter:     createCourseRouter(courseAdapter),
+    apiRouter,
+  },
+  globalErrorHandler,   // ← passed in, not imported inside infrastructure
+);
 
 startServer(app);
