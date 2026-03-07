@@ -5,7 +5,7 @@ import { UserWriterPort } from '../ports/UserWriterPort';
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { OtpServicePort } from '../ports/OtpServicePort';
-import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
+import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 import { Password } from '../../domain/value-objects/Password';
 import { Email } from '../../domain/value-objects/Email';
 import { AppError } from '../../shared/errors/AppError';
@@ -48,8 +48,8 @@ export class SignupUseCase {
     @inject(TYPES.OtpServicePort)
     private readonly otpService: OtpServicePort,
 
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase,
+    @inject(TYPES.CreateRefreshTokenPort)
+    private readonly createRefreshTokenPort: CreateRefreshTokenPort,
   ) {}
 
   async execute(input: SignupInput): Promise<SignupOutput> {
@@ -95,7 +95,7 @@ export class SignupUseCase {
     });
 
     const { token: refreshToken } =
-      await this.createRefreshTokenUseCase.execute(savedUser.id);
+      await this.createRefreshTokenPort.execute(savedUser.id);
 
     return {
       user: {
