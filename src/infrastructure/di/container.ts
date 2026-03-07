@@ -79,6 +79,7 @@ import { RedisClientAdapter }        from '../redis/RedisClientAdapter';
 import { NodemailerEmailService }     from '../services/NodemailerEmailService';
 import { RedisClientPort }            from '../../application/ports/RedisClientPort';
 import { EmailServicePort }           from '../../application/ports/EmailServicePort';
+import { CryptoIdGenerator } from '../utils/CryptoIdGenerator';
 
 
 export const container = new Container();
@@ -162,6 +163,9 @@ container.bind(TYPES.GetVideoUploadUrlUseCase).to(GetVideoUploadUrlUseCase);
 container.bind(TYPES.ConfirmVideoUploadUseCase).to(ConfirmVideoUploadUseCase);
 container.bind(TYPES.ListPublicCoursesUseCase).to(ListPublicCoursesUseCase);
 container.bind(TYPES.GetPublicCourseUseCase).to(GetPublicCourseUseCase);
+
+container.bind(TYPES.IdGeneratorPort).to(CryptoIdGenerator).inSingletonScope();
+
 
 //  OAuth
 

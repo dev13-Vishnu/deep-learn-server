@@ -3,18 +3,21 @@ import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
-import { generateId } from '../../shared/utils/idGenerator';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   AddChapterRequestDTO,
   AddChapterResponseDTO,
 } from '../dto/course/Chapter.dto';
+import { IdGeneratorPort } from '../ports/IdGeneratorPort';
 
 @injectable()
 export class AddChapterUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
-    private readonly courseRepository: CourseRepositoryPort
+    private readonly courseRepository: CourseRepositoryPort,
+
+    @inject(TYPES.IdGeneratorPort)
+  private readonly idGenerator: IdGeneratorPort,
   ) {}
 
   async execute(dto: AddChapterRequestDTO): Promise<AddChapterResponseDTO> {
@@ -26,7 +29,7 @@ export class AddChapterUseCase {
     let chapter;
     try {
       chapter = course.addChapter(dto.moduleId, dto.lessonId, {
-        id:       generateId(),
+        id: this.idGenerator.generate(),
         title:    dto.title,
         type:     dto.type,
         isFree:   dto.isFree,

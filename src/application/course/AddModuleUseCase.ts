@@ -3,18 +3,21 @@ import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
-import { generateId } from '../../shared/utils/idGenerator';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   AddModuleRequestDTO,
   AddModuleResponseDTO,
 } from '../dto/course/Module.dto';
+import { IdGeneratorPort } from '../ports/IdGeneratorPort';
 
 @injectable()
 export class AddModuleUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
-    private readonly courseRepository: CourseRepositoryPort
+    private readonly courseRepository: CourseRepositoryPort,
+
+    @inject(TYPES.IdGeneratorPort)
+    private readonly idGenerator: IdGeneratorPort,
   ) {}
 
   async execute(dto: AddModuleRequestDTO): Promise<AddModuleResponseDTO> {
@@ -26,7 +29,7 @@ export class AddModuleUseCase {
     let module;
     try {
       module = course.addModule({
-        id:          generateId(),
+        id: this.idGenerator.generate(),
         title:       dto.title,
         description: dto.description,
       });

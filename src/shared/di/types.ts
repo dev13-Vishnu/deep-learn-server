@@ -87,6 +87,9 @@ export const TYPES = {
   UserReaderPort: Symbol.for('UserReaderPort'),
   UserWriterPort: Symbol.for('UserWriterPort'),
 
+  IdGeneratorPort: Symbol.for('IdGeneratorPort'),
+
+
   // Ports — Course
   CourseRepositoryPort: Symbol.for('CourseRepositoryPort'),
 

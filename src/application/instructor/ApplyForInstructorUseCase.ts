@@ -3,7 +3,6 @@ import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { InstructorApplication } from '../../domain/entities/InstructorApplication';
 import { AppError } from '../../shared/errors/AppError';
-import { generateId } from '../../shared/utils/idGenerator';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { DomainError } from '../../domain/errors/DomainError';
 import {
@@ -11,6 +10,7 @@ import {
   ApplyForInstructorResponseDTO,
 } from '../dto/instructor/ApplyForInstructor.dto';
 import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
+import { IdGeneratorPort } from '../ports/IdGeneratorPort';
 
 @injectable()
 export class ApplyForInstructorUseCase {
@@ -19,7 +19,11 @@ export class ApplyForInstructorUseCase {
     private readonly applicationRepository: InstructorApplicationRepositoryPort,
 
     @inject(TYPES.UserRepositoryPort)
-    private readonly userRepository: UserRepositoryPort
+    private readonly userRepository: UserRepositoryPort,
+
+
+    @inject(TYPES.IdGeneratorPort)
+    private readonly idGenerator: IdGeneratorPort,
   ) {}
 
   async execute(
@@ -46,7 +50,7 @@ export class ApplyForInstructorUseCase {
     let application: InstructorApplication;
     try {
       application = InstructorApplication.create(
-        generateId(),
+        this.idGenerator.generate(),
         dto.userId,
         dto.bio,
         dto.experienceYears,

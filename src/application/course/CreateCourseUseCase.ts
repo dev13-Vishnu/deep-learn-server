@@ -4,7 +4,6 @@ import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { Course } from '../../domain/entities/Course';
 import { DomainError } from '../../domain/errors/DomainError';
 import { AppError } from '../../shared/errors/AppError';
-import { generateId } from '../../shared/utils/idGenerator';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   CreateCourseRequestDTO,
@@ -12,6 +11,7 @@ import {
 } from '../dto/course/CreateCourse.dto';
 import { UserRole } from '../../domain/entities/UserRole';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
+import { IdGeneratorPort } from '../ports/IdGeneratorPort';
 
 @injectable()
 export class CreateCourseUseCase {
@@ -20,7 +20,11 @@ export class CreateCourseUseCase {
     private readonly courseRepository: CourseRepositoryPort,
 
     @inject(TYPES.UserRepositoryPort)
-    private readonly userRepository: UserRepositoryPort
+    private readonly userRepository: UserRepositoryPort,
+
+
+    @inject(TYPES.IdGeneratorPort)
+    private readonly idGenerator: IdGeneratorPort,
   ) {}
 
   async execute(dto: CreateCourseRequestDTO): Promise<CreateCourseResponseDTO> {
@@ -37,7 +41,7 @@ export class CreateCourseUseCase {
     let course: Course;
     try {
       course = Course.create({
-        id:          generateId(),
+        id: this.idGenerator.generate(),
         tutorId:     dto.tutorId,
         title:       dto.title,
         subtitle:    dto.subtitle,
