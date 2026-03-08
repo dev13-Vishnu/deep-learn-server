@@ -2,15 +2,16 @@ import { Router, Request, Response } from 'express';
 import { AuthHttpAdapter }   from '../http/AuthHttpAdapter';
 import { SignupHttpAdapter }  from '../http/SignupHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
 import { validateRequest }   from '../middlewares/validationRequest';
 import {
   loginSchema, requestOtpSchema, resetPasswordSchema, signupSchema, verifyOtpSchema,
 } from '../validators/auth.validators';
+import { RequestHandler } from 'express';
 
 export function createAuthRouter(
-  authAdapter:   AuthHttpAdapter,
-  signupAdapter: SignupHttpAdapter,
+  authAdapter:       AuthHttpAdapter,
+  signupAdapter:     SignupHttpAdapter,
+  jwtAuthMiddleware: RequestHandler,
 ): Router {
   const router = Router();
 

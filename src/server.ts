@@ -1,11 +1,11 @@
 import { Express } from 'express';
 import { env } from './shared/config/env';
-import { logger } from './shared/utils/logger';
+import { LoggerPort } from './application/ports/LoggerPort';
 import { connectDatabase, disconnectDatabase } from './infrastructure/database/mongoose.connection';
 import { initRedis } from './infrastructure/redis/redis.client';
 
-export async function startServer(app: Express): Promise<void> {
-  await connectDatabase();
+export async function startServer(app: Express, logger: LoggerPort): Promise<void> {
+  await connectDatabase(logger);
   await initRedis();
 
   const server = app.listen(env.port, () => {
@@ -16,7 +16,7 @@ export async function startServer(app: Express): Promise<void> {
     logger.warn(`Received ${signal}. Shutting down gracefully...`);
 
     server.close(async () => {
-      await disconnectDatabase();
+      await disconnectDatabase(logger);
       logger.info('HTTP server closed');
       process.exit(0);
     });

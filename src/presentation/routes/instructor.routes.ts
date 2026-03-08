@@ -1,12 +1,14 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { InstructorHttpAdapter } from '../http/InstructorHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware }   from '../../infrastructure/security/middlewares';
 import { adminAuthMiddleware } from '../../infrastructure/security/admin-auth.middleware';
 import { validateRequest }     from '../middlewares/validationRequest';
 import { applyForInstructorSchema, rejectApplicationSchema } from '../validators/instructor.validators';
 
-export function createInstructorRouter(instructorAdapter: InstructorHttpAdapter): Router {
+export function createInstructorRouter(
+  instructorAdapter: InstructorHttpAdapter,
+  jwtAuthMiddleware: RequestHandler,
+): Router {
   const router = Router();
 
   const bind = (fn: (req: any, res: any) => Promise<void>) =>

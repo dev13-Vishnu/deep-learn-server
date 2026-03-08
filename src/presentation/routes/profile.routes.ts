@@ -1,10 +1,12 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { ProfileHttpAdapter } from '../http/ProfileHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware } from '../../infrastructure/security/middlewares';
 import { upload } from '../middlewares/upload.middleware';
 
-export function createProfileRouter(profileAdapter: ProfileHttpAdapter): Router {
+export function createProfileRouter(
+  profileAdapter:    ProfileHttpAdapter,
+  jwtAuthMiddleware: RequestHandler,
+): Router {
   const router = Router();
 
   const bind = (fn: (req: any, res: any) => Promise<void>) =>

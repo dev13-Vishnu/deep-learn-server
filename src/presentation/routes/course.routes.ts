@@ -1,7 +1,6 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { CourseHttpAdapter } from '../http/CourseHttpAdapter';
 import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
-import { jwtAuthMiddleware }    from '../../infrastructure/security/middlewares';
 import { tutorAuthMiddleware }  from '../../infrastructure/security/tutor-auth.middleware';
 import { validateRequest }      from '../middlewares/validationRequest';
 import {
@@ -13,7 +12,10 @@ import {
 } from '../validators/course.validators';
 import { upload } from '../middlewares/upload.middleware';
 
-export function createCourseRouter(courseAdapter: CourseHttpAdapter): Router {
+export function createCourseRouter(
+  courseAdapter:     CourseHttpAdapter,
+  jwtAuthMiddleware: RequestHandler,
+): Router {
   const router = Router();
 
   const bind = (fn: (req: any, res: any) => Promise<void>) =>
