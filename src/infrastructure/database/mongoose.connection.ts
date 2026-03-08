@@ -1,12 +1,8 @@
 import mongoose from 'mongoose';
 import { env } from '../../shared/config/env';
 import { logger } from '../../shared/utils/logger';
-import './models/user.model';
+import './models';
 
-
-/**
- * Register MongoDB lifecycle events (call once)
- */
 mongoose.connection.on('connected', () => {
   logger.info('MongoDB connection established (event)');
 });
