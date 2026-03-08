@@ -9,9 +9,10 @@ import {
   UploadThumbnailResponseDTO,
 } from '../dto/course/UploadThumbnail.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IUploadThumbnailUseCase } from '../ports/inbound/course/IUploadThumbnailUseCase';
 
 @injectable()
-export class UploadThumbnailUseCase {
+export class UploadThumbnailUseCase implements IUploadThumbnailUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort,

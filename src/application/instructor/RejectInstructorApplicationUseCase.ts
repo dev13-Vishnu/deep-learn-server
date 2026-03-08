@@ -8,9 +8,10 @@ import { LoggerPort } from '../ports/LoggerPort';
 import { DomainError } from '../../domain/errors/DomainError';
 import { RejectInstructorApplicationRequestDTO, RejectInstructorApplicationResponseDTO } from '../dto/instructor/RejectInstructorApplication.dto';
 import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
+import { IRejectInstructorApplicationUseCase } from '../ports/inbound/instructor/IRejectInstructorApplicationUseCase';
 
 @injectable()
-export class RejectInstructorApplicationUseCase {
+export class RejectInstructorApplicationUseCase implements IRejectInstructorApplicationUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort,

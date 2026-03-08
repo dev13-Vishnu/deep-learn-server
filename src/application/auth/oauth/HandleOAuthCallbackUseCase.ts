@@ -10,6 +10,7 @@ import { CreateRefreshTokenPort } from '../../ports/CreateRefreshTokenPort';
 import { OAuthConnection, OAuthProvider } from '../../../domain/entities/OAuthConnection';
 import { Email } from '../../../domain/value-objects/Email';
 import { UserRole } from '../../../domain/entities/UserRole';
+import { IHandleOAuthCallbackUseCase } from '../../ports/inbound/auth/oauth/IHandleOAuthCallbackUseCase';
 
 interface HandleOAuthCallbackInput {
   provider: OAuthProvider;
@@ -25,7 +26,7 @@ interface HandleOAuthCallbackOutput {
 }
 
 @injectable()
-export class HandleOAuthCallbackUseCase {
+export class HandleOAuthCallbackUseCase implements IHandleOAuthCallbackUseCase {
   constructor(
     @inject(TYPES.OAuthStateStorePort)
     private readonly stateStore: OAuthStateStorePort,

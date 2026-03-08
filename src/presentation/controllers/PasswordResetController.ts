@@ -1,20 +1,20 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { RequestPasswordResetOtpUseCase } from '../../application/auth/RequestPasswordResetOtpUseCase';
-import { VerifyPasswordResetOtpUseCase } from '../../application/auth/VerifyPasswordResetOtpUseCase';
-import { ResetPasswordUseCase } from '../../application/auth/ResetPasswordUseCase';
+import { IRequestPasswordResetOtpUseCase } from '../../application/ports/inbound/auth/IRequestPasswordResetOtpUseCase';
+import { IVerifyPasswordResetOtpUseCase }  from '../../application/ports/inbound/auth/IVerifyPasswordResetOtpUseCase';
+import { IResetPasswordUseCase }           from '../../application/ports/inbound/auth/IResetPasswordUseCase';
 
 @injectable()
 export class PasswordResetController {
   constructor(
     @inject(TYPES.RequestPasswordResetOtpUseCase)
-    private readonly requestPasswordResetOtpUseCase: RequestPasswordResetOtpUseCase,
+    private readonly requestPasswordResetOtpUseCase: IRequestPasswordResetOtpUseCase,
 
     @inject(TYPES.VerifyPasswordResetOtpUseCase)
-    private readonly verifyPasswordResetOtpUseCase: VerifyPasswordResetOtpUseCase,
+    private readonly verifyPasswordResetOtpUseCase: IVerifyPasswordResetOtpUseCase,
 
     @inject(TYPES.ResetPasswordUseCase)
-    private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly resetPasswordUseCase: IResetPasswordUseCase,
   ) {}
 
   async requestOtp(email: string) {

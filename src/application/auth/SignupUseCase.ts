@@ -11,6 +11,7 @@ import { Email } from '../../domain/value-objects/Email';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { User } from '../../domain/entities/User';
 import { UserRole } from '../../domain/entities/UserRole';
+import { ISignupUseCase } from '../ports/inbound/auth/ISignupUseCase';
 
 interface SignupInput {
   email:      string;
@@ -27,7 +28,7 @@ interface SignupOutput {
 }
 
 @injectable()
-export class SignupUseCase {
+export class SignupUseCase implements ISignupUseCase {
   constructor(
     @inject(TYPES.UserReaderPort)
     private readonly userReader: UserReaderPort,

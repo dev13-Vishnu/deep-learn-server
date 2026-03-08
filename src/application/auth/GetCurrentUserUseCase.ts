@@ -3,9 +3,10 @@ import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { TYPES } from '../../shared/di/types';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { GetCurrentUserRequestDTO, GetCurrentUserResponseDTO } from '../dto/auth/GetCurrentUser.dto';
+import { IGetCurrentUserUseCase } from '../ports/inbound/auth/IGetCurrentUserUseCase';
 
 @injectable()
-export class GetCurrentUserUseCase {
+export class GetCurrentUserUseCase implements IGetCurrentUserUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,

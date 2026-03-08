@@ -1,24 +1,24 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { LoginUserUseCase } from '../../application/auth/LoginUserUseCase';
-import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
-import { GetCurrentUserUseCase } from '../../application/auth/GetCurrentUserUseCase';
-import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
+import { ILoginUserUseCase }          from '../../application/ports/inbound/auth/ILoginUserUseCase';
+import { IGetCurrentUserUseCase }     from '../../application/ports/inbound/auth/IGetCurrentUserUseCase';
+import { IRefreshAccessTokenUseCase } from '../../application/ports/inbound/auth/IRefreshAccessTokenUseCase';
+import { IRevokeRefreshTokenUseCase } from '../../application/ports/inbound/auth/IRevokeRefreshTokenUseCase';
 
 @injectable()
 export class LoginController {
   constructor(
     @inject(TYPES.LoginUserUseCase)
-    private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly loginUserUseCase: ILoginUserUseCase,
 
     @inject(TYPES.GetCurrentUserUseCase)
-    private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+    private readonly getCurrentUserUseCase: IGetCurrentUserUseCase,
 
     @inject(TYPES.RefreshAccessTokenUseCase)
-    private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
+    private readonly refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
 
     @inject(TYPES.RevokeRefreshTokenUseCase)
-    private readonly revokeRefreshTokenUseCase: RevokeRefreshTokenUseCase,
+    private readonly revokeRefreshTokenUseCase: IRevokeRefreshTokenUseCase,
   ) {}
 
   async login(email: string, password: string) {

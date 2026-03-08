@@ -5,9 +5,10 @@ import { StorageServicePort } from '../ports/StorageServicePort';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { LoggerPort } from '../ports/LoggerPort';
 import { UploadAvatarRequestDTO, UploadAvatarResponseDTO } from '../dto/profile/UploadAvatar.dto';
+import { IUploadAvatarUseCase } from '../ports/inbound/profile/IUploadAvatarUseCase';
 
 @injectable()
-export class UploadAvatarUseCase {
+export class UploadAvatarUseCase implements IUploadAvatarUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,

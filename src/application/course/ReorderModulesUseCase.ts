@@ -7,9 +7,10 @@ import {
   ReorderModulesResponseDTO,
 } from '../dto/course/Module.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IReorderModulesUseCase } from '../ports/inbound/course/IReorderModulesUseCase';
 
 @injectable()
-export class ReorderModulesUseCase {
+export class ReorderModulesUseCase implements IReorderModulesUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

@@ -6,9 +6,10 @@ import {
   DeleteCourseResponseDTO,
 } from '../dto/course/DeleteCourse.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IDeleteCourseUseCase } from '../ports/inbound/course/IDeleteCourseUseCase';
 
 @injectable()
-export class DeleteCourseUseCase {
+export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

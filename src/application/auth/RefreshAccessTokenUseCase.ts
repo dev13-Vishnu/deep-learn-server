@@ -5,9 +5,10 @@ import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
 import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
+import { IRefreshAccessTokenUseCase } from '../ports/inbound/auth/IRefreshAccessTokenUseCase';
 
 @injectable()
-export class RefreshAccessTokenUseCase {
+export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
   constructor(
     @inject(TYPES.RefreshTokenRepositoryPort)
     private readonly refreshTokenRepository: RefreshTokenRepositoryPort,

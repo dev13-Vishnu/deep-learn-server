@@ -3,9 +3,10 @@ import { Email } from "../../domain/value-objects/Email";
 import { OtpServicePort } from "../ports/OtpServicePort";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
 import { TYPES } from "../../shared/di/types";
+import { IRequestPasswordResetOtpUseCase } from "../ports/inbound/auth/IRequestPasswordResetOtpUseCase";
 
 @injectable()
-export class RequestPasswordResetOtpUseCase {
+export class RequestPasswordResetOtpUseCase implements IRequestPasswordResetOtpUseCase {
     constructor (
         @inject(TYPES.UserRepositoryPort)
         private readonly userRepo: UserRepositoryPort,

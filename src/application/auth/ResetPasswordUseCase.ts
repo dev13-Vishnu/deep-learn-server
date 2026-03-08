@@ -5,9 +5,10 @@ import { Email } from "../../domain/value-objects/Email";
 import { Password } from "../../domain/value-objects/Password";
 import { UserRepositoryPort } from "../ports/UserRepositoryPort";
 import { PasswordHasherPort } from "../ports/PasswordHasherPort";
+import { IResetPasswordUseCase } from "../ports/inbound/auth/IResetPasswordUseCase";
 
 @injectable()
-export class ResetPasswordUseCase {
+export class ResetPasswordUseCase implements IResetPasswordUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,

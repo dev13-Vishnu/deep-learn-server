@@ -4,9 +4,10 @@ import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { DeleteAvatarRequestDTO, DeleteAvatarResponseDTO } from '../dto/profile/DeleteAvatar.dto';
+import { IDeleteAvatarUseCase } from '../ports/inbound/profile/IDeleteAvatarUseCase';
 
 @injectable()
-export class DeleteAvatarUseCase {
+export class DeleteAvatarUseCase implements IDeleteAvatarUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,

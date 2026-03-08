@@ -7,9 +7,10 @@ import {
   RemoveModuleResponseDTO,
 } from '../dto/course/Module.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IRemoveModuleUseCase } from '../ports/inbound/course/IRemoveModuleUseCase';
 
 @injectable()
-export class RemoveModuleUseCase {
+export class RemoveModuleUseCase implements IRemoveModuleUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

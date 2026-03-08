@@ -7,9 +7,10 @@ import { DomainError } from '../../domain/errors/DomainError';
 import { LoggerPort } from '../ports/LoggerPort';
 import { ApproveInstructorApplicationRequestDTO, ApproveInstructorApplicationResponseDTO } from '../dto/instructor/ApproveInstructorApplication.dto';
 import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
+import { IApproveInstructorApplicationUseCase } from '../ports/inbound/instructor/IApproveInstructorApplicationUseCase';
 
 @injectable()
-export class ApproveInstructorApplicationUseCase {
+export class ApproveInstructorApplicationUseCase implements IApproveInstructorApplicationUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort,

@@ -2,9 +2,10 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../../shared/di/types";
 import { TokenServicePort } from "../ports/TokenServicePort";
 import { RefreshTokenRepositoryPort } from "../ports/RefreshTokenRepositoryPort";
+import { IRevokeRefreshTokenUseCase } from "../ports/inbound/auth/IRevokeRefreshTokenUseCase";
 
 @injectable()
-export class RevokeRefreshTokenUseCase {
+export class RevokeRefreshTokenUseCase implements IRevokeRefreshTokenUseCase {
     constructor (
         @inject(TYPES.RefreshTokenRepositoryPort)
         private readonly refreshTokenRepository: RefreshTokenRepositoryPort,

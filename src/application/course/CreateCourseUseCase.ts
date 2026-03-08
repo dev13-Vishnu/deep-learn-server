@@ -9,9 +9,10 @@ import { CreateCourseRequestDTO, CreateCourseResponseDTO } from '../dto/course/C
 import { UserRole } from '../../domain/entities/UserRole';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { IdGeneratorPort } from '../ports/IdGeneratorPort';
+import { ICreateCourseUseCase } from '../ports/inbound/course/ICreateCourseUseCase';
 
 @injectable()
-export class CreateCourseUseCase {
+export class CreateCourseUseCase implements ICreateCourseUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort) private readonly courseRepository: CourseRepositoryPort,
     @inject(TYPES.UserRepositoryPort)   private readonly userRepository:   UserRepositoryPort,

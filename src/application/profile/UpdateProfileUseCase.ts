@@ -3,9 +3,10 @@ import { TYPES } from '../../shared/di/types';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { UpdateProfileRequestDTO, UpdateProfileResponseDTO } from '../dto/profile/UpdateProfile.dto';
+import { IUpdateProfileUseCase } from '../ports/inbound/profile/IUpdateProfileUseCase';
 
 @injectable()
-export class UpdateProfileUseCase {
+export class UpdateProfileUseCase implements IUpdateProfileUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,

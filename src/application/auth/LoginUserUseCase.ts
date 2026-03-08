@@ -8,9 +8,10 @@ import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 import { LoginUserRequestDTO, LoginUserResponseDTO } from '../dto/auth/LoginUser.dto';
+import { ILoginUserUseCase } from '../ports/inbound/auth/ILoginUserUseCase';
 
 @injectable()
-export class LoginUserUseCase {
+export class LoginUserUseCase implements ILoginUserUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,

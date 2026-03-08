@@ -8,9 +8,10 @@ import {
   ConfirmVideoUploadResponseDTO,
 } from '../dto/course/Video.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IConfirmVideoUploadUseCase } from '../ports/inbound/course/IConfirmVideoUploadUseCase';
 
 @injectable()
-export class ConfirmVideoUploadUseCase {
+export class ConfirmVideoUploadUseCase implements IConfirmVideoUploadUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

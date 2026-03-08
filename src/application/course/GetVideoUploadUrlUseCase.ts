@@ -8,6 +8,7 @@ import {
   GetVideoUploadUrlResponseDTO,
 } from '../dto/course/Video.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IGetVideoUploadUrlUseCase } from '../ports/inbound/course/IGetVideoUploadUrlUseCase';
 
 const ALLOWED_VIDEO_MIME_TYPES = [
   'video/mp4',
@@ -20,7 +21,7 @@ const MAX_VIDEO_SIZE_BYTES = 2 * 1024 * 1024 * 1024; // 2 GB
 const PRESIGNED_EXPIRES_IN = 3600;                    // 1 hour
 
 @injectable()
-export class GetVideoUploadUrlUseCase {
+export class GetVideoUploadUrlUseCase implements IGetVideoUploadUrlUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort,

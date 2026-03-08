@@ -8,9 +8,10 @@ import {
   ArchiveCourseResponseDTO,
 } from '../dto/course/UnpublishArchiveCourse.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IArchiveCourseUseCase } from '../ports/inbound/course/IArchiveCourseUseCase';
 
 @injectable()
-export class ArchiveCourseUseCase {
+export class ArchiveCourseUseCase implements IArchiveCourseUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

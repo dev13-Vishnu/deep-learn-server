@@ -7,9 +7,10 @@ import {
   RemoveChapterResponseDTO,
 } from '../dto/course/Chapter.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IRemoveChapterUseCase } from '../ports/inbound/course/IRemoveChapterUseCase';
 
 @injectable()
-export class RemoveChapterUseCase {
+export class RemoveChapterUseCase implements IRemoveChapterUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

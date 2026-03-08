@@ -8,9 +8,10 @@ import {
   UpdateLessonResponseDTO,
 } from '../dto/course/Lesson.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IUpdateLessonUseCase } from '../ports/inbound/course/IUpdateLessonUseCase';
 
 @injectable()
-export class UpdateLessonUseCase {
+export class UpdateLessonUseCase implements IUpdateLessonUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

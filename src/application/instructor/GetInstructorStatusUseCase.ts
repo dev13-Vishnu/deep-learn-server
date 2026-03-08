@@ -2,9 +2,10 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { InstructorStatusResult } from '../dto/instructor/GetInstructorStatus.dto';
+import { IGetInstructorStatusUseCase } from '../ports/inbound/instructor/IGetInstructorStatusUseCase';
 
 @injectable()
-export class GetInstructorStatusUseCase {
+export class GetInstructorStatusUseCase implements IGetInstructorStatusUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort

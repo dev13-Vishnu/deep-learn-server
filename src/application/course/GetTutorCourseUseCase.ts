@@ -7,9 +7,10 @@ import {
   GetTutorCourseResponseDTO,
 } from '../dto/course/GetTutorCourse.dto';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IGetTutorCourseUseCase } from '../ports/inbound/course/IGetTutorCourseUseCase';
 
 @injectable()
-export class GetTutorCourseUseCase {
+export class GetTutorCourseUseCase implements IGetTutorCourseUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

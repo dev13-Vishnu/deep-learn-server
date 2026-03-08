@@ -1,37 +1,32 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { GetProfileUseCase } from '../../application/profile/GetProfileUseCase';
-import { UpdateProfileUseCase } from '../../application/profile/UpdateProfileUseCase';
-import { UploadAvatarUseCase } from '../../application/profile/UploadAvatarUseCase';
-import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCase';
+import { IGetProfileUseCase }    from '../../application/ports/inbound/profile/IGetProfileUseCase';
+import { IUpdateProfileUseCase } from '../../application/ports/inbound/profile/IUpdateProfileUseCase';
+import { IUploadAvatarUseCase }  from '../../application/ports/inbound/profile/IUploadAvatarUseCase';
+import { IDeleteAvatarUseCase }  from '../../application/ports/inbound/profile/IDeleteAvatarUseCase';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
 
 @injectable()
 export class ProfileController {
   constructor(
     @inject(TYPES.GetProfileUseCase)
-    private readonly getProfileUseCase: GetProfileUseCase,
+    private readonly getProfileUseCase: IGetProfileUseCase,
 
     @inject(TYPES.UpdateProfileUseCase)
-    private readonly updateProfileUseCase: UpdateProfileUseCase,
+    private readonly updateProfileUseCase: IUpdateProfileUseCase,
 
     @inject(TYPES.UploadAvatarUseCase)
-    private readonly uploadAvatarUseCase: UploadAvatarUseCase,
+    private readonly uploadAvatarUseCase: IUploadAvatarUseCase,
 
     @inject(TYPES.DeleteAvatarUseCase)
-    private readonly deleteAvatarUseCase: DeleteAvatarUseCase,
+    private readonly deleteAvatarUseCase: IDeleteAvatarUseCase,
   ) {}
 
   async getProfile(userId: string) {
     return this.getProfileUseCase.execute({ userId });
   }
 
-  async updateProfile(data: {
-    userId: string;
-    firstName?: string;
-    lastName?: string;
-    bio?: string;
-  }) {
+  async updateProfile(data: { userId: string; firstName?: string; lastName?: string; bio?: string }) {
     return this.updateProfileUseCase.execute(data);
   }
 

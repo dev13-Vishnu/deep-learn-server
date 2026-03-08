@@ -8,9 +8,10 @@ import { DomainError } from '../../domain/errors/DomainError';
 import { ApplyForInstructorRequestDTO, ApplyForInstructorResponseDTO } from '../dto/instructor/ApplyForInstructor.dto';
 import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
 import { IdGeneratorPort } from '../ports/IdGeneratorPort';
+import { IApplyForInstructorUseCase } from '../ports/inbound/instructor/IApplyForInstructorUseCase';
 
 @injectable()
-export class ApplyForInstructorUseCase {
+export class ApplyForInstructorUseCase implements IApplyForInstructorUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort,

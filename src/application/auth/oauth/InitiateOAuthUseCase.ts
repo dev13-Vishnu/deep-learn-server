@@ -5,6 +5,7 @@ import { OAuthStateStorePort } from '../../ports/OAuthStateStorePort';
 import { OAuthProviderPort } from '../../ports/OAuthProviderPort';
 import { OAuthProvider } from '../../../domain/entities/OAuthConnection';
 import { ApplicationError } from '../../../shared/errors/ApplicationError';
+import { IInitiateOAuthUseCase } from '../../ports/inbound/auth/oauth/IInitiateOAuthUseCase';
 
 interface InitiateOAuthOutput {
   redirectUrl: string;
@@ -12,7 +13,7 @@ interface InitiateOAuthOutput {
 }
 
 @injectable()
-export class InitiateOAuthUseCase {
+export class InitiateOAuthUseCase implements IInitiateOAuthUseCase {
   constructor(
     @inject(TYPES.OAuthStateStorePort)
     private readonly stateStore: OAuthStateStorePort,

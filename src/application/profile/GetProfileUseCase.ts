@@ -3,9 +3,10 @@ import { TYPES } from '../../shared/di/types';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { UserReaderPort } from '../ports/UserReaderPort';
 import { GetProfileRequestDTO, GetProfileResponseDTO } from '../dto/profile/GetProfile.dto';
+import { IGetProfileUseCase } from '../ports/inbound/profile/IGetProfileUseCase';
 
 @injectable()
-export class GetProfileUseCase {
+export class GetProfileUseCase implements IGetProfileUseCase {
   constructor(
     @inject(TYPES.UserReaderPort)
     private readonly userReader: UserReaderPort,

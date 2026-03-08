@@ -9,9 +9,10 @@ import {
 } from '../dto/course/Chapter.dto';
 import { IdGeneratorPort } from '../ports/IdGeneratorPort';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IAddChapterUseCase } from '../ports/inbound/course/IAddChapterUseCase';
 
 @injectable()
-export class AddChapterUseCase {
+export class AddChapterUseCase implements IAddChapterUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort,
