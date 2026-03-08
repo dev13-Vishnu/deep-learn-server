@@ -26,7 +26,7 @@ import { IConfirmVideoUploadUseCase } from '../../application/ports/inbound/cour
 import { IListPublicCoursesUseCase }  from '../../application/ports/inbound/course/IListPublicCoursesUseCase';
 import { IGetPublicCourseUseCase }    from '../../application/ports/inbound/course/IGetPublicCourseUseCase';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
-import { CourseCategory, CourseLevel, CourseStatus } from '../../domain/entities/Course';
+import { CourseCategory, CourseLevel, CourseStatus } from '../../application/dto/course/CourseEnums';
 import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
 
 @injectable()

@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify';
 import { HttpRequest, HttpResponse } from './HttpContext';
 import { CourseController } from '../controllers/CourseController';
 
-import { CourseCategory, CourseLevel, CourseStatus } from '../../domain/entities/Course';
+import { CourseCategory, CourseLevel, CourseStatus } from '../../application/dto/course/CourseEnums';
 import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
 import { PRESENTATION_TYPES } from '../di/presentationTypes';
 
