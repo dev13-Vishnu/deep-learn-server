@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { OAuthProviderPort, OAuthUserProfile } from '../../application/ports/OAuthProviderPort';
 import { OAuthProvider } from '../../domain/entities/OAuthConnection';
-import { AppError } from '../../shared/errors/AppError';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 export interface ProviderEndpoints {
   authorizationUrl: string;
@@ -61,10 +61,7 @@ export abstract class BaseOAuthAdapter implements OAuthProviderPort {
 
       return response.data.access_token;
     } catch (error) {
-      throw new AppError(
-        `Failed to exchange authorization code with ${this.providerName}`,
-        502
-      );
+    throw new ApplicationError('OAUTH_TOKEN_EXCHANGE_FAILED', `Failed to exchange authorization code with ${this.providerName}`);
     }
   }
 
@@ -78,10 +75,7 @@ export abstract class BaseOAuthAdapter implements OAuthProviderPort {
 
       return response.data;
     } catch (error) {
-      throw new AppError(
-        `Failed to fetch user profile from ${this.providerName}`,
-        502
-      );
+      throw new ApplicationError('OAUTH_PROFILE_FETCH_FAILED', `Failed to fetch user profile from ${this.providerName}`);
     }
   }
 

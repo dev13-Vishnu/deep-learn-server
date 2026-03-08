@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 import { TokenPayload, TokenServicePort } from "../../application/ports/TokenServicePort";
 import { env } from "../../shared/config/env";
-import { AppError } from "../../shared/errors/AppError";
+import { ApplicationError } from "../../shared/errors/ApplicationError";
 
 @injectable()
 export class JwtTokenService implements TokenServicePort {
@@ -12,7 +12,7 @@ export class JwtTokenService implements TokenServicePort {
     const secret = env.jwtSecret
 
     if(!secret) {
-      throw new AppError('JWT access secret not configured', 500);
+      throw new ApplicationError('CONFIGURATION_ERROR', 'JWT access secret not configured');
     }
 
     return jwt.sign(payload,secret,{
@@ -24,13 +24,13 @@ export class JwtTokenService implements TokenServicePort {
       const secret = env.jwtSecret;
 
       if(!secret) {
-        throw new AppError('JWT access secret not configure', 500);
+        throw new ApplicationError('CONFIGURATION_ERROR', 'JWT access secret not configured');
       }
 
       try {
         return jwt.verify(token, secret) as TokenPayload;
       } catch  {
-        throw new AppError('Invalid or expired access token', 401);
+        throw new ApplicationError('TOKEN_INVALID', 'Invalid or expired access token');
       }
   }
 

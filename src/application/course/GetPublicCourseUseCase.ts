@@ -1,12 +1,12 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   GetPublicCourseRequestDTO,
   GetPublicCourseResponseDTO,
 } from '../dto/course/GetPublicCourse.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 @injectable()
 export class GetPublicCourseUseCase {
@@ -19,7 +19,7 @@ export class GetPublicCourseUseCase {
     const course = await this.courseRepository.findPublishedById(dto.courseId);
 
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     return {

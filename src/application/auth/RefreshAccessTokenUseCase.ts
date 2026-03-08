@@ -1,9 +1,8 @@
 import { injectable, inject } from 'inversify';
-
 import { TYPES } from '../../shared/di/types';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
 import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 
@@ -12,13 +11,10 @@ export class RefreshAccessTokenUseCase {
   constructor(
     @inject(TYPES.RefreshTokenRepositoryPort)
     private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
-
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
-
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,
-
     @inject(TYPES.CreateRefreshTokenPort)
     private readonly createRefreshTokenPort: CreateRefreshTokenPort,
   ) {}
@@ -28,37 +24,29 @@ export class RefreshAccessTokenUseCase {
     refreshToken: string;
     refreshTokenExpiresAt: Date;
   }> {
-    const tokenHash = this.tokenService.hashToken(plainToken);
-
-    const existingToken =
-      await this.refreshTokenRepository.findByHash(tokenHash);
+    const tokenHash     = this.tokenService.hashToken(plainToken);
+    const existingToken = await this.refreshTokenRepository.findByHash(tokenHash);
 
     if (!existingToken) {
-      throw new AppError('Invalid refresh token', 401);
+      throw new ApplicationError('TOKEN_INVALID', 'Invalid refresh token');
     }
-
     if (existingToken.expiresAt.getTime() < Date.now()) {
       await this.refreshTokenRepository.revoke(tokenHash);
-      throw new AppError('Refresh token expired', 401);
+      throw new ApplicationError('TOKEN_EXPIRED', 'Refresh token expired');
     }
 
     const user = await this.userRepository.findById(existingToken.userId);
-
     if (!user || !user.id) {
       await this.refreshTokenRepository.revoke(tokenHash);
-      throw new AppError('User not found', 401);
+      throw new ApplicationError('USER_NOT_FOUND', 'User not found');
     }
 
-    // Revoke old refresh token
     await this.refreshTokenRepository.revoke(tokenHash);
 
-    // Generate new access token
     const accessToken = this.tokenService.generateAccessToken({
       userId: user.id,
-      role: user.role,
+      role:   user.role,
     });
-
-    // Delegate creation of new refresh token via port
     const { token: newRefreshToken, expiresAt: refreshTokenExpiresAt } =
       await this.createRefreshTokenPort.execute(user.id);
 

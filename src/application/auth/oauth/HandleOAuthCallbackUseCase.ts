@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../../shared/di/types';
-import { AppError } from '../../../shared/errors/AppError';
+import { ApplicationError } from '../../../shared/errors/ApplicationError';
 import { OAuthStateStorePort } from '../../ports/OAuthStateStorePort';
 import { OAuthConnectionRepositoryPort } from '../../ports/OAuthConnectionRepositoryPort';
 import { OAuthProviderPort } from '../../ports/OAuthProviderPort';
@@ -13,19 +13,15 @@ import { UserRole } from '../../../domain/entities/UserRole';
 
 interface HandleOAuthCallbackInput {
   provider: OAuthProvider;
-  code: string;
-  state: string;
+  code:     string;
+  state:    string;
 }
 
 interface HandleOAuthCallbackOutput {
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
-  };
-  accessToken: string;
+  user: { id: string; email: string; role: UserRole };
+  accessToken:  string;
   refreshToken: string;
-  isNewUser: boolean;
+  isNewUser:    boolean;
 }
 
 @injectable()
@@ -33,22 +29,16 @@ export class HandleOAuthCallbackUseCase {
   constructor(
     @inject(TYPES.OAuthStateStorePort)
     private readonly stateStore: OAuthStateStorePort,
-
     @inject(TYPES.OAuthProviderRegistry)
     private readonly providerRegistry: Map<OAuthProvider, OAuthProviderPort>,
-
     @inject(TYPES.OAuthConnectionRepositoryPort)
     private readonly oauthConnectionRepo: OAuthConnectionRepositoryPort,
-
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,
-
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
-
-    // FIX #4: Inject via port symbol, typed as the port interface.
     @inject(TYPES.CreateRefreshTokenPort)
-    private readonly createRefreshTokenPort: CreateRefreshTokenPort
+    private readonly createRefreshTokenPort: CreateRefreshTokenPort,
   ) {}
 
   async execute(input: HandleOAuthCallbackInput): Promise<HandleOAuthCallbackOutput> {
@@ -56,35 +46,26 @@ export class HandleOAuthCallbackUseCase {
 
     const stateValid = await this.stateStore.consume(state);
     if (!stateValid) {
-      throw new AppError('OAuth state is invalid or expired. Please try again.', 400);
+      throw new ApplicationError('OAUTH_STATE_INVALID', 'OAuth state is invalid or expired. Please try again.');
     }
 
     const adapter = this.providerRegistry.get(provider);
     if (!adapter) {
-      throw new AppError(`OAuth provider "${provider}" is not configured`, 400);
+      throw new ApplicationError('OAUTH_PROVIDER_NOT_CONFIGURED', `OAuth provider "${provider}" is not configured`);
     }
 
     const profile = await adapter.exchangeCodeForProfile(code);
-
     const { user, isNewUser } = await this.findOrCreateUser(provider, profile);
 
     if (!user.id) {
-      throw new AppError('User ID not found after OAuth', 500);
+      throw new ApplicationError('INTERNAL_ERROR', 'User ID not found after OAuth');
     }
 
-    const accessToken = this.tokenService.generateAccessToken({
-      userId: user.id,
-      role: user.role,
-    });
-
+    const accessToken = this.tokenService.generateAccessToken({ userId: user.id, role: user.role });
     const { token: refreshToken } = await this.createRefreshTokenPort.execute(user.id);
 
     return {
-      user: {
-        id: user.id,
-        email: user.email.getValue(),
-        role: user.role,
-      },
+      user: { id: user.id, email: user.email.getValue(), role: user.role },
       accessToken,
       refreshToken,
       isNewUser,
@@ -93,40 +74,29 @@ export class HandleOAuthCallbackUseCase {
 
   private async findOrCreateUser(
     provider: OAuthProvider,
-    profile: { providerId: string; email: string; name: string; avatarUrl?: string }
+    profile:  { providerId: string; email: string; name: string; avatarUrl?: string }
   ) {
-    const existingConnection = await this.oauthConnectionRepo.findByProvider(
-      provider,
-      profile.providerId
-    );
+    const existingConnection = await this.oauthConnectionRepo.findByProvider(provider, profile.providerId);
 
     if (existingConnection) {
       const user = await this.userRepo.findById(existingConnection.userId);
       if (!user) {
-        throw new AppError('Linked user account not found', 404);
+        throw new ApplicationError('USER_NOT_FOUND', 'Linked user account not found');
       }
       return { user, isNewUser: false };
     }
 
-    const email = new Email(profile.email);
+    const email        = new Email(profile.email);
     const existingUser = await this.userRepo.findByEmail(email);
 
     if (existingUser) {
-      if (!existingUser.id) throw new AppError('User ID not found', 500);
-
+      if (!existingUser.id) {
+        throw new ApplicationError('INTERNAL_ERROR', 'User ID not found');
+      }
       await this.oauthConnectionRepo.create(
-        new OAuthConnection(
-          undefined,
-          existingUser.id,
-          provider,
-          profile.providerId,
-          profile.email,
-          profile.name,
-          profile.avatarUrl,
-          new Date()
-        )
+        new OAuthConnection(undefined, existingUser.id, provider, profile.providerId,
+          profile.email, profile.name, profile.avatarUrl, new Date())
       );
-
       return { user: existingUser, isNewUser: false };
     }
 
@@ -134,29 +104,18 @@ export class HandleOAuthCallbackUseCase {
     const lastName = rest.join(' ') || undefined;
 
     const newUser = await this.userRepo.createOAuthUser({
-      email: profile.email,
-      firstName,
-      lastName,
-      avatar: profile.avatarUrl,
-      provider,
-      providerId: profile.providerId,
+      email: profile.email, firstName, lastName,
+      avatar: profile.avatarUrl, provider, providerId: profile.providerId,
     });
 
-    if (!newUser.id) throw new AppError('Failed to create user', 500);
+    if (!newUser.id) {
+      throw new ApplicationError('INTERNAL_ERROR', 'Failed to create user');
+    }
 
     await this.oauthConnectionRepo.create(
-      new OAuthConnection(
-        undefined,
-        newUser.id,
-        provider,
-        profile.providerId,
-        profile.email,
-        profile.name,
-        profile.avatarUrl,
-        new Date()
-      )
+      new OAuthConnection(undefined, newUser.id, provider, profile.providerId,
+        profile.email, profile.name, profile.avatarUrl, new Date())
     );
-
     return { user: newUser, isNewUser: true };
   }
 }

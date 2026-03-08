@@ -1,38 +1,29 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { AppError } from '../../shared/errors/AppError';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { UserReaderPort } from '../ports/UserReaderPort';
-import {
-  GetProfileRequestDTO,
-  GetProfileResponseDTO,
-} from '../dto/profile/GetProfile.dto';
+import { GetProfileRequestDTO, GetProfileResponseDTO } from '../dto/profile/GetProfile.dto';
 
 @injectable()
 export class GetProfileUseCase {
   constructor(
     @inject(TYPES.UserReaderPort)
-    private readonly userReader: UserReaderPort
+    private readonly userReader: UserReaderPort,
   ) {}
 
   async execute(request: GetProfileRequestDTO): Promise<GetProfileResponseDTO> {
     const user = await this.userReader.findById(request.userId);
-
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
-
-    if (!user.id) {
-      throw new AppError('User ID not found', 500);
-    }
+    if (!user)    { throw new ApplicationError('USER_NOT_FOUND',  'User not found'); }
+    if (!user.id) { throw new ApplicationError('INTERNAL_ERROR', 'User ID not found'); }
 
     return {
-      id: user.id,
-      email: user.email.getValue(),
+      id:        user.id,
+      email:     user.email.getValue(),
       firstName: user.firstName,
-      lastName: user.lastName,
+      lastName:  user.lastName,
       avatarUrl: user.avatar,
-      bio: user.bio,
-      role: user.role,
+      bio:       user.bio,
+      role:      user.role,
     };
   }
 }

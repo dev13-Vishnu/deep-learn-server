@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import { TYPES } from '../../shared/di/types';
 import { RedisClientPort } from '../../application/ports/RedisClientPort';
 import { EmailServicePort } from '../../application/ports/EmailServicePort';
-import { AppError } from '../../shared/errors/AppError';
 import { OtpServicePort } from '../../application/ports/OtpServicePort';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 type OtpPurpose = 'signup' | 'forgot-password';
 
@@ -54,20 +54,20 @@ export class RedisOtpService implements OtpServicePort {
     const raw = await this.redis.get(this.key(email, purpose));
 
     if (!raw) {
-      throw new AppError('OTP expired or not found', 400);
+      throw new ApplicationError('OTP_EXPIRED', 'OTP expired or not found');
     }
 
     const entry: CachedOtp = JSON.parse(raw);
 
     if (entry.attempts >= MAX_ATTEMPTS) {
       await this.redis.del(this.key(email, purpose));
-      throw new AppError('Too many failed attempts. Please request a new OTP', 429);
+      throw new ApplicationError('OTP_TOO_MANY_ATTEMPTS', 'Too many failed attempts. Please request a new OTP');
     }
 
     if (entry.hash !== this.hashOtp(otp)) {
       entry.attempts += 1;
       await this.redis.setEx(this.key(email, purpose), OTP_TTL_SECONDS, JSON.stringify(entry));
-      throw new AppError('Invalid OTP', 400);
+      throw new ApplicationError('OTP_INVALID', 'Invalid OTP');
     }
 
     await this.redis.del(this.key(email, purpose));

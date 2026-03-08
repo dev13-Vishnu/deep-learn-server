@@ -2,12 +2,12 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
-import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
 import {
   GetVideoUploadUrlRequestDTO,
   GetVideoUploadUrlResponseDTO,
 } from '../dto/course/Video.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 const ALLOWED_VIDEO_MIME_TYPES = [
   'video/mp4',
@@ -32,19 +32,16 @@ export class GetVideoUploadUrlUseCase {
   async execute(dto: GetVideoUploadUrlRequestDTO): Promise<GetVideoUploadUrlResponseDTO> {
     // 1. Validate mime type + size before touching the DB
     if (!ALLOWED_VIDEO_MIME_TYPES.includes(dto.mimeType)) {
-      throw new AppError(
-        `Unsupported video format. Allowed: ${ALLOWED_VIDEO_MIME_TYPES.join(', ')}`,
-        400
-      );
+      throw new ApplicationError('VALIDATION_ERROR', `Unsupported video format. Allowed: ${ALLOWED_VIDEO_MIME_TYPES.join(', ')}`);
     }
     if (dto.size > MAX_VIDEO_SIZE_BYTES) {
-      throw new AppError('Video file cannot exceed 2 GB', 400);
+      throw new ApplicationError('VALIDATION_ERROR', 'Video file cannot exceed 2 GB');
     }
 
     // 2. Load course (ownership verified via findByIdAndTutor)
     const course = await this.courseRepository.findByIdAndTutor(dto.courseId, dto.tutorId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     // 3. Build organised S3 key
@@ -65,7 +62,7 @@ export class GetVideoUploadUrlUseCase {
       });
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }

@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import nodemailer, { Transporter } from 'nodemailer';
 import { EmailServicePort } from '../../application/ports/EmailServicePort';
-import { AppError } from '../../shared/errors/AppError';
 import { env } from '../../shared/config/env';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 @injectable()
 export class NodemailerEmailService implements EmailServicePort {
@@ -31,7 +31,7 @@ export class NodemailerEmailService implements EmailServicePort {
         `,
       });
     } catch {
-      throw new AppError('Failed to send OTP email', 500);
+     throw new ApplicationError('EMAIL_SEND_FAILED', 'Failed to send OTP email');
     }
   }
 }

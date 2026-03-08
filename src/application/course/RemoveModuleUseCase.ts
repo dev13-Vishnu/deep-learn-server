@@ -1,12 +1,12 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
 import {
   RemoveModuleRequestDTO,
   RemoveModuleResponseDTO,
 } from '../dto/course/Module.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 @injectable()
 export class RemoveModuleUseCase {
@@ -18,21 +18,18 @@ export class RemoveModuleUseCase {
   async execute(dto: RemoveModuleRequestDTO): Promise<RemoveModuleResponseDTO> {
     const course = await this.courseRepository.findByIdAndTutor(dto.courseId, dto.tutorId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     if (course.enrollmentCount > 0) {
-      throw new AppError(
-        'Cannot remove modules from a course with enrolled students',
-        409
-      );
+      throw new ApplicationError('COURSE_HAS_ENROLLMENTS', 'Cannot delete/remove a course with enrolled students');
     }
 
     try {
       course.removeModule(dto.moduleId);
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }
