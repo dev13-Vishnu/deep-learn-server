@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import { SignOptions } from 'jsonwebtoken';
 
+type TokenExpiry = string | number;
 dotenv.config({
   path: `.env.${process.env.NODE_ENV || 'development'}`
 });
@@ -43,7 +43,7 @@ export const env = {
   // Auth / Security
   jwtSecret: requireEnv('JWT_SECRET'),
   jwtExpiresIn: (process.env.JWT_EXPIRES_IN ??
-    '1d') as SignOptions['expiresIn'],
+    '1d') as TokenExpiry,
 
   //nodemailer
   deepLearnEmail: requireEnv('DEEP_LEARN_EMAIL'),

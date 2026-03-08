@@ -81,6 +81,12 @@ import { RedisClientPort }            from '../../application/ports/RedisClientP
 import { EmailServicePort }           from '../../application/ports/EmailServicePort';
 import { CryptoIdGenerator } from '../utils/CryptoIdGenerator';
 import { AppLoggerAdapter } from '../logging/AppLoggerAdapter';
+import { JwtConfig } from '../../shared/config/types/JwtConfig';
+import { EmailConfig } from '../../shared/config/types/EmailConfig';
+import { StorageConfig } from '../../shared/config/types/StorageConfig';
+import { storageConfig } from '../../shared/config/storage.config';
+import { env } from '../../shared/config/env';
+
 
 
 export const container = new Container();
@@ -96,6 +102,23 @@ container.bind(TYPES.CourseRepositoryPort).to(MongoCourseRepository);
 container.bind(TYPES.UserReaderPort).to(MongoUserRepository);
 container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
 
+// Infrastructure config values 
+container.bind<JwtConfig>(TYPES.JwtConfig).toConstantValue({
+  secret:    env.jwtSecret,
+  expiresIn: env.jwtExpiresIn,
+});
+
+container.bind<EmailConfig>(TYPES.EmailConfig).toConstantValue({
+  user:     env.deepLearnEmail,
+  password: env.deepLearnPassword,
+});
+
+container.bind<StorageConfig>(TYPES.StorageConfig).toConstantValue({
+  region:          storageConfig.aws.region,
+  accessKeyId:     storageConfig.aws.accessKeyId,
+  secretAccessKey: storageConfig.aws.secretAccessKey,
+  bucketName:      storageConfig.aws.bucketName,
+});
 //  Services
 
 container.bind(TYPES.PasswordHasherPort).to(BcryptPasswordHasher);

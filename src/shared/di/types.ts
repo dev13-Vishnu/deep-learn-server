@@ -18,7 +18,7 @@ export const TYPES = {
 
   CreateRefreshTokenPort: Symbol.for('CreateRefreshTokenPort'),
 
-    LoggerPort: Symbol.for('LoggerPort'),
+  LoggerPort: Symbol.for('LoggerPort'),
 
   // Use Cases — Auth
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
@@ -86,6 +86,10 @@ export const TYPES = {
 
   // Storage
   StorageServicePort: Symbol.for('StorageServicePort'),
+
+  JwtConfig:     Symbol.for('JwtConfig'),
+  EmailConfig:   Symbol.for('EmailConfig'),
+  StorageConfig: Symbol.for('StorageConfig'),
 
   // Ports — split interfaces
   UserReaderPort: Symbol.for('UserReaderPort'),
