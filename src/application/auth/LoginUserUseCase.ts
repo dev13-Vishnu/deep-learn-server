@@ -6,9 +6,9 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
-import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 import { LoginUserRequestDTO, LoginUserResponseDTO } from '../dto/auth/LoginUser.dto';
 import { ILoginUserUseCase } from '../ports/inbound/auth/ILoginUserUseCase';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 
 @injectable()
 export class LoginUserUseCase implements ILoginUserUseCase {
@@ -19,8 +19,8 @@ export class LoginUserUseCase implements ILoginUserUseCase {
     private readonly passwordHasher: PasswordHasherPort,
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
-    @inject(TYPES.CreateRefreshTokenPort)
-    private readonly createRefreshTokenPort: CreateRefreshTokenPort,
+    @inject(TYPES.RefreshTokenService)
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async execute(input: LoginUserRequestDTO): Promise<LoginUserResponseDTO> {
@@ -55,7 +55,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
       userId: user.id,
       role:   user.role,
     });
-    const { token: refreshToken } = await this.createRefreshTokenPort.execute(user.id);
+    const { token: refreshToken } = await this.refreshTokenService.create(user.id);
 
     return {
       user: {

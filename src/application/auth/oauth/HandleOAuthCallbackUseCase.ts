@@ -6,11 +6,11 @@ import { OAuthProviderRegistryPort } from '../../ports/OAuthProviderRegistryPort
 import { OAuthConnectionRepositoryPort } from '../../ports/OAuthConnectionRepositoryPort';
 import { UserRepositoryPort } from '../../ports/UserRepositoryPort';
 import { TokenServicePort } from '../../ports/TokenServicePort';
-import { CreateRefreshTokenPort } from '../../ports/CreateRefreshTokenPort';
 import { OAuthConnection, OAuthProvider } from '../../../domain/entities/OAuthConnection';
 import { Email } from '../../../domain/value-objects/Email';
 import { UserRole } from '../../../domain/entities/UserRole';
 import { IHandleOAuthCallbackUseCase } from '../../ports/inbound/auth/oauth/IHandleOAuthCallbackUseCase';
+import { RefreshTokenService } from '../../services/RefreshTokenService';
 
 interface HandleOAuthCallbackInput {
   provider: OAuthProvider;
@@ -47,8 +47,8 @@ export class HandleOAuthCallbackUseCase implements IHandleOAuthCallbackUseCase {
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
 
-    @inject(TYPES.CreateRefreshTokenPort)
-    private readonly createRefreshTokenPort: CreateRefreshTokenPort,
+    @inject(TYPES.RefreshTokenService)
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async execute(input: HandleOAuthCallbackInput): Promise<HandleOAuthCallbackOutput> {
@@ -83,7 +83,8 @@ export class HandleOAuthCallbackUseCase implements IHandleOAuthCallbackUseCase {
       role:   user.role,
     });
 
-    const { token: refreshToken } = await this.createRefreshTokenPort.execute(user.id);
+    const { token: refreshToken } = await this.refreshTokenService.create(user.id);
+
 
     return {
       user: {

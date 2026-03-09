@@ -15,8 +15,8 @@ export const TYPES = {
 
   RedisClientPort:  Symbol.for('RedisClientPort'),
   EmailServicePort: Symbol.for('EmailServicePort'),
+ RefreshTokenService:        Symbol.for('RefreshTokenService'),
 
-  CreateRefreshTokenPort: Symbol.for('CreateRefreshTokenPort'),
 
   LoggerPort: Symbol.for('LoggerPort'),
 
@@ -28,7 +28,6 @@ export const TYPES = {
   VerifySignupOtpUseCase: Symbol.for('VerifySignupOtpUseCase'),
   RequestPasswordResetOtpUseCase: Symbol.for('RequestPasswordResetOtpUseCase'),
   VerifyPasswordResetOtpUseCase: Symbol.for('VerifyPasswordResetOtpUseCase'),
-  CreateRefreshTokenUseCase: Symbol.for('CreateRefreshTokenUseCase'),
   RefreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
   RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
   SignupUseCase: Symbol.for('SignupUseCase'),

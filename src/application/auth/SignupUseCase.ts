@@ -5,13 +5,13 @@ import { UserWriterPort } from '../ports/UserWriterPort';
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { OtpServicePort } from '../ports/OtpServicePort';
-import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 import { Password } from '../../domain/value-objects/Password';
 import { Email } from '../../domain/value-objects/Email';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { User } from '../../domain/entities/User';
 import { UserRole } from '../../domain/entities/UserRole';
 import { ISignupUseCase } from '../ports/inbound/auth/ISignupUseCase';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 
 interface SignupInput {
   email:      string;
@@ -40,8 +40,8 @@ export class SignupUseCase implements ISignupUseCase {
     private readonly tokenService: TokenServicePort,
     @inject(TYPES.OtpServicePort)
     private readonly otpService: OtpServicePort,
-    @inject(TYPES.CreateRefreshTokenPort)
-    private readonly createRefreshTokenPort: CreateRefreshTokenPort,
+    @inject(TYPES.RefreshTokenService)
+     private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async execute(input: SignupInput): Promise<SignupOutput> {
@@ -71,7 +71,7 @@ export class SignupUseCase implements ISignupUseCase {
       userId: savedUser.id,
       role:   savedUser.role,
     });
-    const { token: refreshToken } = await this.createRefreshTokenPort.execute(savedUser.id);
+    const { token: refreshToken } = await this.refreshTokenService.create(savedUser.id);
 
     return {
       user: {

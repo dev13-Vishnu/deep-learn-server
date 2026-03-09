@@ -23,7 +23,6 @@ import { RequestSignupOtpUseCase } from '../../application/auth/RequestSignupOtp
 import { VerifySignupOtpUseCase } from '../../application/auth/VerifySignupOtpUseCase';
 import { RequestPasswordResetOtpUseCase } from '../../application/auth/RequestPasswordResetOtpUseCase';
 import { VerifyPasswordResetOtpUseCase } from '../../application/auth/VerifyPasswordResetOtpUseCase';
-import { CreateRefreshTokenUseCase } from '../../application/auth/CreateRefreshTokenUseCase';
 import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
 import { SignupUseCase } from '../../application/auth/SignupUseCase';
@@ -86,6 +85,7 @@ import { EmailConfig } from '../../shared/config/types/EmailConfig';
 import { StorageConfig } from '../../shared/config/types/StorageConfig';
 import { storageConfig } from '../../shared/config/storage.config';
 import { env } from '../../shared/config/env';
+import { RefreshTokenService } from '../../application/services/RefreshTokenService';
 
 
 
@@ -139,13 +139,11 @@ container.bind(TYPES.RequestSignupOtpUseCase).to(RequestSignupOtpUseCase);
 container.bind(TYPES.VerifySignupOtpUseCase).to(VerifySignupOtpUseCase);
 container.bind(TYPES.RequestPasswordResetOtpUseCase).to(RequestPasswordResetOtpUseCase);
 container.bind(TYPES.VerifyPasswordResetOtpUseCase).to(VerifyPasswordResetOtpUseCase);
-container.bind(TYPES.CreateRefreshTokenUseCase).to(CreateRefreshTokenUseCase);
 container.bind(TYPES.RefreshAccessTokenUseCase).to(RefreshAccessTokenUseCase);
 container.bind(TYPES.RevokeRefreshTokenUseCase).to(RevokeRefreshTokenUseCase);
 container.bind(TYPES.SignupUseCase).to(SignupUseCase);
 
-container.bind(TYPES.CreateRefreshTokenPort).to(CreateRefreshTokenUseCase);
-
+container.bind(TYPES.RefreshTokenService).to(RefreshTokenService);
 //  Use Cases — Instructor 
 
 container.bind(TYPES.ApplyForInstructorUseCase).to(ApplyForInstructorUseCase);

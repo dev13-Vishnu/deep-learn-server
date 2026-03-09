@@ -4,8 +4,8 @@ import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
-import { CreateRefreshTokenPort } from '../ports/CreateRefreshTokenPort';
 import { IRefreshAccessTokenUseCase } from '../ports/inbound/auth/IRefreshAccessTokenUseCase';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 
 @injectable()
 export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
@@ -16,8 +16,8 @@ export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
     private readonly tokenService: TokenServicePort,
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,
-    @inject(TYPES.CreateRefreshTokenPort)
-    private readonly createRefreshTokenPort: CreateRefreshTokenPort,
+    @inject(TYPES.RefreshTokenService)
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async execute(plainToken: string): Promise<{
@@ -49,7 +49,7 @@ export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
       role:   user.role,
     });
     const { token: newRefreshToken, expiresAt: refreshTokenExpiresAt } =
-      await this.createRefreshTokenPort.execute(user.id);
+    await this.refreshTokenService.create(user.id);
 
     return { accessToken, refreshToken: newRefreshToken, refreshTokenExpiresAt };
   }
