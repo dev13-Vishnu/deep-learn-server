@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { IInitiateOAuthUseCase }       from '../../application/ports/inbound/auth/oauth/IInitiateOAuthUseCase';
 import { IHandleOAuthCallbackUseCase } from '../../application/ports/inbound/auth/oauth/IHandleOAuthCallbackUseCase';
-import { AppError } from '../../shared/errors/AppError';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 
 @injectable()
 export class OAuthController {
@@ -21,7 +21,7 @@ export class OAuthController {
 
   async callback(provider: string, code: string, state: string) {
     if (!code || !state) {
-      throw new AppError('Missing OAuth callback parameters', 400);
+      throw new ApplicationError('VALIDATION_ERROR', 'Missing OAuth callback parameters');
     }
     return this.handleOAuthCallbackUseCase.execute({ provider: provider as any, code, state });
   }
