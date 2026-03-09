@@ -68,4 +68,8 @@ export class S3StorageService implements StorageServicePort {
   getPublicUrl(s3Key: string): string {
     return `https://${this.config.bucketName}.s3.${this.config.region}.amazonaws.com/${s3Key}`;
   }
+  generateVideoKey(courseId: string, chapterId: string, filename: string): string {
+  const sanitised = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+  return `videos/${courseId}/${chapterId}/${Date.now()}-${sanitised}`;
+}
 }

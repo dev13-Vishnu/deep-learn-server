@@ -5,4 +5,5 @@ export interface StorageServicePort {
   deleteFile(fileUrl: string): Promise<void>;
   getPresignedUploadUrl(s3Key: string, mimeType: string, expiresIn?: number): Promise<string>;
   getPublicUrl(s3Key: string): string;
+  generateVideoKey(courseId: string, chapterId: string, filename: string): string;
 }

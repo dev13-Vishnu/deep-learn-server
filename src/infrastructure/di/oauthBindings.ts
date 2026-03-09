@@ -18,6 +18,8 @@ import { RedisOAuthStateStore } from '../redis/RedisOAuthStateStore';
 // Use Cases
 import { InitiateOAuthUseCase } from '../../application/auth/oauth/InitiateOAuthUseCase';
 import { HandleOAuthCallbackUseCase } from '../../application/auth/oauth/HandleOAuthCallbackUseCase';
+import { OAuthProviderRegistry } from '../oauth/OAuthProviderRegistry';
+import { OAuthProviderRegistryPort } from '../../application/ports/OAuthProviderRegistryPort';
 
 // Controller
 
@@ -52,9 +54,10 @@ export function bindOAuthDependencies(container: Container): void {
     // ['microsoft', microsoftAdapter],
   ]);
 
-  container
-    .bind<Map<OAuthProvider, OAuthProviderPort>>(TYPES.OAuthProviderRegistry)
-    .toConstantValue(providerRegistry);
+ container
+    .bind<OAuthProviderRegistryPort>(TYPES.OAuthProviderRegistry)
+    .toConstantValue(new OAuthProviderRegistry(providerRegistry));
+
 
   //  Repository + State Store
   container
