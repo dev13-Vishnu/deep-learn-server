@@ -1,6 +1,8 @@
+import { UserRole } from '../../domain/entities/UserRole';
+
 export interface TokenPayload {
-    userId: string; 
-    role: number;
+  userId: string;
+  role:   UserRole;
 }
 
 export interface TokenServicePort {
