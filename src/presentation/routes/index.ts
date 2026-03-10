@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import healthRoutes from './health.routes';
 
-const router = Router();
+export function createApiRouter(
+  publicCourseRouter:     Router,
+  instructorCourseRouter: Router,
+): Router {
+  const router = Router();
 
-// Register feature routes here
-router.use('/health', healthRoutes);
+  router.use('/health',     healthRoutes);
+  router.use('/courses',    publicCourseRouter);
+  router.use('/instructor', instructorCourseRouter);
 
-export default router;
+  return router;
+}

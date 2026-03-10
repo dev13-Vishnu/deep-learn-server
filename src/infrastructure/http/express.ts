@@ -7,9 +7,8 @@ export interface AppRouters {
   authRouter:       Router;
   oauthRouter:      Router;
   profileRouter:    Router;
-  instructorRouter: Router;
-  courseRouter:     Router;
-  apiRouter:        Router;
+  instructorRouter: Router; 
+  apiRouter:        Router; 
 }
 
 export function createExpressApp(
@@ -27,7 +26,6 @@ export function createExpressApp(
   app.use('/auth/oauth', routers.oauthRouter);
   app.use('/profile',    routers.profileRouter);
   app.use('/instructor', routers.instructorRouter);
-  app.use('/courses',    routers.courseRouter);
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Route not found', path: req.originalUrl });
