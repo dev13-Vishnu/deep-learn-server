@@ -9,9 +9,10 @@ import {
 } from '../dto/instructor/ListInstructorApplications.dto';
 import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
 import { UserMapper } from '../mappers/UserMapper';
+import { IListInstructorApplicationsUseCase } from '../ports/inbound/instructor/IListInstructorApplicationsUseCase';
 
 @injectable()
-export class ListInstructorApplicationsUseCase {
+export class ListInstructorApplicationsUseCase implements IListInstructorApplicationsUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort,

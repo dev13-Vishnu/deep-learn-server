@@ -1,16 +1,17 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   ConfirmVideoUploadRequestDTO,
   ConfirmVideoUploadResponseDTO,
 } from '../dto/course/Video.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IConfirmVideoUploadUseCase } from '../ports/inbound/course/IConfirmVideoUploadUseCase';
 
 @injectable()
-export class ConfirmVideoUploadUseCase {
+export class ConfirmVideoUploadUseCase implements IConfirmVideoUploadUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort
@@ -18,12 +19,12 @@ export class ConfirmVideoUploadUseCase {
 
   async execute(dto: ConfirmVideoUploadRequestDTO): Promise<ConfirmVideoUploadResponseDTO> {
     if (dto.duration <= 0) {
-      throw new AppError('Video duration must be greater than 0', 400);
+      throw new ApplicationError('VALIDATION_ERROR', 'Video duration must be greater than 0');
     }
 
     const course = await this.courseRepository.findByIdAndTutor(dto.courseId, dto.tutorId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     // confirmVideo → sets status 'ready', stores duration, triggers recalculateDurations()
@@ -31,7 +32,7 @@ export class ConfirmVideoUploadUseCase {
       course.confirmVideo(dto.moduleId, dto.lessonId, dto.chapterId, dto.duration);
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }

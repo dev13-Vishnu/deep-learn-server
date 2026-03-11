@@ -1,16 +1,17 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   UpdateChapterRequestDTO,
   UpdateChapterResponseDTO,
 } from '../dto/course/Chapter.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IUpdateChapterUseCase } from '../ports/inbound/course/IUpdateChapterUseCase';
 
 @injectable()
-export class UpdateChapterUseCase {
+export class UpdateChapterUseCase implements IUpdateChapterUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort
@@ -19,7 +20,7 @@ export class UpdateChapterUseCase {
   async execute(dto: UpdateChapterRequestDTO): Promise<UpdateChapterResponseDTO> {
     const course = await this.courseRepository.findByIdAndTutor(dto.courseId, dto.tutorId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     try {
@@ -31,7 +32,7 @@ export class UpdateChapterUseCase {
       });
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }

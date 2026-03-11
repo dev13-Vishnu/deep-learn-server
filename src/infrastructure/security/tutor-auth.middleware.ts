@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from './jwt-auth.middleware';
 import { AppError } from '../../shared/errors/AppError';
 import { UserRole } from '../../domain/entities/UserRole';
+import { AuthenticatedRequest } from './AuthenticatedRequest';
 
 export function tutorAuthMiddleware(
   req: Request,

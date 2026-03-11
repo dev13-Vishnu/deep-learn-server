@@ -2,15 +2,16 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { DomainError } from '../../domain/errors/DomainError';
-import { AppError } from '../../shared/errors/AppError';
 import { CourseMapper } from '../mappers/CourseMapper';
 import {
   UpdateCourseRequestDTO,
   UpdateCourseResponseDTO,
 } from '../dto/course/UpdateCourse.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IUpdateCourseUseCase } from '../ports/inbound/course/IUpdateCourseUseCase';
 
 @injectable()
-export class UpdateCourseUseCase {
+export class UpdateCourseUseCase implements IUpdateCourseUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort
@@ -19,11 +20,11 @@ export class UpdateCourseUseCase {
   async execute(dto: UpdateCourseRequestDTO): Promise<UpdateCourseResponseDTO> {
         const course = await this.courseRepository.findById(dto.courseId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
         if (course.tutorId !== dto.tutorId) {
-      throw new AppError('You do not have permission to update this course', 403);
+      throw new ApplicationError('FORBIDDEN', 'You do not have permission to update this course');
     }
 
         try {
@@ -40,7 +41,7 @@ export class UpdateCourseUseCase {
       });
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }

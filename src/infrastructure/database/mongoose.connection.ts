@@ -1,35 +1,30 @@
 import mongoose from 'mongoose';
 import { env } from '../../shared/config/env';
-import { logger } from '../../shared/utils/logger';
-import './models/user.model';
+import { LoggerPort } from '../../application/ports/LoggerPort';
+import './models';
 
+export async function connectDatabase(logger: LoggerPort): Promise<void> {
+  // Register lifecycle events here so the injected logger is in scope
+  mongoose.connection.on('connected', () => {
+    logger.info('MongoDB connection established');
+  });
+  mongoose.connection.on('disconnected', () => {
+    logger.info('MongoDB connection closed');
+  });
+  mongoose.connection.on('error', (error) => {
+    logger.error('MongoDB connection error', error);
+  });
 
-/**
- * Register MongoDB lifecycle events (call once)
- */
-mongoose.connection.on('connected', () => {
-  logger.info('MongoDB connection established (event)');
-});
-
-mongoose.connection.on('disconnected', () => {
-  logger.info('MongoDB connection closed (event)');
-});
-
-mongoose.connection.on('error', (error) => {
-  logger.error('MongoDB connection error (event)', error);
-});
-
-export async function connectDatabase() {
   try {
     await mongoose.connect(env.mongoUri);
     logger.info('MongoDB connected');
   } catch (error) {
     logger.error('MongoDB connection failed', error);
-    process.exit(1);
+    throw error;
   }
 }
 
-export async function disconnectDatabase() {
+export async function disconnectDatabase(logger: LoggerPort): Promise<void> {
   try {
     await mongoose.connection.close();
     logger.info('MongoDB disconnect initiated');

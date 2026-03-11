@@ -1,56 +1,25 @@
-import { Router } from "express";
-import { container } from "../../infrastructure/di/container";
-import { InstructorController } from "../controllers/InstructorController";
-import { TYPES } from "../../shared/di/types";
-import { jwtAuthMiddleware } from "../../infrastructure/security/jwt-auth.middleware";
+import { Router, Request, Response, RequestHandler } from 'express';
+import { InstructorHttpAdapter } from '../http/InstructorHttpAdapter';
+import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
 import { adminAuthMiddleware } from '../../infrastructure/security/admin-auth.middleware';
-import { validateRequest } from '../middlewares/validationRequest';
+import { validateRequest }     from '../middlewares/validationRequest';
 import { applyForInstructorSchema, rejectApplicationSchema } from '../validators/instructor.validators';
 
+export function createInstructorRouter(
+  instructorAdapter: InstructorHttpAdapter,
+  jwtAuthMiddleware: RequestHandler,
+): Router {
+  const router = Router();
 
-const router = Router();
+  const bind = (fn: (req: any, res: any) => Promise<void>) =>
+    (req: Request, res: Response) => fn(toHttpRequest(req), toHttpResponse(res));
 
-//Resolve controller from DI container
-const instructorController = container.get<InstructorController>(
-    TYPES.InstructorController
-);
+  router.post('/apply',  jwtAuthMiddleware, validateRequest(applyForInstructorSchema), bind(instructorAdapter.apply.bind(instructorAdapter)));
+  router.get( '/status', jwtAuthMiddleware, bind(instructorAdapter.getStatus.bind(instructorAdapter)));
 
-/* ================= INSTRUCTOR ================= */
+  router.get( '/applications',                        jwtAuthMiddleware, adminAuthMiddleware, bind(instructorAdapter.listApplications.bind(instructorAdapter)));
+  router.post('/applications/:applicationId/approve', jwtAuthMiddleware, adminAuthMiddleware, bind(instructorAdapter.approveApplication.bind(instructorAdapter)));
+  router.post('/applications/:applicationId/reject',  jwtAuthMiddleware, adminAuthMiddleware, validateRequest(rejectApplicationSchema), bind(instructorAdapter.rejectApplication.bind(instructorAdapter)));
 
-router.post(
-  '/apply',
-  jwtAuthMiddleware,
-  validateRequest(applyForInstructorSchema),
-  instructorController.apply.bind(instructorController)
-);
-
-router.get(
-  '/status',
-  jwtAuthMiddleware,
-  instructorController.getStatus.bind(instructorController)
-);
-
-
-// Admin routes (admin only)
-router.get(
-  '/applications',
-  jwtAuthMiddleware,
-  adminAuthMiddleware,
-  instructorController.listApplications.bind(instructorController)
-);
-
-router.post(
-  '/applications/:applicationId/approve',
-  jwtAuthMiddleware,
-  adminAuthMiddleware,
-  instructorController.approveApplication.bind(instructorController)
-);
-
-router.post(
-  '/applications/:applicationId/reject',
-  jwtAuthMiddleware,
-  adminAuthMiddleware,
-  validateRequest(rejectApplicationSchema),
-  instructorController.rejectApplication.bind(instructorController)
-);
-export default router;
+  return router;
+}

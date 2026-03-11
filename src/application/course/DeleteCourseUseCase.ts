@@ -1,14 +1,15 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
 import {
   DeleteCourseRequestDTO,
   DeleteCourseResponseDTO,
 } from '../dto/course/DeleteCourse.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IDeleteCourseUseCase } from '../ports/inbound/course/IDeleteCourseUseCase';
 
 @injectable()
-export class DeleteCourseUseCase {
+export class DeleteCourseUseCase implements IDeleteCourseUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort
@@ -18,20 +19,17 @@ export class DeleteCourseUseCase {
     // 1. Load course
     const course = await this.courseRepository.findById(dto.courseId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     // 2. Ownership check
     if (course.tutorId !== dto.tutorId) {
-      throw new AppError('You do not have permission to delete this course', 403);
+      throw new ApplicationError('FORBIDDEN', 'You do not have permission to delete this course');
     }
 
     // 3. Enrollment guard — cannot delete a course students have paid for
     if (course.enrollmentCount > 0) {
-      throw new AppError(
-        'Cannot delete a course with enrolled students. Archive it instead.',
-        409
-      );
+      throw new ApplicationError('COURSE_HAS_ENROLLMENTS', 'Cannot delete/remove a course with enrolled students. Archive it instead.');
     }
 
     // 4. Hard delete

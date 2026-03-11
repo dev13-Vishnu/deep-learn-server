@@ -2,9 +2,10 @@ import { injectable, inject } from 'inversify';
 import crypto from 'crypto';
 import { TYPES } from '../../../shared/di/types';
 import { OAuthStateStorePort } from '../../ports/OAuthStateStorePort';
-import { OAuthProviderPort } from '../../ports/OAuthProviderPort';
+import { OAuthProviderRegistryPort } from '../../ports/OAuthProviderRegistryPort';
 import { OAuthProvider } from '../../../domain/entities/OAuthConnection';
-import { AppError } from '../../../shared/errors/AppError';
+import { ApplicationError } from '../../../shared/errors/ApplicationError';
+import { IInitiateOAuthUseCase } from '../../ports/inbound/auth/oauth/IInitiateOAuthUseCase';
 
 interface InitiateOAuthOutput {
   redirectUrl: string;
@@ -12,24 +13,27 @@ interface InitiateOAuthOutput {
 }
 
 @injectable()
-export class InitiateOAuthUseCase {
+export class InitiateOAuthUseCase implements IInitiateOAuthUseCase {
   constructor(
     @inject(TYPES.OAuthStateStorePort)
     private readonly stateStore: OAuthStateStorePort,
 
     @inject(TYPES.OAuthProviderRegistry)
-    private readonly providerRegistry: Map<OAuthProvider, OAuthProviderPort>
+    private readonly providerRegistry: OAuthProviderRegistryPort,
   ) {}
 
   async execute(provider: OAuthProvider): Promise<InitiateOAuthOutput> {
-    const adapter = this.providerRegistry.get(provider);
+    const adapter = this.providerRegistry.getProvider(provider);
 
     if (!adapter) {
-      throw new AppError(`OAuth provider "${provider}" is not configured`, 400);
+      throw new ApplicationError(
+        'OAUTH_PROVIDER_NOT_CONFIGURED',
+        `OAuth provider "${provider}" is not configured`,
+      );
     }
 
     const state = crypto.randomBytes(32).toString('hex');
-    await this.stateStore.save(state, 600); // 10 min TTL
+    await this.stateStore.save(state, 600);
 
     const redirectUrl = adapter.getAuthorizationUrl(state);
 

@@ -2,37 +2,30 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
-import { AppError } from '../../shared/errors/AppError';
-import {
-  DeleteAvatarRequestDTO,
-  DeleteAvatarResponseDTO,
-} from '../dto/profile/DeleteAvatar.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { DeleteAvatarRequestDTO, DeleteAvatarResponseDTO } from '../dto/profile/DeleteAvatar.dto';
+import { IDeleteAvatarUseCase } from '../ports/inbound/profile/IDeleteAvatarUseCase';
 
 @injectable()
-export class DeleteAvatarUseCase {
+export class DeleteAvatarUseCase implements IDeleteAvatarUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,
-
     @inject(TYPES.StorageServicePort)
-    private readonly storageService: StorageServicePort
+    private readonly storageService: StorageServicePort,
   ) {}
 
   async execute(request: DeleteAvatarRequestDTO): Promise<DeleteAvatarResponseDTO> {
     const user = await this.userRepository.findById(request.userId);
-
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new ApplicationError('USER_NOT_FOUND', 'User not found');
     }
-
     if (!user.avatar) {
-      throw new AppError('No avatar to delete', 400);
+      throw new ApplicationError('NO_AVATAR', 'No avatar to delete');
     }
 
     await this.storageService.deleteFile(user.avatar);
-
     user.updateAvatar(null);
-
     await this.userRepository.update(user);
 
     return { message: 'Avatar deleted successfully' };

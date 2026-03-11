@@ -1,27 +1,11 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
-
-export interface InstructorStatusResult {
-  hasApplication: boolean;
-  application?: {
-    id: string;
-    status: 'pending' | 'approved' | 'rejected';
-    rejectionReason: string | null;
-    cooldownExpiresAt: Date | null;
-    bio: string;
-    experienceYears: string;
-    teachingExperience: 'yes' | 'no';
-    courseIntent: string;
-    level: 'beginner' | 'intermediate' | 'advanced';
-    language: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-}
+import { InstructorStatusResult } from '../dto/instructor/GetInstructorStatus.dto';
+import { IGetInstructorStatusUseCase } from '../ports/inbound/instructor/IGetInstructorStatusUseCase';
 
 @injectable()
-export class GetInstructorStatusUseCase {
+export class GetInstructorStatusUseCase implements IGetInstructorStatusUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort

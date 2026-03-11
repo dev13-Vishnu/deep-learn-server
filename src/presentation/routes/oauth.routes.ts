@@ -1,18 +1,15 @@
-import { Router } from 'express';
-import { container } from '../../infrastructure/di/container';
-import { TYPES } from '../../shared/di/types';
-import { OAuthController } from '../controllers/OAuthController';
+import { Router, Request, Response } from 'express';
+import { OAuthHttpAdapter } from '../http/OAuthHttpAdapter';
+import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
 
-const router = Router();
+export function createOAuthRouter(oauthAdapter: OAuthHttpAdapter): Router {
+  const router = Router();
 
-const oauthController = container.get<OAuthController>(TYPES.OAuthController);
+  const bind = (fn: (req: any, res: any) => Promise<void>) =>
+    (req: Request, res: Response) => fn(toHttpRequest(req), toHttpResponse(res));
 
-router.get('/:provider', (req, res, next) =>
-  oauthController.initiate(req, res, next)
-);
+  router.get('/:provider',          bind(oauthAdapter.initiate.bind(oauthAdapter)));
+  router.get('/:provider/callback', bind(oauthAdapter.callback.bind(oauthAdapter)));
 
-router.get('/:provider/callback', (req, res, next) =>
-  oauthController.callback(req, res, next)
-);
-
-export default router;
+  return router;
+}

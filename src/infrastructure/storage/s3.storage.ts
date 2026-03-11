@@ -4,40 +4,38 @@ import {
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { injectable } from 'inversify';
-import { storageConfig } from '../../shared/config/storage.config';
+import { injectable, inject } from 'inversify';
 import { StorageServicePort } from '../../application/ports/StorageServicePort';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
+import { StorageConfig } from '../../shared/config/types/StorageConfig';
+import { TYPES } from '../../shared/di/types';
 
 @injectable()
 export class S3StorageService implements StorageServicePort {
-  private readonly region: string;
   private readonly s3Client: S3Client;
-  private readonly bucketName: string;
 
-  constructor() {
-    this.region     = storageConfig.aws.region;
+  constructor(
+    @inject(TYPES.StorageConfig)
+    private readonly config: StorageConfig,
+  ) {
     this.s3Client = new S3Client({
-      region: storageConfig.aws.region,
+      region: config.region,
       credentials: {
-        accessKeyId: storageConfig.aws.accessKeyId,
-        secretAccessKey: storageConfig.aws.secretAccessKey,
+        accessKeyId:     config.accessKeyId,
+        secretAccessKey: config.secretAccessKey,
       },
     });
-    this.bucketName = storageConfig.aws.bucketName;
   }
 
   async uploadFile(file: UploadableFile, folder: string): Promise<string> {
     const fileName = `${folder}/${Date.now()}-${file.originalname}`;
 
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: fileName,
-      Body: file.buffer,
+    await this.s3Client.send(new PutObjectCommand({
+      Bucket:      this.config.bucketName,
+      Key:         fileName,
+      Body:        file.buffer,
       ContentType: file.mimetype,
-    });
-
-    await this.s3Client.send(command);
+    }));
 
     return this.getPublicUrl(fileName);
   }
@@ -45,37 +43,33 @@ export class S3StorageService implements StorageServicePort {
   async deleteFile(fileUrl: string): Promise<void> {
     const fileName = fileUrl.split('.com/')[1];
 
-    const command = new DeleteObjectCommand({
-      Bucket: this.bucketName,
-      Key: fileName,
-    });
-
-    await this.s3Client.send(command);
-  }
-
-  async getSignedUploadUrl(fileName: string): Promise<string> {
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: fileName,
-    });
-
-    return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+    await this.s3Client.send(new DeleteObjectCommand({
+      Bucket: this.config.bucketName,
+      Key:    fileName,
+    }));
   }
 
   async getPresignedUploadUrl(
-  s3Key: string,
-  mimeType: string,
-  expiresIn: number = 3600
-): Promise<string> {
-  const command = new PutObjectCommand({
-    Bucket:      this.bucketName,
-    Key:         s3Key,
-    ContentType: mimeType,
-  });
-  return getSignedUrl(this.s3Client, command, { expiresIn });
-}
+    s3Key:     string,
+    mimeType:  string,
+    expiresIn: number = 3600,
+  ): Promise<string> {
+    return getSignedUrl(
+      this.s3Client,
+      new PutObjectCommand({
+        Bucket:      this.config.bucketName,
+        Key:         s3Key,
+        ContentType: mimeType,
+      }),
+      { expiresIn }
+    );
+  }
 
-getPublicUrl(s3Key: string): string {
-  return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${s3Key}`;
+  getPublicUrl(s3Key: string): string {
+    return `https://${this.config.bucketName}.s3.${this.config.region}.amazonaws.com/${s3Key}`;
+  }
+  generateVideoKey(courseId: string, chapterId: string, filename: string): string {
+  const sanitised = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+  return `videos/${courseId}/${chapterId}/${Date.now()}-${sanitised}`;
 }
 }

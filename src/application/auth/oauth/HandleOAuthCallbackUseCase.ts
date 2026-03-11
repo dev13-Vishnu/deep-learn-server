@@ -1,47 +1,42 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// USE CASE: HandleOAuthCallbackUseCase
-// Shared callback logic for ALL three providers.
-// Reuses your existing CreateRefreshTokenUseCase + TokenServicePort — no duplication.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../../shared/di/types';
-import { AppError } from '../../../shared/errors/AppError';
+import { ApplicationError } from '../../../shared/errors/ApplicationError';
 import { OAuthStateStorePort } from '../../ports/OAuthStateStorePort';
+import { OAuthProviderRegistryPort } from '../../ports/OAuthProviderRegistryPort';
 import { OAuthConnectionRepositoryPort } from '../../ports/OAuthConnectionRepositoryPort';
-import { OAuthProviderPort } from '../../ports/OAuthProviderPort';
 import { UserRepositoryPort } from '../../ports/UserRepositoryPort';
 import { TokenServicePort } from '../../ports/TokenServicePort';
-import { CreateRefreshTokenUseCase } from '../CreateRefreshTokenUseCase';
 import { OAuthConnection, OAuthProvider } from '../../../domain/entities/OAuthConnection';
 import { Email } from '../../../domain/value-objects/Email';
 import { UserRole } from '../../../domain/entities/UserRole';
+import { IHandleOAuthCallbackUseCase } from '../../ports/inbound/auth/oauth/IHandleOAuthCallbackUseCase';
+import { RefreshTokenService } from '../../services/RefreshTokenService';
 
 interface HandleOAuthCallbackInput {
   provider: OAuthProvider;
-  code: string;
-  state: string;
+  code:     string;
+  state:    string;
 }
 
 interface HandleOAuthCallbackOutput {
   user: {
-    id: string;
+    id:    string;
     email: string;
-    role: UserRole;
+    role:  UserRole;
   };
-  accessToken: string;
+  accessToken:  string;
   refreshToken: string;
-  isNewUser: boolean;
+  isNewUser:    boolean;
 }
 
 @injectable()
-export class HandleOAuthCallbackUseCase {
+export class HandleOAuthCallbackUseCase implements IHandleOAuthCallbackUseCase {
   constructor(
     @inject(TYPES.OAuthStateStorePort)
     private readonly stateStore: OAuthStateStorePort,
 
     @inject(TYPES.OAuthProviderRegistry)
-    private readonly providerRegistry: Map<OAuthProvider, OAuthProviderPort>,
+    private readonly providerRegistry: OAuthProviderRegistryPort,
 
     @inject(TYPES.OAuthConnectionRepositoryPort)
     private readonly oauthConnectionRepo: OAuthConnectionRepositoryPort,
@@ -52,8 +47,8 @@ export class HandleOAuthCallbackUseCase {
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
 
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
+    @inject(TYPES.RefreshTokenService)
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async execute(input: HandleOAuthCallbackInput): Promise<HandleOAuthCallbackOutput> {
@@ -61,12 +56,18 @@ export class HandleOAuthCallbackUseCase {
 
     const stateValid = await this.stateStore.consume(state);
     if (!stateValid) {
-      throw new AppError('OAuth state is invalid or expired. Please try again.', 400);
+      throw new ApplicationError(
+        'OAUTH_STATE_INVALID',
+        'OAuth state is invalid or expired. Please try again.',
+      );
     }
 
-    const adapter = this.providerRegistry.get(provider);
+    const adapter = this.providerRegistry.getProvider(provider);
     if (!adapter) {
-      throw new AppError(`OAuth provider "${provider}" is not configured`, 400);
+      throw new ApplicationError(
+        'OAUTH_PROVIDER_NOT_CONFIGURED',
+        `OAuth provider "${provider}" is not configured`,
+      );
     }
 
     const profile = await adapter.exchangeCodeForProfile(code);
@@ -74,21 +75,22 @@ export class HandleOAuthCallbackUseCase {
     const { user, isNewUser } = await this.findOrCreateUser(provider, profile);
 
     if (!user.id) {
-      throw new AppError('User ID not found after OAuth', 500);
+      throw new ApplicationError('INTERNAL_ERROR', 'User ID not found after OAuth');
     }
 
     const accessToken = this.tokenService.generateAccessToken({
       userId: user.id,
-      role: user.role,
+      role:   user.role,
     });
 
-    const { token: refreshToken } = await this.createRefreshTokenUseCase.execute(user.id);
+    const { token: refreshToken } = await this.refreshTokenService.create(user.id);
+
 
     return {
       user: {
-        id: user.id,
+        id:    user.id,
         email: user.email.getValue(),
-        role: user.role,
+        role:  user.role,
       },
       accessToken,
       refreshToken,
@@ -98,17 +100,17 @@ export class HandleOAuthCallbackUseCase {
 
   private async findOrCreateUser(
     provider: OAuthProvider,
-    profile: { providerId: string; email: string; name: string; avatarUrl?: string }
+    profile: { providerId: string; email: string; name: string; avatarUrl?: string },
   ) {
     const existingConnection = await this.oauthConnectionRepo.findByProvider(
       provider,
-      profile.providerId
+      profile.providerId,
     );
 
     if (existingConnection) {
       const user = await this.userRepo.findById(existingConnection.userId);
       if (!user) {
-        throw new AppError('Linked user account not found', 404);
+        throw new ApplicationError('USER_NOT_FOUND', 'Linked user account not found');
       }
       return { user, isNewUser: false };
     }
@@ -117,8 +119,9 @@ export class HandleOAuthCallbackUseCase {
     const existingUser = await this.userRepo.findByEmail(email);
 
     if (existingUser) {
-      if (!existingUser.id) throw new AppError('User ID not found', 500);
-
+      if (!existingUser.id) {
+        throw new ApplicationError('INTERNAL_ERROR', 'User ID not found');
+      }
       await this.oauthConnectionRepo.create(
         new OAuthConnection(
           undefined,
@@ -128,10 +131,9 @@ export class HandleOAuthCallbackUseCase {
           profile.email,
           profile.name,
           profile.avatarUrl,
-          new Date()
+          new Date(),
         )
       );
-
       return { user: existingUser, isNewUser: false };
     }
 
@@ -139,15 +141,17 @@ export class HandleOAuthCallbackUseCase {
     const lastName = rest.join(' ') || undefined;
 
     const newUser = await this.userRepo.createOAuthUser({
-      email: profile.email,
+      email:      profile.email,
       firstName,
       lastName,
-      avatar: profile.avatarUrl,
+      avatar:     profile.avatarUrl,
       provider,
       providerId: profile.providerId,
     });
 
-    if (!newUser.id) throw new AppError('Failed to create user', 500);
+    if (!newUser.id) {
+      throw new ApplicationError('INTERNAL_ERROR', 'Failed to create user');
+    }
 
     await this.oauthConnectionRepo.create(
       new OAuthConnection(
@@ -158,7 +162,7 @@ export class HandleOAuthCallbackUseCase {
         profile.email,
         profile.name,
         profile.avatarUrl,
-        new Date()
+        new Date(),
       )
     );
 

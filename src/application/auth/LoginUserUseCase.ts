@@ -1,94 +1,67 @@
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
 import { Email } from '../../domain/value-objects/Email';
 import { Password } from '../../domain/value-objects/Password';
-import { AppError } from '../../shared/errors/AppError';
-
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-
 import { PasswordHasherPort } from '../ports/PasswordHasherPort';
 import { TokenServicePort } from '../ports/TokenServicePort';
-import { UserRole } from '../../domain/entities/UserRole';
-import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
-import { InstructorState } from '../../domain/entities/InstructorState';
-
-// ADD THIS MISSING INTERFACE
-interface LoginUserInput {
-  email: string;
-  password: string;
-}
-
-interface LoginUserOutput {
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
-    instructorState: InstructorState | null;
-  };
-  accessToken: string;
-  refreshToken: string;
-}
+import { LoginUserRequestDTO, LoginUserResponseDTO } from '../dto/auth/LoginUser.dto';
+import { ILoginUserUseCase } from '../ports/inbound/auth/ILoginUserUseCase';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 
 @injectable()
-export class LoginUserUseCase {
+export class LoginUserUseCase implements ILoginUserUseCase {
   constructor(
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepo: UserRepositoryPort,
-
     @inject(TYPES.PasswordHasherPort)
     private readonly passwordHasher: PasswordHasherPort,
-
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
-
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase
+    @inject(TYPES.RefreshTokenService)
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
-  async execute(input: LoginUserInput): Promise<LoginUserOutput> {
-    const email = new Email(input.email);
+  async execute(input: LoginUserRequestDTO): Promise<LoginUserResponseDTO> {
+    const email    = new Email(input.email);
     const password = new Password(input.password);
 
     const user = await this.userRepo.findByEmail(email);
-
     if (!user) {
-      throw new AppError('Invalid email or password', 401);
+      throw new ApplicationError('INVALID_CREDENTIALS', 'Invalid email or password');
     }
+
     if (!user.passwordHash) {
-  throw new AppError(
-    'This account uses social login. Please sign in with your provider.',
-    400
-  );
-}
+      throw new ApplicationError(
+        'SOCIAL_LOGIN_REQUIRED',
+        'This account uses social login. Please sign in with your provider.'
+      );
+    }
 
     const passwordMatch = await this.passwordHasher.compare(
       password.getValue(),
       user.passwordHash
     );
-
     if (!passwordMatch) {
-      throw new AppError('Invalid email or password', 401);
+      throw new ApplicationError('INVALID_CREDENTIALS', 'Invalid email or password');
     }
 
     if (!user.id) {
-      throw new AppError('User ID not found', 500);
+      throw new ApplicationError('INTERNAL_ERROR', 'User ID not found');
     }
 
-    // Generate access token
     const accessToken = this.tokenService.generateAccessToken({
       userId: user.id,
-      role: user.role,
+      role:   user.role,
     });
-
-    // Create refresh token
-    const { token: refreshToken } =
-      await this.createRefreshTokenUseCase.execute(user.id);
+    const { token: refreshToken } = await this.refreshTokenService.create(user.id);
 
     return {
       user: {
-        id: user.id,
-        email: user.email.getValue(),
-        role: user.role,
+        id:              user.id,
+        email:           user.email.getValue(),
+        role:            user.role,
         instructorState: user.instructorState ?? null,
       },
       accessToken,

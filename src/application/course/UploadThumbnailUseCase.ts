@@ -2,33 +2,38 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
 import { StorageServicePort } from '../ports/StorageServicePort';
-import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
+import { LoggerPort } from '../ports/LoggerPort';
 import {
   UploadThumbnailRequestDTO,
   UploadThumbnailResponseDTO,
 } from '../dto/course/UploadThumbnail.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IUploadThumbnailUseCase } from '../ports/inbound/course/IUploadThumbnailUseCase';
 
 @injectable()
-export class UploadThumbnailUseCase {
+export class UploadThumbnailUseCase implements IUploadThumbnailUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort,
 
     @inject(TYPES.StorageServicePort)
-    private readonly storageService: StorageServicePort
+    private readonly storageService: StorageServicePort,
+
+    @inject(TYPES.LoggerPort)
+    private readonly logger: LoggerPort,
   ) {}
 
   async execute(dto: UploadThumbnailRequestDTO): Promise<UploadThumbnailResponseDTO> {
     // 1. Load course
     const course = await this.courseRepository.findById(dto.courseId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     // 2. Ownership check
     if (course.tutorId !== dto.tutorId) {
-      throw new AppError('You do not have permission to update this course', 403);
+      throw new ApplicationError('FORBIDDEN', 'You do not have permission to update this course');
     }
 
     // 3. Delete old thumbnail from S3 if one exists
@@ -37,7 +42,7 @@ export class UploadThumbnailUseCase {
         await this.storageService.deleteFile(course.thumbnail);
       } catch (error) {
         // Best-effort — log but don't block the upload
-        console.error('[UploadThumbnailUseCase] Failed to delete old thumbnail:', error);
+        this.logger.error('[UploadThumbnailUseCase] Failed to delete old thumbnail', error);
       }
     }
 
@@ -49,7 +54,7 @@ export class UploadThumbnailUseCase {
       course.setThumbnail(thumbnailUrl);
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }

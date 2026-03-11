@@ -1,9 +1,10 @@
 import { inject, injectable } from "inversify";
 import { OtpServicePort } from "../ports/OtpServicePort";
 import { TYPES } from "../../shared/di/types";
+import { IRequestSignupOtpUseCase } from "../ports/inbound/auth/IRequestSignupOtpUseCase";
 
 @injectable()
-export class RequestSignupOtpUseCase {
+export class RequestSignupOtpUseCase implements IRequestSignupOtpUseCase {
     constructor(
         @inject(TYPES.OtpServicePort)
         private readonly otpService: OtpServicePort

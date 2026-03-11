@@ -18,14 +18,16 @@ import { RedisOAuthStateStore } from '../redis/RedisOAuthStateStore';
 // Use Cases
 import { InitiateOAuthUseCase } from '../../application/auth/oauth/InitiateOAuthUseCase';
 import { HandleOAuthCallbackUseCase } from '../../application/auth/oauth/HandleOAuthCallbackUseCase';
+import { OAuthProviderRegistry } from '../oauth/OAuthProviderRegistry';
+import { OAuthProviderRegistryPort } from '../../application/ports/OAuthProviderRegistryPort';
 
 // Controller
-import { OAuthController } from '../../presentation/controllers/OAuthController';
+
 
 export function bindOAuthDependencies(container: Container): void {
   const backendUrl = env.backendUrl; // add BACKEND_URL to your env.ts (see env additions)
 
-  // ── Provider Adapters ────────────────────────────────────────────────────
+  //  Provider Adapters 
   const googleAdapter = new GoogleOAuthAdapter({
     clientId: env.googleClientId,
     clientSecret: env.googleClientSecret,
@@ -45,18 +47,19 @@ export function bindOAuthDependencies(container: Container): void {
   //   tenant: env.microsoftTenant,
   // });
 
-  // ── Provider Registry (Map injected into use cases) ───────────────────────
+  //  Provider Registry (Map injected into use cases)
   const providerRegistry = new Map<OAuthProvider, OAuthProviderPort>([
     ['google', googleAdapter],
     // ['facebook', facebookAdapter],
     // ['microsoft', microsoftAdapter],
   ]);
 
-  container
-    .bind<Map<OAuthProvider, OAuthProviderPort>>(TYPES.OAuthProviderRegistry)
-    .toConstantValue(providerRegistry);
+ container
+    .bind<OAuthProviderRegistryPort>(TYPES.OAuthProviderRegistry)
+    .toConstantValue(new OAuthProviderRegistry(providerRegistry));
 
-  // ── Repository + State Store ───────────────────────────────────────────────
+
+  //  Repository + State Store
   container
     .bind<MongoOAuthConnectionRepository>(TYPES.OAuthConnectionRepositoryPort)
     .to(MongoOAuthConnectionRepository)
@@ -67,7 +70,7 @@ export function bindOAuthDependencies(container: Container): void {
     .to(RedisOAuthStateStore)
     .inSingletonScope();
 
-  // ── Use Cases ──────────────────────────────────────────────────────────────
+  //  Use Cases 
   container
     .bind<InitiateOAuthUseCase>(TYPES.InitiateOAuthUseCase)
     .to(InitiateOAuthUseCase)
@@ -78,16 +81,12 @@ export function bindOAuthDependencies(container: Container): void {
     .to(HandleOAuthCallbackUseCase)
     .inSingletonScope();
 
-  // ── Controller ─────────────────────────────────────────────────────────────
-  container
-    .bind<OAuthController>(TYPES.OAuthController)
-    .to(OAuthController)
-    .inSingletonScope();
+  //  Controller
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // USAGE in your existing container.ts:
 //
 //   import { bindOAuthDependencies } from './oauthBindings';
 //   bindOAuthDependencies(container);
-// ─────────────────────────────────────────────────────────────────────────────
+// 

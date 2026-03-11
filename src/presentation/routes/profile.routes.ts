@@ -1,26 +1,23 @@
-import { Router } from 'express';
-import { container } from '../../infrastructure/di/container';
-import { TYPES } from '../../shared/di/types';
-import { ProfileController } from '../controllers/ProfileController';
-import { jwtAuthMiddleware } from '../../infrastructure/security/jwt-auth.middleware';
-import { upload } from '../../infrastructure/middlewares/upload.middleware';
+import { Router, Request, Response, RequestHandler } from 'express';
+import { ProfileHttpAdapter } from '../http/ProfileHttpAdapter';
+import { toHttpRequest, toHttpResponse } from '../../infrastructure/http/ExpressBridge';
+import { upload } from '../middlewares/upload.middleware';
 
-const router = Router();
+export function createProfileRouter(
+  profileAdapter:    ProfileHttpAdapter,
+  jwtAuthMiddleware: RequestHandler,
+): Router {
+  const router = Router();
 
-const profileController = container.get<ProfileController>(
-  TYPES.ProfileController
-);
+  const bind = (fn: (req: any, res: any) => Promise<void>) =>
+    (req: Request, res: Response) => fn(toHttpRequest(req), toHttpResponse(res));
 
-// All profile routes are protected
-router.use(jwtAuthMiddleware);
+  router.use(jwtAuthMiddleware);
 
-router.get('/', profileController.getProfile.bind(profileController));
-router.patch('/', profileController.updateProfile.bind(profileController));
-router.post(
-  '/avatar',
-  upload.single('avatar'),
-  profileController.uploadAvatar.bind(profileController)
-);
-router.delete('/avatar', profileController.deleteAvatar.bind(profileController));
+  router.get(   '/',       bind(profileAdapter.getProfile.bind(profileAdapter)));
+  router.patch( '/',       bind(profileAdapter.updateProfile.bind(profileAdapter)));
+  router.post(  '/avatar', upload.single('avatar'), bind(profileAdapter.uploadAvatar.bind(profileAdapter)));
+  router.delete('/avatar', bind(profileAdapter.deleteAvatar.bind(profileAdapter)));
 
-export default router;
+  return router;
+}

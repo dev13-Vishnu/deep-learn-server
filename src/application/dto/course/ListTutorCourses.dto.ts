@@ -1,11 +1,10 @@
 import { TutorCourseListItemDTO } from './CourseData.dto';
-import { CourseStatus } from '../../../domain/entities/Course';
 
 export interface ListTutorCoursesRequestDTO {
   tutorId: string;
   page?:   number;
   limit?:  number;
-  status?: CourseStatus;
+  status?: 'draft' | 'published' | 'archived';
 }
 
 export interface PaginationMeta {

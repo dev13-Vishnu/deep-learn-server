@@ -2,42 +2,35 @@ import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { InstructorApplicationRepositoryPort } from '../ports/InstructorApplicationRepositoryPort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
-import { UserRole } from '../../domain/entities/UserRole';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { DomainError } from '../../domain/errors/DomainError';
-import { logger } from '../../shared/utils/logger';
-import {
-  ApproveInstructorApplicationRequestDTO,
-  ApproveInstructorApplicationResponseDTO,
-} from '../dto/instructor/ApproveInstructorApplication.dto';
+import { LoggerPort } from '../ports/LoggerPort';
+import { ApproveInstructorApplicationRequestDTO, ApproveInstructorApplicationResponseDTO } from '../dto/instructor/ApproveInstructorApplication.dto';
 import { InstructorApplicationMapper } from '../mappers/InstructorApplicationMapper';
+import { IApproveInstructorApplicationUseCase } from '../ports/inbound/instructor/IApproveInstructorApplicationUseCase';
 
 @injectable()
-export class ApproveInstructorApplicationUseCase {
+export class ApproveInstructorApplicationUseCase implements IApproveInstructorApplicationUseCase {
   constructor(
     @inject(TYPES.InstructorApplicationRepositoryPort)
     private readonly applicationRepository: InstructorApplicationRepositoryPort,
-
     @inject(TYPES.UserRepositoryPort)
-    private readonly userRepository: UserRepositoryPort
+    private readonly userRepository: UserRepositoryPort,
+    @inject(TYPES.LoggerPort)
+    private readonly logger: LoggerPort,
   ) {}
 
-  async execute(
-    request: ApproveInstructorApplicationRequestDTO
-  ): Promise<ApproveInstructorApplicationResponseDTO> {
-    const application = await this.applicationRepository.findById(
-      request.applicationId
-    );
-
+  async execute(request: ApproveInstructorApplicationRequestDTO): Promise<ApproveInstructorApplicationResponseDTO> {
+    const application = await this.applicationRepository.findById(request.applicationId);
     if (!application) {
-      throw new AppError('Application not found', 404);
+      throw new ApplicationError('APPLICATION_NOT_FOUND', 'Application not found');
     }
 
     try {
       application.approve();
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }
@@ -45,32 +38,30 @@ export class ApproveInstructorApplicationUseCase {
     await this.applicationRepository.update(application);
 
     const user = await this.userRepository.findById(application.userId);
-
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new ApplicationError('USER_NOT_FOUND', 'User not found');
     }
-
     if (!user.id) {
-      throw new AppError('User ID not found', 500);
+      throw new ApplicationError('INTERNAL_ERROR', 'User ID not found');
     }
 
     try {
       user.upgradeToInstructor();
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }
 
     await this.userRepository.update(user);
 
-    logger.info(
+    this.logger.info(
       `[AUDIT] Application approved | applicationId=${request.applicationId} userId=${application.userId} at=${new Date().toISOString()}`
     );
 
     return {
-      message: 'Application approved successfully',
+      message:     'Application approved successfully',
       application: InstructorApplicationMapper.toDTO(application),
     };
   }

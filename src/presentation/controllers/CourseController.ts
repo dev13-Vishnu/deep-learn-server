@@ -1,488 +1,166 @@
-import { Request, Response } from 'express';
-import { inject, injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
-import { AuthenticatedRequest } from '../../infrastructure/security/jwt-auth.middleware';
-import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
-import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
-import { ListTutorCoursesUseCase } from '../../application/course/ListTutorCoursesUseCase';
-import { CourseStatus } from '../../domain/entities/Course';
-import { GetTutorCourseUseCase } from '../../application/course/GetTutorCourseUseCase';
-import { DeleteCourseUseCase } from '../../application/course/DeleteCourseUseCase';
+import { ICreateCourseUseCase }       from '../../application/ports/inbound/course/ICreateCourseUseCase';
+import { IUpdateCourseUseCase }       from '../../application/ports/inbound/course/IUpdateCourseUseCase';
+import { IListTutorCoursesUseCase }   from '../../application/ports/inbound/course/IListTutorCoursesUseCase';
+import { IGetTutorCourseUseCase }     from '../../application/ports/inbound/course/IGetTutorCourseUseCase';
+import { IDeleteCourseUseCase }       from '../../application/ports/inbound/course/IDeleteCourseUseCase';
+import { IUploadThumbnailUseCase }    from '../../application/ports/inbound/course/IUploadThumbnailUseCase';
+import { IPublishCourseUseCase }      from '../../application/ports/inbound/course/IPublishCourseUseCase';
+import { IUnpublishCourseUseCase }    from '../../application/ports/inbound/course/IUnpublishCourseUseCase';
+import { IArchiveCourseUseCase }      from '../../application/ports/inbound/course/IArchiveCourseUseCase';
+import { IAddModuleUseCase }          from '../../application/ports/inbound/course/IAddModuleUseCase';
+import { IUpdateModuleUseCase }       from '../../application/ports/inbound/course/IUpdateModuleUseCase';
+import { IRemoveModuleUseCase }       from '../../application/ports/inbound/course/IRemoveModuleUseCase';
+import { IReorderModulesUseCase }     from '../../application/ports/inbound/course/IReorderModulesUseCase';
+import { IAddLessonUseCase }          from '../../application/ports/inbound/course/IAddLessonUseCase';
+import { IUpdateLessonUseCase }       from '../../application/ports/inbound/course/IUpdateLessonUseCase';
+import { IRemoveLessonUseCase }       from '../../application/ports/inbound/course/IRemoveLessonUseCase';
+import { IReorderLessonsUseCase }     from '../../application/ports/inbound/course/IReorderLessonsUseCase';
+import { IAddChapterUseCase }         from '../../application/ports/inbound/course/IAddChapterUseCase';
+import { IUpdateChapterUseCase }      from '../../application/ports/inbound/course/IUpdateChapterUseCase';
+import { IRemoveChapterUseCase }      from '../../application/ports/inbound/course/IRemoveChapterUseCase';
+import { IReorderChaptersUseCase }    from '../../application/ports/inbound/course/IReorderChaptersUseCase';
+import { IGetVideoUploadUrlUseCase }  from '../../application/ports/inbound/course/IGetVideoUploadUrlUseCase';
+import { IConfirmVideoUploadUseCase } from '../../application/ports/inbound/course/IConfirmVideoUploadUseCase';
+import { IListPublicCoursesUseCase }  from '../../application/ports/inbound/course/IListPublicCoursesUseCase';
+import { IGetPublicCourseUseCase }    from '../../application/ports/inbound/course/IGetPublicCourseUseCase';
 import { UploadableFile } from '../../application/dto/shared/UploadableFile.dto';
-import { UploadThumbnailUseCase } from '../../application/course/UploadThumbnailUseCase';
-import { PublishCourseUseCase } from '../../application/course/PublishCourseUseCase';
-import { UnpublishCourseUseCase } from '../../application/course/UnpublishCourseUseCase';
-import { ArchiveCourseUseCase } from '../../application/course/ArchiveCourseUseCase';
-import { AddModuleUseCase } from '../../application/course/AddModuleUseCase';
-import { UpdateModuleUseCase } from '../../application/course/UpdateModuleUseCase';
-import { RemoveModuleUseCase } from '../../application/course/RemoveModuleUseCase';
-import { ReorderModulesUseCase } from '../../application/course/ReorderModulesUseCase';
-import { AddLessonUseCase } from '../../application/course/AddLessonUseCase';
-import { UpdateLessonUseCase } from '../../application/course/UpdateLessonUseCase';
-import { RemoveLessonUseCase } from '../../application/course/RemoveLessonUseCase';
-import { ReorderLessonsUseCase } from '../../application/course/ReorderLessonsUseCase';
-import { AddChapterUseCase } from '../../application/course/AddChapterUseCase';
-import { UpdateChapterUseCase } from '../../application/course/UpdateChapterUseCase';
-import { RemoveChapterUseCase } from '../../application/course/RemoveChapterUseCase';
-import { ReorderChaptersUseCase } from '../../application/course/ReorderChaptersUseCase';
-import { GetVideoUploadUrlUseCase } from '../../application/course/GetVideoUploadUrlUseCase';
-import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideoUploadUseCase';
-import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
+import { CourseCategory, CourseLevel, CourseStatus } from '../../application/dto/course/CourseEnums';
 import { PublicCourseSort } from '../../application/ports/CourseRepositoryPort';
-import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
 
 @injectable()
 export class CourseController {
   constructor(
-    @inject(TYPES.CreateCourseUseCase)
-    private readonly createCourseUseCase: CreateCourseUseCase,
-
-    @inject(TYPES.UpdateCourseUseCase)
-    private readonly updateCourseUseCase: UpdateCourseUseCase,
-
-    @inject(TYPES.ListTutorCoursesUseCase)
-    private readonly listTutorCoursesUseCase: ListTutorCoursesUseCase,
-
-    @inject(TYPES.GetTutorCourseUseCase)
-    private readonly getTutorCourseUseCase: GetTutorCourseUseCase,
-
-    @inject(TYPES.DeleteCourseUseCase)
-    private readonly deleteCourseUseCase: DeleteCourseUseCase,
-
-    @inject(TYPES.UploadThumbnailUseCase)
-    private readonly uploadThumbnailUseCase: UploadThumbnailUseCase,
-
-    @inject(TYPES.PublishCourseUseCase)
-    private readonly publishCourseUseCase: PublishCourseUseCase,
-
-    @inject(TYPES.UnpublishCourseUseCase)
-    private readonly unpublishCourseUseCase: UnpublishCourseUseCase,
-
-    @inject(TYPES.ArchiveCourseUseCase)
-    private readonly archiveCourseUseCase: ArchiveCourseUseCase,
-
-    @inject(TYPES.AddModuleUseCase)
-    private readonly addModuleUseCase: AddModuleUseCase,
-
-    @inject(TYPES.UpdateModuleUseCase)
-    private readonly updateModuleUseCase: UpdateModuleUseCase,
-
-    @inject(TYPES.RemoveModuleUseCase)
-    private readonly removeModuleUseCase: RemoveModuleUseCase,
-
-    @inject(TYPES.ReorderModulesUseCase)
-    private readonly reorderModulesUseCase: ReorderModulesUseCase,
-
-    @inject(TYPES.AddLessonUseCase)
-    private readonly addLessonUseCase: AddLessonUseCase,
-
-    @inject(TYPES.UpdateLessonUseCase)
-    private readonly updateLessonUseCase: UpdateLessonUseCase,
-
-    @inject(TYPES.RemoveLessonUseCase)
-    private readonly removeLessonUseCase: RemoveLessonUseCase,
-
-    @inject(TYPES.ReorderLessonsUseCase)
-    private readonly reorderLessonsUseCase: ReorderLessonsUseCase,
-
-    //  Feature 11
-    @inject(TYPES.AddChapterUseCase)
-    private readonly addChapterUseCase: AddChapterUseCase,
-
-    @inject(TYPES.UpdateChapterUseCase)
-    private readonly updateChapterUseCase: UpdateChapterUseCase,
-
-    @inject(TYPES.RemoveChapterUseCase)
-    private readonly removeChapterUseCase: RemoveChapterUseCase,
-
-    @inject(TYPES.ReorderChaptersUseCase)
-    private readonly reorderChaptersUseCase: ReorderChaptersUseCase,
-
-    @inject(TYPES.GetVideoUploadUrlUseCase)
-    private readonly getVideoUploadUrlUseCase: GetVideoUploadUrlUseCase,
-
-    @inject(TYPES.ConfirmVideoUploadUseCase)
-    private readonly confirmVideoUploadUseCase: ConfirmVideoUploadUseCase,
-
-    @inject(TYPES.ListPublicCoursesUseCase)
-    private readonly listPublicCoursesUseCase: ListPublicCoursesUseCase,
-
-    @inject(TYPES.GetPublicCourseUseCase)
-    private readonly getPublicCourseUseCase: GetPublicCourseUseCase,
+    @inject(TYPES.CreateCourseUseCase)      private readonly createCourseUseCase:      ICreateCourseUseCase,
+    @inject(TYPES.UpdateCourseUseCase)      private readonly updateCourseUseCase:      IUpdateCourseUseCase,
+    @inject(TYPES.ListTutorCoursesUseCase)  private readonly listTutorCoursesUseCase:  IListTutorCoursesUseCase,
+    @inject(TYPES.GetTutorCourseUseCase)    private readonly getTutorCourseUseCase:    IGetTutorCourseUseCase,
+    @inject(TYPES.DeleteCourseUseCase)      private readonly deleteCourseUseCase:      IDeleteCourseUseCase,
+    @inject(TYPES.UploadThumbnailUseCase)   private readonly uploadThumbnailUseCase:   IUploadThumbnailUseCase,
+    @inject(TYPES.PublishCourseUseCase)     private readonly publishCourseUseCase:     IPublishCourseUseCase,
+    @inject(TYPES.UnpublishCourseUseCase)   private readonly unpublishCourseUseCase:   IUnpublishCourseUseCase,
+    @inject(TYPES.ArchiveCourseUseCase)     private readonly archiveCourseUseCase:     IArchiveCourseUseCase,
+    @inject(TYPES.AddModuleUseCase)         private readonly addModuleUseCase:         IAddModuleUseCase,
+    @inject(TYPES.UpdateModuleUseCase)      private readonly updateModuleUseCase:      IUpdateModuleUseCase,
+    @inject(TYPES.RemoveModuleUseCase)      private readonly removeModuleUseCase:      IRemoveModuleUseCase,
+    @inject(TYPES.ReorderModulesUseCase)    private readonly reorderModulesUseCase:    IReorderModulesUseCase,
+    @inject(TYPES.AddLessonUseCase)         private readonly addLessonUseCase:         IAddLessonUseCase,
+    @inject(TYPES.UpdateLessonUseCase)      private readonly updateLessonUseCase:      IUpdateLessonUseCase,
+    @inject(TYPES.RemoveLessonUseCase)      private readonly removeLessonUseCase:      IRemoveLessonUseCase,
+    @inject(TYPES.ReorderLessonsUseCase)    private readonly reorderLessonsUseCase:    IReorderLessonsUseCase,
+    @inject(TYPES.AddChapterUseCase)        private readonly addChapterUseCase:        IAddChapterUseCase,
+    @inject(TYPES.UpdateChapterUseCase)     private readonly updateChapterUseCase:     IUpdateChapterUseCase,
+    @inject(TYPES.RemoveChapterUseCase)     private readonly removeChapterUseCase:     IRemoveChapterUseCase,
+    @inject(TYPES.ReorderChaptersUseCase)   private readonly reorderChaptersUseCase:   IReorderChaptersUseCase,
+    @inject(TYPES.GetVideoUploadUrlUseCase)  private readonly getVideoUploadUrlUseCase:  IGetVideoUploadUrlUseCase,
+    @inject(TYPES.ConfirmVideoUploadUseCase) private readonly confirmVideoUploadUseCase: IConfirmVideoUploadUseCase,
+    @inject(TYPES.ListPublicCoursesUseCase)  private readonly listPublicCoursesUseCase:  IListPublicCoursesUseCase,
+    @inject(TYPES.GetPublicCourseUseCase)    private readonly getPublicCourseUseCase:    IGetPublicCourseUseCase,
   ) {}
 
-  async createCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.createCourseUseCase.execute({
-      tutorId:     authReq.user!.userId,
-      title:       req.body.title,
-      subtitle:    req.body.subtitle    ?? null,
-      description: req.body.description,
-      category:    req.body.category,
-      level:       req.body.level,
-      language:    req.body.language,
-      price:       req.body.price,
-      currency:    req.body.currency,
-      tags:        req.body.tags,
-    });
-
-    return res.status(201).json(result);
+  async createCourse(tutorId: string, body: { title: string; subtitle?: string | null; description: string; category: CourseCategory; level: CourseLevel; language: string; price?: number; currency?: string; tags?: string[];
+  }) {
+    return this.createCourseUseCase.execute({ tutorId, ...body });
   }
 
-  async updateCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.updateCourseUseCase.execute({
-      courseId:    req.params.courseId,
-      tutorId:     authReq.user!.userId,
-      title:       req.body.title,
-      subtitle:    req.body.subtitle,
-      description: req.body.description,
-      category:    req.body.category,
-      level:       req.body.level,
-      language:    req.body.language,
-      price:       req.body.price,
-      currency:    req.body.currency,
-      tags:        req.body.tags,
-    });
-
-    return res.status(200).json(result);
+  async updateCourse(courseId: string, tutorId: string, body: { title?: string; subtitle?: string | null; description?: string; category?: CourseCategory; level?: CourseLevel; language?: string; price?: number; currency?: string; tags?: string[];
+  }) {
+    return this.updateCourseUseCase.execute({ courseId, tutorId, ...body });
   }
 
-  async getMyCourses(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-    const { page, limit, status } = req.query;
-
-    const result = await this.listTutorCoursesUseCase.execute({
-      tutorId: authReq.user!.userId,
-      page:    page  ? parseInt(page  as string, 10) : undefined,
-      limit:   limit ? parseInt(limit as string, 10) : undefined,
-      status:  status as CourseStatus | undefined,
-    });
-
-    return res.status(200).json(result);
+  async getMyCourses(tutorId: string, query: { page?: number; limit?: number; status?: CourseStatus;
+  }) {
+    return this.listTutorCoursesUseCase.execute({ tutorId, ...query });
   }
 
-  async getMyCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.getTutorCourseUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-    });
-
-    return res.status(200).json(result);
+  async getMyCourse(courseId: string, tutorId: string) {
+    return this.getTutorCourseUseCase.execute({ courseId, tutorId });
   }
 
-  async getPublicCourses(req: Request, res: Response): Promise<Response> {
-    const {
-      page, limit,
-      category, level, language,
-      minPrice, maxPrice,
-      search, sort,
-    } = req.query;
-
-    const result = await this.listPublicCoursesUseCase.execute({
-      page:  page  ? parseInt(page  as string, 10) : undefined,
-      limit: limit ? parseInt(limit as string, 10) : undefined,
-      filter: {
-        category: category as string | undefined,
-        level:    level    as string | undefined,
-        language: language as string | undefined,
-        minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
-        maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
-        search:   search   as string | undefined,
-        sort:     sort     as PublicCourseSort | undefined,
-      },
-    });
-
-    return res.status(200).json(result);
-  }
-
-  async getPublicCourse(req: Request, res: Response): Promise<Response> {
-    const result = await this.getPublicCourseUseCase.execute({
-      courseId: req.params.courseId,
-    });
-    return res.status(200).json(result);
-  }
-
-  async deleteCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.deleteCourseUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-    });
-
-    return res.status(200).json(result);
-  }
-
-  async uploadThumbnail(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    const uploadableFile: UploadableFile = {
-      buffer:       req.file.buffer,
-      originalname: req.file.originalname,
-      mimetype:     req.file.mimetype,
-      size:         req.file.size,
+  async getPublicCourses(params: { page?: number; limit?: number; filter: { category?: CourseCategory; level?: CourseLevel; language?: string; minPrice?: number; maxPrice?: number; search?: string; sort?: PublicCourseSort;
     };
-
-    const result = await this.uploadThumbnailUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-      file:     uploadableFile,
-    });
-
-    return res.status(200).json(result);
+  }) {
+    return this.listPublicCoursesUseCase.execute(params);
   }
 
-  async publishCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.publishCourseUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-    });
-
-    return res.status(200).json(result);
+  async getPublicCourse(courseId: string) {
+    return this.getPublicCourseUseCase.execute({ courseId });
   }
 
-  async unpublishCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.unpublishCourseUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-    });
-
-    return res.status(200).json(result);
+  async deleteCourse(courseId: string, tutorId: string) {
+    return this.deleteCourseUseCase.execute({ courseId, tutorId });
   }
 
-  async archiveCourse(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.archiveCourseUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-    });
-
-    return res.status(200).json(result);
+  async uploadThumbnail(courseId: string, tutorId: string, file: UploadableFile) {
+    return this.uploadThumbnailUseCase.execute({ courseId, tutorId, file });
   }
 
-  //  Module Management 
-
-  async addModule(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.addModuleUseCase.execute({
-      courseId:    req.params.courseId,
-      tutorId:     authReq.user!.userId,
-      title:       req.body.title,
-      description: req.body.description ?? null,
-    });
-
-    return res.status(201).json(result);
+  async publishCourse(courseId: string, tutorId: string) {
+    return this.publishCourseUseCase.execute({ courseId, tutorId });
   }
 
-  async updateModule(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.updateModuleUseCase.execute({
-      courseId:    req.params.courseId,
-      tutorId:     authReq.user!.userId,
-      moduleId:    req.params.moduleId,
-      title:       req.body.title,
-      description: req.body.description,
-    });
-
-    return res.status(200).json(result);
+  async unpublishCourse(courseId: string, tutorId: string) {
+    return this.unpublishCourseUseCase.execute({ courseId, tutorId });
   }
 
-  async removeModule(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.removeModuleUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-      moduleId: req.params.moduleId,
-    });
-
-    return res.status(200).json(result);
+  async archiveCourse(courseId: string, tutorId: string) {
+    return this.archiveCourseUseCase.execute({ courseId, tutorId });
   }
 
-  async reorderModules(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.reorderModulesUseCase.execute({
-      courseId:   req.params.courseId,
-      tutorId:    authReq.user!.userId,
-      orderedIds: req.body.orderedIds,
-    });
-
-    return res.status(200).json(result);
+  async addModule(courseId: string, tutorId: string, body: { title: string; description?: string | null }) {
+    return this.addModuleUseCase.execute({ courseId, tutorId, ...body });
   }
 
-  //  Lesson Management 
-
-  async addLesson(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.addLessonUseCase.execute({
-      courseId:    req.params.courseId,
-      tutorId:     authReq.user!.userId,
-      moduleId:    req.params.moduleId,
-      title:       req.body.title,
-      description: req.body.description ?? null,
-      isPreview:   req.body.isPreview,
-    });
-
-    return res.status(201).json(result);
+  async updateModule(courseId: string, tutorId: string, moduleId: string, body: { title?: string; description?: string | null }) {
+    return this.updateModuleUseCase.execute({ courseId, tutorId, moduleId, ...body });
   }
 
-  async updateLesson(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.updateLessonUseCase.execute({
-      courseId:    req.params.courseId,
-      tutorId:     authReq.user!.userId,
-      moduleId:    req.params.moduleId,
-      lessonId:    req.params.lessonId,
-      title:       req.body.title,
-      description: req.body.description,
-      isPreview:   req.body.isPreview,
-    });
-
-    return res.status(200).json(result);
+  async removeModule(courseId: string, tutorId: string, moduleId: string) {
+    return this.removeModuleUseCase.execute({ courseId, tutorId, moduleId });
   }
 
-  async removeLesson(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.removeLessonUseCase.execute({
-      courseId: req.params.courseId,
-      tutorId:  authReq.user!.userId,
-      moduleId: req.params.moduleId,
-      lessonId: req.params.lessonId,
-    });
-
-    return res.status(200).json(result);
+  async reorderModules(courseId: string, tutorId: string, orderedIds: string[]) {
+    return this.reorderModulesUseCase.execute({ courseId, tutorId, orderedIds });
   }
 
-  async reorderLessons(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.reorderLessonsUseCase.execute({
-      courseId:   req.params.courseId,
-      tutorId:    authReq.user!.userId,
-      moduleId:   req.params.moduleId,
-      orderedIds: req.body.orderedIds,
-    });
-
-    return res.status(200).json(result);
+  async addLesson(courseId: string, tutorId: string, moduleId: string, body: { title: string; description?: string | null; isPreview?: boolean }) {
+    return this.addLessonUseCase.execute({ courseId, tutorId, moduleId, ...body });
   }
 
-  //  Chapter Management 
-
-  async addChapter(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.addChapterUseCase.execute({
-      courseId:  req.params.courseId,
-      tutorId:   authReq.user!.userId,
-      moduleId:  req.params.moduleId,
-      lessonId:  req.params.lessonId,
-      title:     req.body.title,
-      type:      req.body.type,
-      isFree:    req.body.isFree,
-      content:   req.body.content  ?? null,
-      duration:  req.body.duration,
-    });
-
-    return res.status(201).json(result);
+  async updateLesson(courseId: string, tutorId: string, moduleId: string, lessonId: string, body: { title?: string; description?: string | null; isPreview?: boolean }) {
+    return this.updateLessonUseCase.execute({ courseId, tutorId, moduleId, lessonId, ...body });
   }
 
-  async updateChapter(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.updateChapterUseCase.execute({
-      courseId:  req.params.courseId,
-      tutorId:   authReq.user!.userId,
-      moduleId:  req.params.moduleId,
-      lessonId:  req.params.lessonId,
-      chapterId: req.params.chapterId,
-      title:     req.body.title,
-      isFree:    req.body.isFree,
-      content:   req.body.content,
-      duration:  req.body.duration,
-    });
-
-    return res.status(200).json(result);
+  async removeLesson(courseId: string, tutorId: string, moduleId: string, lessonId: string) {
+    return this.removeLessonUseCase.execute({ courseId, tutorId, moduleId, lessonId });
   }
 
-  async removeChapter(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.removeChapterUseCase.execute({
-      courseId:  req.params.courseId,
-      tutorId:   authReq.user!.userId,
-      moduleId:  req.params.moduleId,
-      lessonId:  req.params.lessonId,
-      chapterId: req.params.chapterId,
-    });
-
-    return res.status(200).json(result);
+  async reorderLessons(courseId: string, tutorId: string, moduleId: string, orderedIds: string[]) {
+    return this.reorderLessonsUseCase.execute({ courseId, tutorId, moduleId, orderedIds });
   }
 
-  async reorderChapters(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.reorderChaptersUseCase.execute({
-      courseId:   req.params.courseId,
-      tutorId:    authReq.user!.userId,
-      moduleId:   req.params.moduleId,
-      lessonId:   req.params.lessonId,
-      orderedIds: req.body.orderedIds,
-    });
-
-    return res.status(200).json(result);
+  async addChapter(courseId: string, tutorId: string, moduleId: string, lessonId: string, body: { title: string; type: 'video' | 'text'; isFree?: boolean; content?: string | null; duration?: number }) {
+    return this.addChapterUseCase.execute({ courseId, tutorId, moduleId, lessonId, ...body });
   }
 
-  // Video Upload
-
-  async getVideoUploadUrl(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
-
-    const result = await this.getVideoUploadUrlUseCase.execute({
-      courseId:  req.params.courseId,
-      tutorId:   authReq.user!.userId,
-      moduleId:  req.params.moduleId,
-      lessonId:  req.params.lessonId,
-      chapterId: req.params.chapterId,
-      filename:  req.body.filename,
-      mimeType:  req.body.mimeType,
-      size:      req.body.size,
-    });
-
-    return res.status(200).json(result);
+  async updateChapter(courseId: string, tutorId: string, moduleId: string, lessonId: string, chapterId: string, body: { title?: string; isFree?: boolean; content?: string | null; duration?: number }) {
+    return this.updateChapterUseCase.execute({ courseId, tutorId, moduleId, lessonId, chapterId, ...body });
   }
 
-  async confirmVideoUpload(req: Request, res: Response): Promise<Response> {
-    const authReq = req as AuthenticatedRequest;
+  async removeChapter(courseId: string, tutorId: string, moduleId: string, lessonId: string, chapterId: string) {
+    return this.removeChapterUseCase.execute({ courseId, tutorId, moduleId, lessonId, chapterId });
+  }
 
-    const result = await this.confirmVideoUploadUseCase.execute({
-      courseId:  req.params.courseId,
-      tutorId:   authReq.user!.userId,
-      moduleId:  req.params.moduleId,
-      lessonId:  req.params.lessonId,
-      chapterId: req.params.chapterId,
-      duration:  req.body.duration,
-    });
+  async reorderChapters(courseId: string, tutorId: string, moduleId: string, lessonId: string, orderedIds: string[]) {
+    return this.reorderChaptersUseCase.execute({ courseId, tutorId, moduleId, lessonId, orderedIds });
+  }
 
-    return res.status(200).json(result);
+  async getVideoUploadUrl(courseId: string, tutorId: string, moduleId: string, lessonId: string, chapterId: string, body: { filename: string; mimeType: string; size: number }) {
+    return this.getVideoUploadUrlUseCase.execute({ courseId, tutorId, moduleId, lessonId, chapterId, ...body });
+  }
+
+  async confirmVideoUpload(courseId: string, tutorId: string, moduleId: string, lessonId: string, chapterId: string, body: { duration: number }) {
+    return this.confirmVideoUploadUseCase.execute({ courseId, tutorId, moduleId, lessonId, chapterId, ...body });
   }
 }

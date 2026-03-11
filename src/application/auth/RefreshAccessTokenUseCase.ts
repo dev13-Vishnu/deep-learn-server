@@ -1,78 +1,56 @@
 import { injectable, inject } from 'inversify';
-
 import { TYPES } from '../../shared/di/types';
 import { TokenServicePort } from '../ports/TokenServicePort';
 import { UserRepositoryPort } from '../ports/UserRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
-import { authConfig } from '../../shared/config/auth.config';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
 import { RefreshTokenRepositoryPort } from '../ports/RefreshTokenRepositoryPort';
-import { RefreshToken } from '../../domain/entities/RefreshToken';
-import { CreateRefreshTokenUseCase } from './CreateRefreshTokenUseCase';
-
-
+import { IRefreshAccessTokenUseCase } from '../ports/inbound/auth/IRefreshAccessTokenUseCase';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 
 @injectable()
-export class RefreshAccessTokenUseCase {
+export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
   constructor(
     @inject(TYPES.RefreshTokenRepositoryPort)
     private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
-
     @inject(TYPES.TokenServicePort)
     private readonly tokenService: TokenServicePort,
-
     @inject(TYPES.UserRepositoryPort)
     private readonly userRepository: UserRepositoryPort,
-    
-    @inject(TYPES.CreateRefreshTokenUseCase)
-    private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase,
+    @inject(TYPES.RefreshTokenService)
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async execute(plainToken: string): Promise<{
-  accessToken: string;
-  refreshToken: string;
-  refreshTokenExpiresAt: Date;
-}> {
+    accessToken: string;
+    refreshToken: string;
+    refreshTokenExpiresAt: Date;
+  }> {
+    const tokenHash     = this.tokenService.hashToken(plainToken);
+    const existingToken = await this.refreshTokenRepository.findByHash(tokenHash);
 
-  const tokenHash = this.tokenService.hashToken(plainToken);
+    if (!existingToken) {
+      throw new ApplicationError('TOKEN_INVALID', 'Invalid refresh token');
+    }
+    if (existingToken.expiresAt.getTime() < Date.now()) {
+      await this.refreshTokenRepository.revoke(tokenHash);
+      throw new ApplicationError('TOKEN_EXPIRED', 'Refresh token expired');
+    }
 
-  const existingToken =
-    await this.refreshTokenRepository.findByHash(tokenHash);
+    const user = await this.userRepository.findById(existingToken.userId);
+    if (!user || !user.id) {
+      await this.refreshTokenRepository.revoke(tokenHash);
+      throw new ApplicationError('USER_NOT_FOUND', 'User not found');
+    }
 
-  if (!existingToken) {
-    throw new AppError('Invalid refresh token', 401);
-  }
-
-  if (existingToken.expiresAt.getTime() < Date.now()) {
     await this.refreshTokenRepository.revoke(tokenHash);
-    throw new AppError('Refresh token expired', 401);
+
+    const accessToken = this.tokenService.generateAccessToken({
+      userId: user.id,
+      role:   user.role,
+    });
+    const { token: newRefreshToken, expiresAt: refreshTokenExpiresAt } =
+    await this.refreshTokenService.create(user.id);
+
+    return { accessToken, refreshToken: newRefreshToken, refreshTokenExpiresAt };
   }
-
-  const user = await this.userRepository.findById(existingToken.userId);
-
-  if (!user || !user.id) {
-    await this.refreshTokenRepository.revoke(tokenHash);
-    throw new AppError('User not found', 401);
-  }
-
-  // Revoke old refresh token
-  await this.refreshTokenRepository.revoke(tokenHash);
-
-  // Delegate creation of new refresh token
-  const {
-    token: newRefreshToken,
-    expiresAt: refreshTokenExpiresAt,
-  } = await this.createRefreshTokenUseCase.execute(user.id);
-
-  // Generate new access token
-  const accessToken = this.tokenService.generateAccessToken({
-    userId: user.id,
-    role: user.role,
-  });
-
-  return {
-    accessToken,
-    refreshToken: newRefreshToken,
-    refreshTokenExpiresAt,
-  };
-}
 }

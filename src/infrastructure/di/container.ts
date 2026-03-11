@@ -23,7 +23,6 @@ import { RequestSignupOtpUseCase } from '../../application/auth/RequestSignupOtp
 import { VerifySignupOtpUseCase } from '../../application/auth/VerifySignupOtpUseCase';
 import { RequestPasswordResetOtpUseCase } from '../../application/auth/RequestPasswordResetOtpUseCase';
 import { VerifyPasswordResetOtpUseCase } from '../../application/auth/VerifyPasswordResetOtpUseCase';
-import { CreateRefreshTokenUseCase } from '../../application/auth/CreateRefreshTokenUseCase';
 import { RefreshAccessTokenUseCase } from '../../application/auth/RefreshAccessTokenUseCase';
 import { RevokeRefreshTokenUseCase } from '../../application/auth/RevokeRefreshTokenUseCase';
 import { SignupUseCase } from '../../application/auth/SignupUseCase';
@@ -45,13 +44,7 @@ import { DeleteAvatarUseCase } from '../../application/profile/DeleteAvatarUseCa
 import { CreateCourseUseCase } from '../../application/course/CreateCourseUseCase';
 import { UpdateCourseUseCase } from '../../application/course/UpdateCourseUseCase';
 
-// Controllers
-import { LoginController } from '../../presentation/controllers/LoginController';
-import { SignupController } from '../../presentation/controllers/SignupController';
-import { PasswordResetController } from '../../presentation/controllers/PasswordResetController';
-import { InstructorController } from '../../presentation/controllers/InstructorController';
-import { ProfileController } from '../../presentation/controllers/ProfileController';
-import { CourseController } from '../../presentation/controllers/CourseController';
+
 
 // OAuth
 import { bindOAuthDependencies } from './oauthBindings';
@@ -79,6 +72,23 @@ import { ConfirmVideoUploadUseCase } from '../../application/course/ConfirmVideo
 import { ListPublicCoursesUseCase } from '../../application/course/ListPublicCoursesUseCase';
 import { GetPublicCourseUseCase } from '../../application/course/GetPublicCourseUseCase';
 
+import { bindPresentationDependencies } from '../../presentation/di/presentationBindings';
+
+import { RedisClientAdapter }        from '../redis/RedisClientAdapter';
+import { NodemailerEmailService }     from '../services/NodemailerEmailService';
+import { RedisClientPort }            from '../../application/ports/RedisClientPort';
+import { EmailServicePort }           from '../../application/ports/EmailServicePort';
+import { CryptoIdGenerator } from '../utils/CryptoIdGenerator';
+import { AppLoggerAdapter } from '../logging/AppLoggerAdapter';
+import { JwtConfig } from '../../shared/config/types/JwtConfig';
+import { EmailConfig } from '../../shared/config/types/EmailConfig';
+import { StorageConfig } from '../../shared/config/types/StorageConfig';
+import { storageConfig } from '../../shared/config/storage.config';
+import { env } from '../../shared/config/env';
+import { RefreshTokenService } from '../../application/services/RefreshTokenService';
+
+
+
 export const container = new Container();
 
 //  Repositories
@@ -92,12 +102,33 @@ container.bind(TYPES.CourseRepositoryPort).to(MongoCourseRepository);
 container.bind(TYPES.UserReaderPort).to(MongoUserRepository);
 container.bind(TYPES.UserWriterPort).to(MongoUserRepository);
 
+// Infrastructure config values 
+container.bind<JwtConfig>(TYPES.JwtConfig).toConstantValue({
+  secret:    env.jwtSecret,
+  expiresIn: env.jwtExpiresIn,
+});
+
+container.bind<EmailConfig>(TYPES.EmailConfig).toConstantValue({
+  user:     env.deepLearnEmail,
+  password: env.deepLearnPassword,
+});
+
+container.bind<StorageConfig>(TYPES.StorageConfig).toConstantValue({
+  region:          storageConfig.aws.region,
+  accessKeyId:     storageConfig.aws.accessKeyId,
+  secretAccessKey: storageConfig.aws.secretAccessKey,
+  bucketName:      storageConfig.aws.bucketName,
+});
 //  Services
 
 container.bind(TYPES.PasswordHasherPort).to(BcryptPasswordHasher);
 container.bind(TYPES.TokenServicePort).to(JwtTokenService);
 container.bind(TYPES.OtpServicePort).to(RedisOtpService);
 container.bind(TYPES.StorageServicePort).to(S3StorageService);
+container.bind<RedisClientPort>(TYPES.RedisClientPort).to(RedisClientAdapter).inSingletonScope();
+container.bind<EmailServicePort>(TYPES.EmailServicePort).to(NodemailerEmailService);
+
+container.bind(TYPES.LoggerPort).to(AppLoggerAdapter).inSingletonScope();
 
 //  Use Cases — Auth 
 
@@ -108,11 +139,11 @@ container.bind(TYPES.RequestSignupOtpUseCase).to(RequestSignupOtpUseCase);
 container.bind(TYPES.VerifySignupOtpUseCase).to(VerifySignupOtpUseCase);
 container.bind(TYPES.RequestPasswordResetOtpUseCase).to(RequestPasswordResetOtpUseCase);
 container.bind(TYPES.VerifyPasswordResetOtpUseCase).to(VerifyPasswordResetOtpUseCase);
-container.bind(TYPES.CreateRefreshTokenUseCase).to(CreateRefreshTokenUseCase);
 container.bind(TYPES.RefreshAccessTokenUseCase).to(RefreshAccessTokenUseCase);
 container.bind(TYPES.RevokeRefreshTokenUseCase).to(RevokeRefreshTokenUseCase);
 container.bind(TYPES.SignupUseCase).to(SignupUseCase);
 
+container.bind(TYPES.RefreshTokenService).to(RefreshTokenService);
 //  Use Cases — Instructor 
 
 container.bind(TYPES.ApplyForInstructorUseCase).to(ApplyForInstructorUseCase);
@@ -159,15 +190,11 @@ container.bind(TYPES.ConfirmVideoUploadUseCase).to(ConfirmVideoUploadUseCase);
 container.bind(TYPES.ListPublicCoursesUseCase).to(ListPublicCoursesUseCase);
 container.bind(TYPES.GetPublicCourseUseCase).to(GetPublicCourseUseCase);
 
-//  Controllers
+container.bind(TYPES.IdGeneratorPort).to(CryptoIdGenerator).inSingletonScope();
 
-container.bind(TYPES.LoginController).to(LoginController);
-container.bind(TYPES.SignupController).to(SignupController);
-container.bind(TYPES.PasswordResetController).to(PasswordResetController);
-container.bind(TYPES.InstructorController).to(InstructorController);
-container.bind(TYPES.ProfileController).to(ProfileController);
-container.bind(TYPES.CourseController).to(CourseController);
 
 //  OAuth
 
 bindOAuthDependencies(container);
+bindPresentationDependencies(container);
+

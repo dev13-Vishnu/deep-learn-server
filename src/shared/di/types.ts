@@ -13,6 +13,13 @@ export const TYPES = {
   PasswordHasherPort: Symbol.for('PasswordHasherPort'),
   TokenServicePort: Symbol.for('TokenServicePort'),
 
+  RedisClientPort:  Symbol.for('RedisClientPort'),
+  EmailServicePort: Symbol.for('EmailServicePort'),
+ RefreshTokenService:        Symbol.for('RefreshTokenService'),
+
+
+  LoggerPort: Symbol.for('LoggerPort'),
+
   // Use Cases — Auth
   LoginUserUseCase: Symbol.for('LoginUserUseCase'),
   ResetPasswordUseCase: Symbol.for('ResetPasswordUseCase'),
@@ -21,7 +28,6 @@ export const TYPES = {
   VerifySignupOtpUseCase: Symbol.for('VerifySignupOtpUseCase'),
   RequestPasswordResetOtpUseCase: Symbol.for('RequestPasswordResetOtpUseCase'),
   VerifyPasswordResetOtpUseCase: Symbol.for('VerifyPasswordResetOtpUseCase'),
-  CreateRefreshTokenUseCase: Symbol.for('CreateRefreshTokenUseCase'),
   RefreshAccessTokenUseCase: Symbol.for('RefreshAccessTokenUseCase'),
   RevokeRefreshTokenUseCase: Symbol.for('RevokeRefreshTokenUseCase'),
   SignupUseCase: Symbol.for('SignupUseCase'),
@@ -76,19 +82,20 @@ export const TYPES = {
 
   // Controllers
   AuthController: Symbol.for('AuthController'),
-  LoginController: Symbol.for('LoginController'),
-  SignupController: Symbol.for('SignupController'),
-  PasswordResetController: Symbol.for('PasswordResetController'),
-  InstructorController: Symbol.for('InstructorController'),
-  ProfileController: Symbol.for('ProfileController'),
-  CourseController: Symbol.for('CourseController'),
 
   // Storage
   StorageServicePort: Symbol.for('StorageServicePort'),
 
+  JwtConfig:     Symbol.for('JwtConfig'),
+  EmailConfig:   Symbol.for('EmailConfig'),
+  StorageConfig: Symbol.for('StorageConfig'),
+
   // Ports — split interfaces
   UserReaderPort: Symbol.for('UserReaderPort'),
   UserWriterPort: Symbol.for('UserWriterPort'),
+
+  IdGeneratorPort: Symbol.for('IdGeneratorPort'),
+
 
   // Ports — Course
   CourseRepositoryPort: Symbol.for('CourseRepositoryPort'),
@@ -99,7 +106,6 @@ export const TYPES = {
   OAuthProviderRegistry: Symbol.for('OAuthProviderRegistry'),
   InitiateOAuthUseCase: Symbol.for('InitiateOAuthUseCase'),
   HandleOAuthCallbackUseCase: Symbol.for('HandleOAuthCallbackUseCase'),
-  OAuthController: Symbol.for('OAuthController'),
   GoogleOAuthAdapter: Symbol.for('GoogleOAuthAdapter'),
   FacebookOAuthAdapter: Symbol.for('FacebookOAuthAdapter'),
   MicrosoftOAuthAdapter: Symbol.for('MicrosoftOAuthAdapter'),

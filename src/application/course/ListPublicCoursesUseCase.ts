@@ -6,13 +6,14 @@ import {
   ListPublicCoursesRequestDTO,
   ListPublicCoursesResponseDTO,
 } from '../dto/course/ListPublicCourses.dto';
+import { IListPublicCoursesUseCase } from '../ports/inbound/course/IListPublicCoursesUseCase';
 
 const DEFAULT_PAGE  = 1;
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT     = 50;
 
 @injectable()
-export class ListPublicCoursesUseCase {
+export class ListPublicCoursesUseCase implements IListPublicCoursesUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort

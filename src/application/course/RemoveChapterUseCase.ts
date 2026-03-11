@@ -1,15 +1,16 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../shared/di/types';
 import { CourseRepositoryPort } from '../ports/CourseRepositoryPort';
-import { AppError } from '../../shared/errors/AppError';
 import { DomainError } from '../../domain/errors/DomainError';
 import {
   RemoveChapterRequestDTO,
   RemoveChapterResponseDTO,
 } from '../dto/course/Chapter.dto';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { IRemoveChapterUseCase } from '../ports/inbound/course/IRemoveChapterUseCase';
 
 @injectable()
-export class RemoveChapterUseCase {
+export class RemoveChapterUseCase implements IRemoveChapterUseCase {
   constructor(
     @inject(TYPES.CourseRepositoryPort)
     private readonly courseRepository: CourseRepositoryPort
@@ -18,21 +19,18 @@ export class RemoveChapterUseCase {
   async execute(dto: RemoveChapterRequestDTO): Promise<RemoveChapterResponseDTO> {
     const course = await this.courseRepository.findByIdAndTutor(dto.courseId, dto.tutorId);
     if (!course) {
-      throw new AppError('Course not found', 404);
+      throw new ApplicationError('COURSE_NOT_FOUND', 'Course not found');
     }
 
     if (course.enrollmentCount > 0) {
-      throw new AppError(
-        'Cannot remove chapters from a course with enrolled students',
-        409
-      );
+      throw new ApplicationError('COURSE_HAS_ENROLLMENTS', 'Cannot delete/remove a course with enrolled students');
     }
 
     try {
       course.removeChapter(dto.moduleId, dto.lessonId, dto.chapterId);
     } catch (error: unknown) {
       if (error instanceof DomainError) {
-        throw new AppError(error.message, 400);
+        throw new ApplicationError('DOMAIN_RULE_VIOLATED', error.message);
       }
       throw error;
     }
